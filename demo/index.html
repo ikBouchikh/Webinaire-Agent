@@ -7,8 +7,31 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<section id="landing" class="landing">
+  <div class="l-top">
+    <span class="mark" aria-hidden="true"></span>
+    <span class="l-kicker">Webinaire · Agents IA : comment les intégrer concrètement dans votre quotidien ?</span>
+  </div>
+  <div class="l-grid">
+    <div class="l-copy">
+      <p class="l-eyebrow">Démonstration en direct</p>
+      <h1>Votre <em>copilote</em><br>de manager</h1>
+      <p class="l-lead">Un agent IA qui prépare, analyse et suit. <b>Vous gardez la main</b> sur chaque décision.</p>
+      <div class="badges">
+        <span class="badge">Données fictives</span>
+        <span class="badge badge-accent">Démo scénarisée</span>
+        <span class="badge badge-ok">Supervision humaine : active</span>
+      </div>
+    </div>
+    <div class="l-cards" id="lcards"></div>
+  </div>
+  <p class="l-foot">Touches 1 · 2 · 3 pour choisir une mission</p>
+</section>
+
+<div id="app" hidden>
 <header class="top">
   <div class="brand">
+    <button id="backBtn" class="back" title="Retour aux missions" aria-label="Retour aux missions"></button>
     <span class="mark" aria-hidden="true"></span>
     <span class="product">Le Copilote <b>du Manager</b></span>
   </div>
@@ -56,8 +79,10 @@
 <footer class="foot">
   Aller plus loin : la gamme de formations IA de Lefebvre Dalloz Compétences ·
   Démo scénarisée à vocation pédagogique, aucune donnée réelle n'est traitée.
-  <span class="keys">Raccourcis : 1 2 3 mission · Entrée lancer · F rapide · Échap réinitialiser</span>
+  <span class="keys">Raccourcis : 1 2 3 mission · Entrée lancer · H accueil · F rapide · Échap réinitialiser</span>
 </footer>
+
+</div><!-- /app -->
 
 <div id="gate" class="gate" hidden role="dialog" aria-modal="true" aria-labelledby="gateTitle">
   <div class="gate-card">

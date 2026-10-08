@@ -212,7 +212,34 @@ function reset() {
 
 function select(key) {
   if (running) return;
-  current = key; scen = 0; reset();
+  current = key; scen = 0;
+  showApp();
+  reset();
+}
+
+function showApp() {
+  $('#landing').hidden = true;
+  $('#app').hidden = false;
+  window.scrollTo(0, 0);
+}
+
+function showLanding() {
+  if (running) return;
+  $('#app').hidden = true;
+  $('#landing').hidden = false;
+  window.scrollTo(0, 0);
+}
+
+function renderLanding() {
+  const box = $('#lcards');
+  box.innerHTML = '';
+  Object.entries(MISSIONS).forEach(([key, m], i) => {
+    const b = document.createElement('button');
+    b.className = 'lcard';
+    b.innerHTML = `<span class="ln">0${i + 1}</span><span class="lt">${m.name}</span><span class="ls">${m.sub}</span><span class="go"></span>`;
+    b.onclick = () => select(key);
+    box.appendChild(b);
+  });
 }
 
 function setStatus(text, cls) {
@@ -313,12 +340,15 @@ async function run() {
 $('#runBtn').onclick = run;
 $('#resetBtn').onclick = reset;
 $('#printBtn').onclick = () => window.print();
+$('#backBtn').onclick = showLanding;
 
 document.addEventListener('keydown', (e) => {
   if ($('#gate').hidden === false || e.target.isContentEditable) return;
   const keys = Object.keys(MISSIONS);
   if (['1', '2', '3'].includes(e.key)) select(keys[Number(e.key) - 1]);
+  else if (!$('#landing').hidden) return;
   else if (e.key === 'Enter') run();
+  else if (e.key.toLowerCase() === 'h') showLanding();
   else if (e.key === 'Escape') reset();
   else if (e.key.toLowerCase() === 'f') {
     speed = speed === 1 ? 0.35 : 1;
@@ -326,5 +356,6 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+renderLanding();
 renderMissions();
 renderInput();
