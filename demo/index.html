@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le Copilote du Manager</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="mark" aria-hidden="true"></span>
+    <span class="product">Le Copilote <b>du Manager</b></span>
+  </div>
+  <div class="badges">
+    <span class="badge">Données fictives</span>
+    <span class="badge badge-accent">Démo scénarisée</span>
+    <span class="badge badge-ok">Supervision humaine : active</span>
+  </div>
+</header>
+
+<nav id="missions" class="missions" aria-label="Missions"></nav>
+
+<main class="grid">
+  <section class="col">
+    <article class="panel" id="inputPanel">
+      <h2>Situation du manager</h2>
+      <div id="chips" class="chips"></div>
+      <pre id="inputText" class="input-text"></pre>
+      <div class="actions">
+        <button id="runBtn" class="btn btn-primary">Lancer l'agent</button>
+        <button id="resetBtn" class="btn btn-ghost">Réinitialiser</button>
+      </div>
+    </article>
+
+    <article class="panel" id="activityPanel">
+      <h2>L'agent au travail <span id="status" class="status">en attente</span></h2>
+      <ol id="steps" class="steps"></ol>
+      <p id="stepsEmpty" class="muted">Les étapes et les outils utilisés par l'agent s'afficheront ici en direct.</p>
+    </article>
+  </section>
+
+  <section class="col">
+    <article class="panel result" id="resultPanel">
+      <div class="result-head">
+        <h2>Livrable</h2>
+        <button id="printBtn" class="btn btn-ghost small" hidden>Exporter en PDF</button>
+      </div>
+      <div id="result" class="result-body">
+        <p class="muted">Choisissez une mission, puis lancez l'agent. Le livrable apparaîtra ici.</p>
+      </div>
+    </article>
+  </section>
+</main>
+
+<footer class="foot">
+  Aller plus loin : la gamme de formations IA de Lefebvre Dalloz Compétences ·
+  Démo scénarisée à vocation pédagogique, aucune donnée réelle n'est traitée.
+  <span class="keys">Raccourcis : 1 2 3 mission · Entrée lancer · F rapide · Échap réinitialiser</span>
+</footer>
+
+<div id="gate" class="gate" hidden role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+  <div class="gate-card">
+    <p class="gate-tag">Validation humaine requise</p>
+    <h3 id="gateTitle"></h3>
+    <p id="gateBody"></p>
+    <div class="gate-actions">
+      <button class="btn btn-primary" data-choice="ok">Valider (V)</button>
+      <button class="btn btn-secondary" data-choice="edit">Modifier (M)</button>
+      <button class="btn btn-ghost" data-choice="no">Refuser (R)</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
