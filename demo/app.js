@@ -10,6 +10,80 @@ const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>':
 /* ---------- Contenu des missions ---------- */
 
 const MISSIONS = {
+  journee: {
+    name: 'Ma journée', sub: 'Agenda, mails et Teams en 30 secondes',
+    connectors: ['Agenda', 'Messagerie', 'Teams'],
+    scenarios: [
+      {
+        chip: 'Jeudi 15 octobre',
+        input: `Jeudi 15 octobre 2026 — 7 h 55.
+Vous demandez : « Prépare ma journée. »
+
+Accès accordés à l'agent :
+• Agenda : lecture seule
+• Messagerie : lecture seule
+• Teams : lecture seule
+
+Aucune action n'est exécutée sans votre validation.`,
+        steps: [
+          ['connecter_agenda()', 'Connexion à l\'agenda (lecture seule) : 6 rendez-vous aujourd\'hui', 1200, '', 'Agenda'],
+          ['connecter_messagerie()', 'Connexion à la messagerie (lecture seule) : 12 mails non lus analysés', 1200, '', 'Messagerie'],
+          ['connecter_teams()', 'Connexion à Teams (lecture seule) : 7 messages non lus analysés', 1100, '', 'Teams'],
+          ['croiser_sources()', 'Rapprochement des rendez-vous avec les mails et les messages', 1400],
+          ['detecter_conflits()', '1 conflit d\'agenda : comité 14 h / point Atlas 14 h 30', 1000, 'warn'],
+          ['evaluer_urgence()', 'Tri : 2 mails urgents et 2 messages Teams urgents retenus', 1200],
+          ['preparer_rdv()', '4 rendez-vous à préparer : fiches générées', 1500],
+          ['verifier_perimetre()', 'Lecture seule respectée : 2 actions proposées, en attente de votre accord', 900, 'warn'],
+        ],
+        gate: {
+          title: 'Appliquer 2 actions proposées ?',
+          body: 'Décaler le point Atlas à 15 h 15 et répondre à Marc sur Teams. Rien ne part sans votre accord : jusqu\'ici, l\'agent n\'a fait que lire.',
+        },
+        blocks: () => [
+          `<h3>Votre journée en bref</h3><div class="stats">
+            <div class="stat"><b>6</b><span>rendez-vous</span></div>
+            <div class="stat"><b>4</b><span>à préparer</span></div>
+            <div class="stat"><b>1</b><span>conflit d'agenda</span></div>
+            <div class="stat"><b>2</b><span>mails urgents</span></div>
+            <div class="stat"><b>2</b><span>messages Teams urgents</span></div>
+          </div><p class="muted">Environ 1 h de préparation au total. Vous avez 2 h de libre entre 12 h et 14 h.</p>`,
+          `<h3>Dans cet ordre</h3><ol>
+            <li><b>09 h 30</b> (20 min) : préparer l'entretien de Camille.</li>
+            <li><b>10 h 50</b> (10 min) : répondre à la direction financière sur le budget, et décider votre position avant l'appel Delmas.</li>
+            <li><b>12 h 15</b> (25 min) : relire la note de cadrage de Sofia, puis préparer le comité de 14 h.</li>
+            <li><b>15 h 45</b> (10 min) : préparer le point RH de 16 h.</li>
+          </ol>`,
+          `<h3>Votre agenda</h3>
+          <div class="rdv"><span class="h">09:00</span><div><span class="rt">Point hebdo de l'équipe</span> <span class="tag">Routine</span><p class="muted">Rien à préparer. Pensez à annoncer le comité de 14 h.</p></div></div>
+          <div class="rdv"><span class="h">10:00</span><div><span class="rt">Entretien annuel : Camille</span> <span class="tag hi">À préparer</span><ul><li>Guide prêt : +12 % d'objectifs à valoriser, reporting à traiter sans en faire le centre.</li><li>Le créneau est de 45 min, pas 1 h : réduisez le bilan à 10 minutes.</li><li>Aucune promesse de promotion sans validation RH.</li></ul></div></div>
+          <div class="rdv"><span class="h">11:30</span><div><span class="rt">Appel fournisseur Delmas</span> <span class="tag hi">À préparer</span><ul><li>Mail de 6 h 40 : nouvelle grille tarifaire à +4 %, signature prévue vendredi.</li><li>Décidez votre position avant l'appel : accepter, négocier ou comparer.</li></ul></div></div>
+          <div class="rdv"><span class="h">14:00</span><div><span class="rt">Comité de pilotage « Nouveau parcours client »</span> <span class="tag hi">À préparer</span><ul><li>Le budget n'est pas validé par la direction : réponse attendue avant 12 h.</li><li>La note de cadrage de Sofia est prête et attend votre relecture avant 13 h.</li><li>Prévoyez un plan B si le budget n'est pas validé : pilote réduit ou décalage. Vous décidez.</li></ul></div></div>
+          <div class="rdv conflict"><span class="h">14:30</span><div><span class="rt">Point client Atlas</span> <span class="tag chk">Conflit</span><p class="muted">Chevauche le comité. Proposition : décaler à 15 h 15, créneau libre. Brouillon d'invitation prêt, en attente de votre accord.</p></div></div>
+          <div class="rdv"><span class="h">16:00</span><div><span class="rt">Point RH : absentéisme</span> <span class="tag hi">À préparer</span><ul><li>Données de l'enquête prêtes : charge de travail 2,9 sur 5, absentéisme de 3,1 % à 4,8 %.</li><li>Échantillon de 12 personnes : ce sont des pistes à vérifier, pas des preuves.</li></ul></div></div>`,
+          `<h3>Mails à traiter (2 urgents)</h3>
+          <div class="urg"><small>Direction financière · 7 h 12 · <b>Urgent</b></small><br><b>Budget « Nouveau parcours client » : décision avant 12 h</b><br><span class="muted">Conditionne le comité de 14 h.</span></div>
+          <div class="urg"><small>Delmas · 6 h 40 · <b>Urgent</b></small><br><b>Nouvelle grille tarifaire : signature vendredi</b><br><span class="muted">À trancher avant l'appel de 11 h 30.</span></div>
+          <div class="urg mid"><small>Ressources humaines · hier · Cette semaine</small><br><b>Entretiens annuels : saisie avant vendredi 16/10</b><br><span class="muted">À saisir après l'entretien de Camille.</span></div>
+          <p class="muted">9 autres mails (newsletters, informations) classés sans urgence.</p>`,
+          `<h3>Teams (2 urgents)</h3>
+          <div class="urg"><small>Marc · 7 h 48 · <b>Urgent</b></small><br>« Le budget n'est toujours pas validé, on maintient le comité de 14 h ? »</div>
+          <div class="urg"><small>Sofia · 7 h 31 · <b>Urgent</b></small><br>« La note de cadrage est prête, tu peux la relire avant 13 h ? »</div>
+          <div class="urg mid"><small>Karim · hier 18 h 02 · Aujourd'hui</small><br>« L'une des deux agences pilotes demande de reporter la visite. »</div>
+          <p class="muted">4 autres messages classés sans urgence.</p>`,
+          `<h3>Actions proposées (brouillons)</h3><div class="mail" id="mail"><span class="subj">1. Invitation à Atlas : décalage du point</span>Bonjour, un imprévu m'oblige à décaler notre point de 14 h 30 à 15 h 15 (même durée). Ce créneau vous convient-il ?
+
+<span class="subj">2. Teams à Marc</span>Je relance la direction financière ce matin. On maintient le comité à 14 h, je te confirme avant 12 h.</div>`,
+          `<div class="callout"><b>Périmètre de l'agent.</b> Il a lu votre agenda, vos mails et vos messages Teams, sans rien modifier. Il n'a pas ouvert les mails personnels ni les contenus RH sensibles : seul l'objet a été lu. Vous décidez de chaque réponse.</div>`,
+        ],
+        after: {
+          ok: ['ok', '<b>Validé par vous.</b> Point Atlas décalé à 15 h 15 et réponse envoyée à Marc. <i>(Simulation : rien n\'a réellement été modifié ni envoyé.)</i>'],
+          edit: ['ok', '<b>Version modifiée par vous, puis validée.</b> Actions appliquées. <i>(Simulation : rien n\'a réellement été modifié ni envoyé.)</i>'],
+          no: ['', '<b>Actions refusées.</b> L\'agenda et Teams n\'ont pas été modifiés : les brouillons restent à votre disposition.'],
+        },
+      },
+    ],
+  },
+
   preparer: {
     name: 'Préparer', sub: 'Un entretien ou une annonce délicate',
     scenarios: [
@@ -197,6 +271,15 @@ function renderInput() {
     });
   }
   $('#inputText').textContent = m.scenarios[scen].input;
+  const cn = $('#connectors');
+  cn.innerHTML = '';
+  (m.connectors || []).forEach((name) => {
+    const s = document.createElement('span');
+    s.className = 'conn';
+    s.dataset.name = name;
+    s.textContent = name;
+    cn.appendChild(s);
+  });
 }
 
 function reset() {
@@ -281,7 +364,7 @@ async function run() {
   $('#printBtn').hidden = true;
   setStatus('en cours…', 'run');
 
-  for (const [tool, desc, ms, kind] of sc.steps) {
+  for (const [tool, desc, ms, kind, conn] of sc.steps) {
     const li = document.createElement('li');
     li.className = 'step' + (kind === 'warn' ? ' warn' : '');
     li.innerHTML = `<span class="ico"></span><div class="body"><span class="tool">${esc(tool)}</span><span class="desc">${esc(desc)}</span></div><time></time>`;
@@ -290,6 +373,7 @@ async function run() {
     const t0 = performance.now();
     await sleep(ms);
     li.classList.add('done');
+    if (conn) document.querySelectorAll('.conn').forEach((c) => { if (c.dataset.name === conn) c.classList.add('on'); });
     li.querySelector('time').textContent = ((performance.now() - t0) / 1000).toFixed(1).replace('.', ',') + ' s';
   }
 
@@ -345,7 +429,7 @@ $('#backBtn').onclick = showLanding;
 document.addEventListener('keydown', (e) => {
   if ($('#gate').hidden === false || e.target.isContentEditable) return;
   const keys = Object.keys(MISSIONS);
-  if (['1', '2', '3'].includes(e.key)) select(keys[Number(e.key) - 1]);
+  if (['1', '2', '3', '4'].includes(e.key)) select(keys[Number(e.key) - 1]);
   else if (!$('#landing').hidden) return;
   else if (e.key === 'Enter') run();
   else if (e.key.toLowerCase() === 'h') showLanding();

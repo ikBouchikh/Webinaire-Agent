@@ -34,7 +34,7 @@ body::before{content:"";position:fixed;left:0;top:12vh;bottom:12vh;width:14px;ba
 .mission:hover{background:rgba(255,255,255,.85)}
 .mission.active{border-color:var(--ink);background:#fff;box-shadow:0 6px 18px rgba(59,10,10,.12)}
 .mission .num{flex:none;display:grid;place-items:center;width:2.6rem;height:2.6rem;border-radius:50%;background:var(--red);color:#fff;font-weight:700;font-size:.95rem}
-.mission:nth-child(2) .num{background:var(--peach);color:var(--ink)}
+.mission:nth-child(even) .num{background:var(--peach);color:var(--ink)}
 .mission .m-title{display:block;font-size:1.3rem;font-weight:700}
 .mission .m-sub{display:block;color:var(--muted);font-size:.78rem}
 
@@ -152,3 +152,39 @@ table.t td{padding:.45rem .5rem;border-bottom:1px solid var(--line);vertical-ali
 
 .back{width:2.1rem;height:2.1rem;border-radius:50%;background:var(--black);border:0;cursor:pointer;position:relative;flex:none}
 .back::after{content:"";position:absolute;left:.85rem;top:.72rem;width:.55rem;height:.55rem;border:solid #fff;border-width:0 0 2px 2px;transform:rotate(45deg)}
+
+/* ---------- 4 missions à l'accueil ---------- */
+.l-grid{grid-template-columns:minmax(0,.75fr) minmax(0,1.9fr)}
+.l-cards{grid-template-columns:repeat(4,1fr);gap:1.1rem}
+@media(max-width:1300px){.l-cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.l-cards{grid-template-columns:1fr}}
+.lcard{min-height:clamp(17rem,48vh,24rem)}
+.lcard:nth-child(2){transform:translateY(2rem) rotate(1.1deg);background:var(--peach);color:var(--ink);box-shadow:0 22px 40px -18px rgba(150,70,0,.5)}
+.lcard:nth-child(3){transform:rotate(-.8deg);background:var(--red);color:#fff}
+.lcard:nth-child(4){transform:translateY(2rem) rotate(1.2deg);background:var(--peach);color:var(--ink);box-shadow:0 22px 40px -18px rgba(150,70,0,.5)}
+.lcard:nth-child(1){transform:rotate(-1.4deg)}
+.lcard:hover,.lcard:focus-visible{transform:translateY(-.5rem) rotate(0)}
+.lcard .lt{font-size:clamp(1.4rem,1.9vw,2rem)}
+
+/* ---------- Mission « Ma journée » ---------- */
+.connectors{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.7rem}
+.connectors:empty{display:none}
+.conn{font-size:.78rem;padding:.25rem .8rem .25rem 1.6rem;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:#fff;position:relative;transition:.3s}
+.conn::before{content:"";position:absolute;left:.65rem;top:50%;width:.55rem;height:.55rem;margin-top:-.275rem;border-radius:50%;background:#c9bdb5}
+.conn.on{color:var(--ok);border-color:var(--ok)}
+.conn.on::before{background:var(--ok)}
+.conn.on::after{content:" · connecté";color:var(--ok)}
+.stats{display:flex;gap:.6rem;flex-wrap:wrap;margin:.3rem 0 .5rem}
+.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:.5rem .85rem;min-width:5.6rem}
+.stat b{display:block;font-size:1.9rem;line-height:1.05;color:var(--red-d);font-weight:700}
+.stat span{font-size:.72rem;color:var(--muted)}
+.rdv{display:grid;grid-template-columns:3.6rem minmax(0,1fr);gap:.8rem;padding:.65rem 0;border-bottom:1px solid var(--line)}
+.rdv .h{font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
+.rdv .rt{font-weight:700;margin-right:.3rem}
+.rdv p{margin:.2rem 0 0}
+.rdv ul{margin:.3rem 0 0;padding-left:1.1rem}
+.rdv.conflict{background:var(--peach-l);margin:0 -.5rem;padding:.65rem .5rem;border-radius:10px}
+.urg{background:#fff;border:1px solid var(--line);border-left:5px solid var(--red);border-radius:10px;padding:.55rem .85rem;margin:.45rem 0}
+.urg.mid{border-left-color:var(--peach)}
+.urg small{color:var(--muted)}
+.mail .subj{margin-top:.2rem}

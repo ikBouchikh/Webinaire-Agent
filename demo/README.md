@@ -17,13 +17,14 @@ Cela reste honnête vis-à-vis des participants et renforce votre message sur la
 ## Raccourcis (pratique en direct)
 | Touche | Action |
 |---|---|
-| `1` `2` `3` | Choisir la mission |
+| `1` `2` `3` `4` | Choisir la mission |
 | `Entrée` | Lancer l'agent |
 | `V` `M` `R` | Valider / Modifier / Refuser (fenêtre de validation) |
 | `F` | Mode rapide (×3) en cas de manque de temps |
 | `Échap` | Réinitialiser |
 
-## Déroulé conseillé (≈ 8 min)
+## Déroulé conseillé (≈ 10 min)
+0. **Ma journée (2 min), l'ouverture.** « Prépare ma journée. » Regardez les trois connecteurs passer au vert (agenda, messagerie, Teams, en lecture seule). L'agent repère un conflit d'agenda, trie l'urgent, prépare les rendez-vous et propose 2 actions. La fenêtre de validation arrive : vous décidez.
 1. **Préparer (3 min).** « Camille, entretien annuel. » Lancez, commentez les étapes (*l'agent lit, consulte un référentiel, identifie les enjeux, rédige, puis vérifie*). Montrez l'encadré orange : l'agent signale ce qu'il ne peut pas décider.
 2. **Analyser (2 min).** Le graphique apparaît. Insistez sur la dernière étape : *« L'agent ne conclut pas à la place du manager »* (échantillon de 12, corrélation ≠ causalité).
 3. **Suivre (3 min).** Le moment fort : la fenêtre rouge **« Validation humaine requise »**. Faites voter la salle : valider, modifier ou refuser. Montrez le refus pour prouver que rien ne part sans vous.
