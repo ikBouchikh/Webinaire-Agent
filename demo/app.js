@@ -11,11 +11,13 @@ const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>':
 
 const MISSIONS = {
   journee: {
-    name: 'Ma journée', sub: 'Agenda, mails et Teams en 30 secondes',
-    connectors: ['Agenda', 'Messagerie', 'Teams'],
+    name: 'Ma journée', sub: 'Agenda, mails et Teams, puis votre équipe',
     scenarios: [
       {
-        chip: 'Jeudi 15 octobre',
+        chip: 'Ma journée',
+        connectors: ['Agenda', 'Messagerie', 'Teams'],
+        next: 1,
+        nextLabel: 'Et pour mon équipe ? Intégrer cet agent',
         input: `Jeudi 15 octobre 2026 — 7 h 55.
 Vous demandez : « Prépare ma journée. »
 
@@ -79,6 +81,70 @@ Aucune action n'est exécutée sans votre validation.`,
           ok: ['ok', '<b>Validé par vous.</b> Point Atlas décalé à 15 h 15 et réponse envoyée à Marc. <i>(Simulation : rien n\'a réellement été modifié ni envoyé.)</i>'],
           edit: ['ok', '<b>Version modifiée par vous, puis validée.</b> Actions appliquées. <i>(Simulation : rien n\'a réellement été modifié ni envoyé.)</i>'],
           no: ['', '<b>Actions refusées.</b> L\'agenda et Teams n\'ont pas été modifiés : les brouillons restent à votre disposition.'],
+        },
+      },
+      {
+        chip: 'Dans mon équipe',
+        input: `Vous demandez : « Comment intégrer cet agent dans mon équipe ? »
+
+Contexte (fictif) :
+• Équipe de 8 personnes, projet « Nouveau parcours client ».
+• 12 tâches récurrentes recensées : préparation des 1-to-1, comptes rendus, suivi des actions, tri des mails, synthèses d'enquête, point budget, etc.
+• Objectif : gagner du temps sans perdre le contrôle ni la confiance de l'équipe.`,
+        steps: [
+          ['cartographier_taches()', 'Analyse des 12 tâches récurrentes de l\'équipe', 1300],
+          ['evaluer_risques()', 'Notation de chaque tâche : sensibilité des données, impact d\'une erreur, volume', 1500],
+          ['definir_roles()', 'Qui exécute, qui valide, qui décide', 1200],
+          ['planifier_deploiement()', 'Déploiement progressif en 4 étapes sur 8 semaines', 1400],
+          ['rediger_charte()', 'Charte d\'usage de l\'équipe en 5 règles', 1300],
+          ['definir_indicateurs()', '4 indicateurs pour savoir si cela fonctionne', 1000],
+          ['verifier_cadre()', 'Points à valider hors de l\'équipe : sécurité des données, RH, instances', 1000, 'warn'],
+        ],
+        gate: {
+          title: 'Annoncer ce test à votre équipe ?',
+          body: 'L\'agent a rédigé le message d\'annonce pour vos 8 collaborateurs. Rien ne part sans votre accord : l\'équipe doit savoir ce que l\'agent fait et ne fait pas.',
+        },
+        blocks: () => [
+          `<h3>Où l'agent aide, où il s'arrête</h3><div class="trio">
+            <div class="tcol t1"><b>Déléguer</b><small>Fort volume, faible risque</small><ul><li>Brief du matin</li><li>Actions extraites des comptes rendus</li><li>Tri des mails</li><li>Mise en forme des synthèses</li></ul></div>
+            <div class="tcol t2"><b>Superviser</b><small>L'agent propose, vous validez</small><ul><li>Réponses aux mails et à Teams</li><li>Décalage d'un rendez-vous</li><li>Guide d'entretien</li><li>Analyse d'enquête</li></ul></div>
+            <div class="tcol t3"><b>Garder humain</b><small>Jugement, confiance, enjeu fort</small><ul><li>Promotion, rémunération, sanction</li><li>Annonces sensibles</li><li>Arbitrage du budget</li><li>Retour individuel</li></ul></div>
+          </div>`,
+          `<h3>Un déploiement progressif</h3><div class="phases">
+            <div class="ph"><span class="c">01</span><b>Observer</b><small>Semaines 1 à 2</small><p>Lecture seule. Vous comparez ses synthèses aux vôtres.</p></div>
+            <div class="ph"><span class="c">02</span><b>Proposer</b><small>Semaines 3 à 4</small><p>Brouillons de mails et de comptes rendus, toujours relus.</p></div>
+            <div class="ph"><span class="c">03</span><b>Agir avec accord</b><small>Semaines 5 à 6</small><p>Actions simples, validées d'un clic.</p></div>
+            <div class="ph"><span class="c">04</span><b>Bilan</b><small>Semaines 7 à 8</small><p>Avec l'équipe : étendre, restreindre ou arrêter.</p></div>
+          </div><p class="muted">Exemple de critère pour passer à l'étape suivante : l'agent repère les mêmes priorités que vous 9 fois sur 10. À fixer avec votre équipe.</p>`,
+          `<h3>Charte d'usage de l'équipe</h3><ol>
+            <li><b>Données :</b> aucune donnée personnelle ou confidentielle en dehors du périmètre validé.</li>
+            <li><b>Validation :</b> toute action visible de l'extérieur (envoi, modification, publication) passe par un humain.</li>
+            <li><b>Relecture :</b> chaque production est relue avant usage, et les erreurs sont signalées.</li>
+            <li><b>Transparence :</b> on dit quand l'IA a contribué, à l'équipe comme aux clients.</li>
+            <li><b>Liberté :</b> chacun peut signaler un malaise ou demander une pause, et le dispositif s'adapte.</li>
+          </ol>`,
+          `<h3>Comment savoir si ça marche</h3><div class="stats">
+            <div class="stat wide"><span>Temps de préparation par semaine</span></div>
+            <div class="stat wide"><span>Propositions validées, modifiées ou refusées</span></div>
+            <div class="stat wide"><span>Erreurs repérées avant envoi</span></div>
+            <div class="stat wide"><span>Ressenti de l'équipe (3 questions par mois)</span></div>
+          </div><p class="muted">À mesurer dès la semaine 1 : sans point de départ, on ne peut pas montrer le gain.</p>`,
+          `<h3>Compétences à développer</h3><div class="chipset"><span>Formuler une demande claire</span><span>Vérifier une réponse</span><span>Décider avec l'IA, pas à sa place</span><span>Protéger les données</span><span>Animer le collectif</span></div>`,
+          `<h3>Message d'annonce à l'équipe (brouillon)</h3><div class="mail" id="mail"><span class="subj">Objet : Nous testons un assistant IA pour préparer nos journées et nos suivis</span>Bonjour à toutes et à tous,
+
+À partir de lundi, et pendant 8 semaines, nous testons un assistant IA. Il lit l'agenda, les mails et les comptes rendus que je lui ouvre, puis prépare des synthèses et des brouillons.
+
+Ce qu'il ne fait pas : il n'envoie rien et ne décide rien sans mon accord, et il n'a accès à aucun sujet RH individuel.
+
+Vous pouvez poser vos questions, signaler une erreur ou demander une pause à tout moment. Nous ferons le bilan ensemble à la fin de la 8e semaine.
+
+[Votre prénom]</div>`,
+          `<div class="callout"><b>À vérifier hors de l'équipe.</b> Selon votre entreprise : l'outil doit être autorisé par la sécurité et la protection des données, la politique interne sur l'IA doit être respectée, et les représentants du personnel peuvent devoir être informés. L'agent ne peut pas le trancher.</div>`,
+        ],
+        after: {
+          ok: ['ok', '<b>Validé par vous.</b> Message d\'annonce envoyé aux 8 collaborateurs et plan de déploiement enregistré. <i>(Simulation : rien n\'a réellement été envoyé.)</i>'],
+          edit: ['ok', '<b>Version modifiée par vous, puis validée.</b> Annonce envoyée à l\'équipe. <i>(Simulation : rien n\'a réellement été envoyé.)</i>'],
+          no: ['', '<b>Envoi refusé.</b> Rien n\'a été envoyé à l\'équipe : le plan et le brouillon restent à votre disposition.'],
         },
       },
     ],
@@ -273,7 +339,7 @@ function renderInput() {
   $('#inputText').textContent = m.scenarios[scen].input;
   const cn = $('#connectors');
   cn.innerHTML = '';
-  (m.connectors || []).forEach((name) => {
+  (m.scenarios[scen].connectors || []).forEach((name) => {
     const s = document.createElement('span');
     s.className = 'conn';
     s.dataset.name = name;
@@ -345,6 +411,7 @@ function gate({ title, body }) {
     };
     const onKey = (e) => {
       const k = e.key.toLowerCase();
+      if (['v', 'm', 'r'].includes(k)) e.preventDefault();
       if (k === 'v') done('ok'); else if (k === 'm') done('edit'); else if (k === 'r') done('no');
     };
     g.querySelectorAll('button').forEach((b) => (b.onclick = () => done(b.dataset.choice)));
@@ -413,6 +480,14 @@ async function run() {
     c.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
 
+  if (sc.next !== undefined) {
+    const nx = document.createElement('div');
+    nx.className = 'blk next';
+    nx.innerHTML = `<button class="btn btn-primary" id="nextBtn">${sc.nextLabel} →</button>`;
+    res.appendChild(nx);
+    nx.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    $('#nextBtn').onclick = () => { scen = sc.next; renderInput(); run(); };
+  }
   setStatus('terminé', 'done');
   $('#printBtn').hidden = false;
   $('#runBtn').disabled = false;
