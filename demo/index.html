@@ -10,22 +10,23 @@
 <section id="landing" class="landing">
   <div class="l-top">
     <span class="mark" aria-hidden="true"></span>
-    <span class="l-kicker">Webinaire · Agents IA : comment les intégrer concrètement dans votre quotidien ?</span>
+    <span class="l-kicker">Webinaire du 15 octobre 2026 · Sabrine Bendimerad & Ikram Bouchikh · Lefebvre Dalloz Compétences</span>
   </div>
   <div class="l-grid">
     <div class="l-copy">
-      <p class="l-eyebrow">Démonstration en direct</p>
-      <h1>Votre <em>copilote</em><br>de manager</h1>
-      <p class="l-lead">Un agent IA qui prépare, analyse et suit. <b>Vous gardez la main</b> sur chaque décision.</p>
+      <p class="l-eyebrow">Démonstration · Comprendre, déléguer, encadrer</p>
+      <h1>Intégrer un <em>agent</em> dans votre équipe</h1>
+      <p class="l-lead">Le cas de Claire, manager de 8 personnes : choisir, déléguer, encadrer, déployer. <b>Vous gardez la main</b> à chaque étape.</p>
       <div class="badges">
         <span class="badge">Données fictives</span>
         <span class="badge badge-accent">Démo scénarisée</span>
         <span class="badge badge-ok">Supervision humaine : active</span>
       </div>
+      <p class="l-bonus">Bonus : <button id="bonusBtn" class="linklike">ma journée de manager (agenda, mails, Teams) →</button></p>
     </div>
     <div class="l-cards" id="lcards"></div>
   </div>
-  <p class="l-foot">Touches 1 · 2 · 3 · 4 pour choisir une mission</p>
+  <p class="l-foot">Touches 1 · 2 · 3 · 4 pour choisir une étape · 5 pour le bonus</p>
 </section>
 
 <div id="app" hidden>
@@ -47,9 +48,10 @@
 <main class="grid">
   <section class="col">
     <article class="panel" id="inputPanel">
-      <h2>Situation du manager</h2>
+      <h2 id="inputTitle">Situation du manager</h2>
       <div id="chips" class="chips"></div>
       <div id="connectors" class="connectors"></div>
+      <div id="autonomy" class="autonomy"></div>
       <pre id="inputText" class="input-text"></pre>
       <div class="actions">
         <button id="runBtn" class="btn btn-primary">Lancer l'agent</button>
@@ -80,7 +82,7 @@
 <footer class="foot">
   Aller plus loin : la gamme de formations IA de Lefebvre Dalloz Compétences ·
   Démo scénarisée à vocation pédagogique, aucune donnée réelle n'est traitée.
-  <span class="keys">Raccourcis : 1 2 3 4 mission · Entrée lancer · H accueil · F rapide · Échap réinitialiser</span>
+  <span class="keys">Raccourcis : 1 2 3 4 5 mission · ← → niveau d'autonomie · Entrée lancer · H accueil · F rapide · Échap réinitialiser</span>
 </footer>
 
 </div><!-- /app -->
