@@ -1,0 +1,1405 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Univers Techno Numérique 2027</title>
+<meta name="description" content="Exploration 3D des galaxies, métiers, compétences et formations Technologies Numériques 2027 de Lefebvre Dalloz Compétences.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  /* Plan : cosmos WebGL plein écran, HUD en verre dépoli posé sur les bords, la caméra vole Univers → Galaxie → Planète → Lune. */
+  --void:#080205;
+  --wine:#1c040b;
+  --wine-lit:#4a0711;
+  --bordeaux:#98000d;
+  --ember:#e0303f;
+  --beige:#f5f0e5;
+  --champagne:#e8cfa8;
+  --line:rgba(245,240,229,.16);
+  --line-strong:rgba(245,240,229,.34);
+  --txt-2:rgba(245,240,229,.76);
+  --txt-3:rgba(245,240,229,.56);
+  --glass:linear-gradient(155deg,rgba(66,8,22,.58),rgba(14,3,8,.78));
+  --f-display:"Fraunces","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --f-body:"Manrope","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --gut-l:max(24px,env(safe-area-inset-left,0px));
+  --gut-r:max(24px,env(safe-area-inset-right,0px));
+  --ease:cubic-bezier(.2,.8,.2,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
+html,body{height:100%;overflow:hidden;background:var(--void);color:var(--beige);font-family:var(--f-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:inherit}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--beige);outline-offset:3px;border-radius:10px}
+svg{display:block;flex:none}
+#gl,#warp{position:fixed;inset:0;width:100%;height:100%;display:block}
+#gl{z-index:0;cursor:grab;touch-action:none}
+#gl.hot{cursor:pointer}
+#gl.drag{cursor:grabbing}
+#warp{z-index:3;pointer-events:none}
+#labels{position:fixed;inset:0;z-index:5;pointer-events:none;transition:opacity .45s ease}
+#labels.flying{opacity:0}
+#ui{position:fixed;inset:0;z-index:10;pointer-events:none}
+#ui button,#ui a,#ui .glass,#ui input,#labels button{pointer-events:auto}
+
+/* ---------- Chargement ---------- */
+#loader{position:fixed;inset:0;z-index:100;display:grid;place-content:center;justify-items:center;gap:22px;background:radial-gradient(circle at 50% 45%,#2a0710 0,var(--void) 62%);transition:opacity 1.1s ease,visibility 0s linear 1.1s}
+#loader.done{opacity:0;visibility:hidden;pointer-events:none}
+.mark{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:linear-gradient(145deg,var(--beige),#d9c2a0);color:var(--bordeaux);font:700 22px/1 var(--f-display);letter-spacing:-.04em;box-shadow:0 0 0 1px rgba(255,255,255,.5) inset,0 10px 30px rgba(0,0,0,.4),0 0 40px rgba(152,0,13,.45)}
+#loader .mark{width:64px;height:64px;font-size:30px;border-radius:19px}
+.ld-bar{width:180px;height:2px;border-radius:2px;background:var(--line);overflow:hidden}
+.ld-bar i{display:block;height:100%;width:40%;background:linear-gradient(90deg,transparent,var(--beige),transparent);animation:ldbar 1.3s ease-in-out infinite}
+@keyframes ldbar{from{transform:translateX(-120%)}to{transform:translateX(320%)}}
+#loader p{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--txt-3)}
+#nogl{position:fixed;inset:0;z-index:90;display:grid;place-content:center;justify-items:center;gap:14px;padding:32px;text-align:center;background:var(--void)}
+#nogl h2{font:300 32px/1.1 var(--f-display)}
+#nogl p{color:var(--txt-2);max-width:46ch}
+
+/* ---------- Barre haute ---------- */
+.top{position:absolute;top:calc(18px + env(safe-area-inset-top,0px));left:var(--gut-l);right:var(--gut-r);display:flex;align-items:center;justify-content:space-between;gap:16px;pointer-events:none}
+.brand{display:flex;align-items:center;gap:12px;padding:8px 16px 8px 8px;border-radius:18px;background:rgba(14,3,8,.5);border:1px solid var(--line);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.brand strong{display:block;font:600 15px/1.1 var(--f-display);letter-spacing:-.01em}
+.brand small{display:block;margin-top:4px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--txt-3);font-weight:600}
+.crumbs{flex:1;display:flex;justify-content:center;min-width:0;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility 0s linear .6s}
+.crumbs ol{display:flex;align-items:center;gap:2px;list-style:none;padding:4px;border-radius:999px;background:rgba(14,3,8,.5);border:1px solid var(--line);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);max-width:100%}
+.crumbs li{display:flex;align-items:center;min-width:0}
+.crumbs li+li::before{content:"";width:5px;height:5px;margin:0 2px;border-top:1.5px solid var(--txt-3);border-right:1.5px solid var(--txt-3);transform:rotate(45deg) scale(.8);flex:none}
+.crumbs button,.crumbs span{padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:26vw}
+.crumbs button{color:var(--txt-2);transition:background .2s,color .2s}
+.crumbs button:hover{background:rgba(245,240,229,.1);color:var(--beige)}
+.crumbs span{background:var(--beige);color:var(--wine);font-weight:700}
+.tools{display:flex;gap:8px}
+.chip-btn{display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 16px;border-radius:15px;background:rgba(14,3,8,.5);border:1px solid var(--line);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);font-size:13px;font-weight:700;transition:background .25s,border-color .25s,transform .25s var(--ease)}
+.chip-btn:hover{background:rgba(66,8,22,.7);border-color:var(--line-strong);transform:translateY(-1px)}
+.chip-btn kbd{font:600 11px var(--f-body);padding:3px 7px;border-radius:7px;border:1px solid var(--line);color:var(--txt-3)}
+.chip-btn.solid{background:var(--bordeaux);border-color:rgba(245,240,229,.28);box-shadow:0 10px 30px -10px rgba(224,48,63,.7)}
+.chip-btn.solid:hover{background:#b3001a}
+
+/* ---------- Voile de lisibilité et halo du curseur ---------- */
+.scrim{position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,2,5,.66) 0,rgba(8,2,5,.4) 26%,rgba(8,2,5,0) 52%);opacity:0;transition:opacity 1s ease}
+#ui[data-level=intro] .scrim{opacity:.85}
+#ui:is([data-level=domain],[data-level=role]) .scrim{opacity:1}
+#glow{position:fixed;left:0;top:0;width:560px;height:560px;margin:-280px 0 0 -280px;z-index:2;pointer-events:none;border-radius:50%;background:radial-gradient(circle,rgba(224,48,63,.17),rgba(152,0,13,.07) 38%,transparent 66%);mix-blend-mode:screen;will-change:transform}
+@media (hover:none){#glow{display:none}}
+
+/* ---------- Apparition par niveau ---------- */
+.lv{opacity:0;visibility:hidden;transform:translate3d(0,22px,0);transition:opacity .6s ease,transform .9s var(--ease),visibility 0s linear .9s}
+#ui[data-level=intro] #hero,
+#ui[data-level=domain] #dpanel,
+#ui[data-level=role] #rpanel,
+#ui[data-level=role] #dock,
+#ui:is([data-level=domain],[data-level=role]) .crumbs,
+#ui:is([data-level=universe],[data-level=domain],[data-level=role]) #gdock,
+#ui:is([data-level=universe],[data-level=domain],[data-level=role]) #hint,
+#ui:not([data-level=loading]) .rncp{opacity:1;visibility:visible;transform:none;transition-delay:.55s,.55s,0s}
+
+/* ---------- Hero ---------- */
+#hero{position:absolute;left:var(--gut-l);top:calc(84px + env(safe-area-inset-top,0px));bottom:calc(30px + env(safe-area-inset-bottom,0px));width:min(760px,calc(100vw - 48px));display:flex;flex-direction:column;justify-content:center}
+.eyebrow{display:flex;align-items:center;gap:14px;font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--champagne)}
+.eyebrow i{width:42px;height:1px;background:linear-gradient(90deg,var(--ember),var(--champagne))}
+#hero h1{margin-top:26px;font:300 clamp(44px,5.7vw,94px)/.95 var(--f-display);font-variation-settings:"opsz" 144;letter-spacing:-.04em;text-wrap:balance}
+#hero h1 em{font-style:italic;font-weight:300;filter:drop-shadow(0 0 26px rgba(224,48,63,.4))}
+#hero h1 em .w{padding-right:.08em;background:linear-gradient(100deg,var(--beige) 6%,#f0a5a0 50%,var(--ember) 94%) calc((var(--i) - 3) * 33.34%) 0/400% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
+.w{display:inline-block;opacity:0}
+a{color:inherit;text-decoration:none}
+#ui[data-level=intro] .w{animation:rise 1.2s var(--ease) both;animation-delay:calc(.75s + var(--i)*95ms)}
+@keyframes rise{from{opacity:0;transform:translateY(.45em);filter:blur(14px)}to{opacity:1;transform:none;filter:blur(0)}}
+.lede{margin-top:28px;max-width:52ch;font-size:clamp(15px,1.25vw,18px);line-height:1.6;color:var(--txt-2)}
+.hero-actions{margin-top:36px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.cta{position:relative;display:inline-flex;align-items:center;gap:16px;padding:10px 10px 10px 30px;border-radius:999px;font-size:16px;font-weight:700;letter-spacing:.01em;background:var(--bordeaux);box-shadow:0 0 0 1px rgba(245,240,229,.3) inset,0 22px 60px -14px rgba(224,48,63,.85),0 0 90px rgba(152,0,13,.45);transition:transform .35s var(--ease),box-shadow .35s,background .3s;overflow:hidden;isolation:isolate}
+.cta::before{content:"";position:absolute;inset:-60%;z-index:-1;background:conic-gradient(from 0deg,transparent 0 62%,rgba(245,240,229,.55) 74%,transparent 86%);animation:spin 5s linear infinite;opacity:.55}
+.cta::after{content:"";position:absolute;inset:2px;z-index:-1;border-radius:inherit;background:linear-gradient(180deg,#b3001a,var(--bordeaux) 60%,#7a000a)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cta:hover{transform:translateY(-3px) scale(1.02)}
+.cta .arr{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--beige);color:var(--bordeaux);transition:transform .4s var(--ease)}
+.cta:hover .arr{transform:translateX(4px) rotate(-8deg)}
+.hero-link{font-size:14px;font-weight:700;color:var(--txt-2);display:inline-flex;gap:8px;align-items:center;border-bottom:1px solid var(--line-strong);padding-bottom:4px;transition:color .2s,border-color .2s}
+.hero-link:hover{color:var(--beige);border-color:var(--beige)}
+.stats{margin-top:54px;display:flex;gap:0;flex-wrap:wrap}
+.stats div{padding:0 30px 0 0;margin-right:30px;border-right:1px solid var(--line)}
+.stats div:last-child{border:0;margin:0;padding:0}
+.stats dt{font:300 clamp(34px,3.6vw,54px)/1 var(--f-display);font-variation-settings:"opsz" 144;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stats dd{margin-top:8px;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--txt-3)}
+
+/* ---------- Panneaux titre (galaxie / planète) ---------- */
+.ptitle{position:absolute;left:var(--gut-l);top:calc(112px + env(safe-area-inset-top,0px));width:min(440px,calc(100vw - 48px))}
+.kicker{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--champagne)}
+.kicker::before{content:"";width:30px;height:1px;background:linear-gradient(90deg,var(--ember),var(--champagne))}
+.ptitle h2{margin-top:18px;font:300 clamp(40px,4.6vw,76px)/.96 var(--f-display);font-variation-settings:"opsz" 144;letter-spacing:-.035em;text-wrap:balance}
+#rpanel h2{font-size:clamp(32px,3.5vw,56px)}
+.ptitle p{margin-top:20px;font-size:15.5px;line-height:1.62;color:var(--txt-2);max-width:42ch}
+.facts{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+.fact{display:inline-flex;align-items:baseline;gap:8px;padding:9px 15px;border-radius:999px;border:1px solid var(--line);background:rgba(14,3,8,.45);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);font-size:13px;color:var(--txt-2);font-weight:600}
+.fact b{font:400 20px/1 var(--f-display);color:var(--beige);font-variant-numeric:tabular-nums}
+.nudge{margin-top:30px;display:flex;align-items:center;gap:12px;font-size:13px;font-weight:600;color:var(--champagne)}
+.nudge i{width:34px;height:1px;background:var(--champagne);position:relative;animation:nudge 2.2s ease-in-out infinite}
+.nudge i::after{content:"";position:absolute;right:0;top:-3px;width:7px;height:7px;border-top:1px solid var(--champagne);border-right:1px solid var(--champagne);transform:rotate(45deg)}
+@keyframes nudge{50%{opacity:.35}}
+
+/* ---------- Verre ---------- */
+.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);box-shadow:0 40px 90px -24px rgba(0,0,0,.75),inset 0 1px 0 rgba(245,240,229,.12)}
+
+/* ---------- Dock formations / compétences ---------- */
+#dock{position:absolute;right:var(--gut-r);top:calc(96px + env(safe-area-inset-top,0px));bottom:calc(92px + env(safe-area-inset-bottom,0px));width:min(430px,38vw);min-width:340px;border-radius:26px;display:flex;flex-direction:column;overflow:hidden}
+.dock-head{padding:16px 16px 0}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:15px;background:rgba(8,2,5,.55);border:1px solid var(--line)}
+.tabs button{display:flex;align-items:center;justify-content:center;gap:9px;padding:11px 8px;border-radius:11px;font-size:13.5px;font-weight:700;color:var(--txt-3);transition:background .25s,color .25s}
+.tabs button b{font-size:11px;padding:2px 7px;border-radius:999px;background:rgba(245,240,229,.1);font-variant-numeric:tabular-nums}
+.tabs button[aria-selected=true]{background:var(--beige);color:var(--wine)}
+.tabs button[aria-selected=true] b{background:rgba(152,0,13,.14);color:var(--bordeaux)}
+.dock-body{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:rgba(245,240,229,.25) transparent}
+.dock-body::-webkit-scrollbar{width:6px}
+.dock-body::-webkit-scrollbar-thumb{background:rgba(245,240,229,.22);border-radius:6px}
+.dock-note{font-size:12.5px;line-height:1.5;color:var(--txt-3);padding:0 2px 4px}
+.mod{border-radius:18px;border:1px solid var(--line);background:rgba(245,240,229,.04);transition:border-color .3s,background .3s,box-shadow .3s}
+.mod:hover,.mod.hi{border-color:var(--line-strong);background:rgba(245,240,229,.08)}
+.mod.open{border-color:rgba(224,48,63,.6);background:linear-gradient(160deg,rgba(152,0,13,.3),rgba(245,240,229,.05));box-shadow:0 0 40px -10px rgba(224,48,63,.5)}
+.mod-h{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;width:100%;padding:14px 14px 14px 12px}
+.mod-n{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;border:1px solid var(--line-strong);font:400 15px/1 var(--f-display);font-variant-numeric:tabular-nums;color:var(--champagne);transition:background .3s,color .3s}
+.mod.open .mod-n,.mod:hover .mod-n,.mod.hi .mod-n{background:var(--beige);color:var(--bordeaux);border-color:var(--beige)}
+.mod-t{font-size:14px;line-height:1.38;font-weight:600;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.mod.open .mod-t{-webkit-line-clamp:unset}
+.mod-d{font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;background:rgba(232,207,168,.14);color:var(--champagne);white-space:nowrap}
+.mod-b{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)}
+.mod.open .mod-b{grid-template-rows:1fr}
+.mod-in{overflow:hidden;min-height:0}
+.mod-in>div{padding:2px 16px 16px 60px}
+.mod-ref{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--txt-3)}
+.chips{margin-top:12px;display:flex;flex-direction:column;gap:7px}
+.chip{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:12px;background:rgba(8,2,5,.4);border:1px solid var(--line)}
+.chip small{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--champagne)}
+.chip span{font-size:13px;font-weight:600}
+.link{margin-top:14px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--beige);padding:10px 16px;border-radius:999px;background:var(--bordeaux);border:1px solid rgba(245,240,229,.25);transition:background .25s,transform .25s var(--ease)}
+.link:hover{background:#b3001a;transform:translateY(-1px)}
+.comp{padding:15px 16px;border-radius:18px;border:1px solid var(--line);background:rgba(245,240,229,.04)}
+.comp b{display:block;font:400 18px/1.2 var(--f-display)}
+.comp p{margin-top:8px;font-size:13px;line-height:1.55;color:var(--txt-2)}
+.fam{display:inline-block;margin-top:11px;padding:4px 10px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:rgba(152,0,13,.4);color:#ffd9d4}
+
+/* ---------- Dock galaxies ---------- */
+#gdock{position:absolute;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));margin-left:0;transform:translateX(-50%);display:flex;gap:6px;padding:7px;border-radius:999px}
+#gdock.lv{transform:translate3d(-50%,22px,0)}
+#ui:is([data-level=universe],[data-level=domain],[data-level=role]) #gdock{transform:translateX(-50%)}
+#gdock button{position:relative;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;font:400 15px/1 var(--f-display);color:var(--txt-2);border:1px solid transparent;font-variant-numeric:tabular-nums;transition:background .25s,color .25s,border-color .25s,transform .3s var(--ease)}
+#gdock button:hover{background:rgba(245,240,229,.12);color:var(--beige);transform:translateY(-3px)}
+#gdock button.on{background:var(--beige);color:var(--bordeaux)}
+#gdock button::after{content:attr(data-label);position:absolute;bottom:calc(100% + 14px);left:50%;transform:translate(-50%,6px);white-space:nowrap;padding:7px 12px;border-radius:10px;background:rgba(14,3,8,.92);border:1px solid var(--line);font:600 12.5px var(--f-body);color:var(--beige);opacity:0;pointer-events:none;transition:opacity .2s,transform .25s var(--ease)}
+#gdock button:hover::after{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- Aide + RNCP ---------- */
+#hint{position:absolute;left:var(--gut-l);bottom:calc(30px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:12px;font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--txt-3);max-width:34vw}
+.mouse{flex:none;width:18px;height:28px;border:1.5px solid var(--txt-3);border-radius:10px;position:relative}
+.mouse::after{content:"";position:absolute;left:6px;top:5px;width:2px;height:5px;border-radius:2px;background:var(--beige);animation:wheel 1.6s ease-in-out infinite}
+@keyframes wheel{50%{transform:translateY(7px);opacity:.2}}
+.rncp{position:absolute;right:var(--gut-r);bottom:calc(30px + env(safe-area-inset-bottom,0px))}
+.rncp-btn{display:inline-flex;align-items:center;gap:9px;padding:11px 16px;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--txt-2);background:rgba(14,3,8,.55);border:1px solid var(--line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);transition:color .2s,border-color .2s}
+.rncp-btn:hover{color:var(--beige);border-color:var(--line-strong)}
+.rncp-pop{position:absolute;right:0;bottom:calc(100% + 12px);width:min(360px,calc(100vw - 48px));padding:20px;border-radius:20px;opacity:0;transform:translateY(8px);visibility:hidden;transition:opacity .25s,transform .3s var(--ease),visibility 0s linear .3s}
+.rncp.open .rncp-pop{opacity:1;transform:none;visibility:visible;transition-delay:0s}
+.rncp-pop strong{display:block;font:400 20px/1.2 var(--f-display)}
+.rncp-pop p{margin:10px 0 14px;font-size:13px;line-height:1.6;color:var(--txt-2)}
+.rncp-pop a{display:block;margin-top:8px;font-size:13px;font-weight:600;color:var(--champagne);text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- Étiquettes 3D ---------- */
+.g-label,.p-label{position:absolute;left:0;top:0;text-align:center;transition:opacity .35s ease;will-change:transform;text-shadow:0 2px 18px rgba(8,2,5,.95),0 0 3px rgba(8,2,5,.9)}
+.g-label{width:288px}
+.g-label .n{display:block;font-size:11px;font-weight:800;letter-spacing:.3em;color:var(--champagne)}
+.g-label strong{display:block;margin-top:5px;font:400 clamp(19px,1.5vw,24px)/1.1 var(--f-display);letter-spacing:-.01em}
+.g-label .m{display:block;margin-top:6px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--txt-2)}
+.g-label .d{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease),opacity .4s;opacity:0}
+.g-label .d span{overflow:hidden;min-height:0;font-size:13px;line-height:1.5;color:var(--txt-2);font-weight:500}
+.g-label .go{display:inline-flex;margin-top:0;opacity:0;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--beige);transition:opacity .3s}
+.g-label{padding:8px 14px 10px;margin:-8px 0 0 -14px;border-radius:18px;border:1px solid transparent;transition:opacity .35s ease,background .35s ease,border-color .35s ease,box-shadow .35s}
+.g-label.hov{z-index:3;background:linear-gradient(160deg,rgba(66,8,22,.82),rgba(14,3,8,.88));border-color:var(--line-strong);box-shadow:0 30px 70px -20px rgba(0,0,0,.8),0 0 50px -10px rgba(224,48,63,.5);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);text-shadow:none}
+.g-label.hov .d{grid-template-rows:1fr;opacity:1}
+.g-label.hov .d span{padding-top:8px}
+.g-label.hov .go{opacity:1;margin-top:10px}
+.g-label.hov strong{text-shadow:0 0 30px rgba(224,48,63,.85),0 2px 18px rgba(8,2,5,.95)}
+.p-label{width:210px}
+.p-label strong{display:block;font:400 17px/1.15 var(--f-display)}
+.p-label .m{display:block;margin-top:5px;font-size:10.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--champagne)}
+.p-label .d{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .4s var(--ease),opacity .35s}
+.p-label .d span{overflow:hidden;min-height:0;font-size:12.5px;line-height:1.45;color:var(--txt-2);font-weight:500}
+.p-label.hov .d{grid-template-rows:1fr;opacity:1}
+.p-label.hov .d span{padding-top:6px}
+.p-label.dim{opacity:.0}
+.m-tag{position:absolute;left:0;top:0;display:grid;place-items:center;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;font:400 14px/1 var(--f-display);color:var(--beige);background:rgba(14,3,8,.7);border:1px solid var(--line-strong);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:background .25s,color .25s,box-shadow .3s,border-color .25s;will-change:transform;font-variant-numeric:tabular-nums}
+.m-tag:hover,.m-tag.hi{background:var(--beige);color:var(--bordeaux);border-color:var(--beige);box-shadow:0 0 0 6px rgba(245,240,229,.14),0 0 30px rgba(224,48,63,.7)}
+.n-label{position:absolute;left:0;top:0;text-align:center;pointer-events:none;transition:opacity .5s;text-shadow:0 2px 18px rgba(8,2,5,.95);width:300px}
+.n-label strong{display:block;font:400 17px/1.1 var(--f-display)}
+.n-label span{display:block;margin-top:6px;font-size:10.5px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--champagne)}
+
+/* ---------- Recherche ---------- */
+.search-overlay{position:fixed;inset:0;z-index:50;display:grid;place-items:start center;padding:12vh 16px 0;background:rgba(8,2,5,.62);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s linear .3s}
+.search-overlay.open{opacity:1;visibility:visible;transition-delay:0s}
+.searchbox{width:min(780px,100%);border-radius:26px;overflow:hidden;transform:translateY(14px) scale(.98);transition:transform .45s var(--ease)}
+.search-overlay.open .searchbox{transform:none}
+.searchhead{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.searchhead svg{color:var(--champagne)}
+.searchhead input{flex:1;min-width:0;height:46px;background:none;border:0;outline:0;color:var(--beige);font:400 22px var(--f-display);letter-spacing:-.01em}
+.searchhead input::placeholder{color:var(--txt-3)}
+.searchhead input:focus-visible{outline:0}
+.searchhead input::-webkit-search-cancel-button,.searchhead input::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
+.esc{font:700 11px var(--f-body);letter-spacing:.1em;padding:7px 10px;border-radius:9px;border:1px solid var(--line);color:var(--txt-3)}
+.results{max-height:56vh;overflow:auto;padding:10px}
+.result{width:100%;display:grid;grid-template-columns:42px 1fr auto;gap:14px;align-items:center;padding:12px 14px;border-radius:16px;transition:background .2s}
+.result:hover,.result.sel{background:rgba(245,240,229,.09)}
+.result .dot{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:var(--bordeaux);color:var(--beige)}
+.result strong{display:block;font-size:14.5px;font-weight:600;line-height:1.35}
+.result small{display:block;margin-top:3px;font-size:12px;color:var(--txt-3);font-weight:600}
+.result em{font-style:normal;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--champagne)}
+.nores{padding:30px;text-align:center;color:var(--txt-3);font-size:14px}
+.toast{position:fixed;left:50%;bottom:90px;z-index:80;transform:translate(-50%,14px);padding:12px 20px;border-radius:999px;background:var(--beige);color:var(--wine);font-size:13px;font-weight:700;box-shadow:0 20px 50px rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .3s,transform .4s var(--ease)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- Adaptatif ---------- */
+@media (max-width:1100px){
+  #hint{display:none}
+  #dock{width:min(400px,42vw);min-width:320px}
+  .crumbs button,.crumbs span{max-width:20vw}
+}
+@media (max-width:820px){
+  :root{--gut-l:max(16px,env(safe-area-inset-left,0px));--gut-r:max(16px,env(safe-area-inset-right,0px))}
+  .top{top:calc(12px + env(safe-area-inset-top,0px));gap:8px}
+  .brand{padding:6px 12px 6px 6px}
+  .brand small,.chip-btn span,.chip-btn kbd,.crumbs{display:none}
+  .chip-btn{width:46px;padding:0;justify-content:center}
+  #hero{justify-content:flex-end;bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+  #hero h1{font-size:clamp(38px,12vw,60px);margin-top:18px}
+  .lede{font-size:14.5px;margin-top:16px}
+  .hero-actions{margin-top:22px}
+  .stats{margin-top:28px}
+  .stats div{padding-right:18px;margin-right:18px}
+  .stats dt{font-size:30px}
+  .stats dd{font-size:10px;letter-spacing:.14em}
+  .ptitle{top:calc(76px + env(safe-area-inset-top,0px))}
+  .ptitle h2{font-size:clamp(34px,10vw,46px);margin-top:12px}
+  #rpanel h2{font-size:clamp(28px,8.4vw,38px)}
+  .ptitle p,.nudge{display:none}
+  .facts{margin-top:14px}
+  #dock{left:var(--gut-l);right:var(--gut-r);top:auto;bottom:calc(76px + env(safe-area-inset-bottom,0px));width:auto;min-width:0;max-height:44vh;border-radius:22px}
+  #gdock{bottom:calc(14px + env(safe-area-inset-bottom,0px));gap:2px;padding:5px}
+  #gdock button{width:36px;height:36px;font-size:14px}
+  .rncp{display:none}
+  .g-label{width:150px}
+  .g-label strong{font-size:15px}
+  .g-label .m,.g-label .n{font-size:9.5px;letter-spacing:.12em}
+  .g-label .d{display:none}
+  .p-label{width:130px}
+  .p-label strong{font-size:13.5px}
+  .p-label .m{display:none}
+  .mod-in>div{padding-left:16px}
+}
+@media (max-width:820px){
+  .scrim{background:linear-gradient(0deg,rgba(8,2,5,.9) 0,rgba(8,2,5,.62) 42%,rgba(8,2,5,0) 72%)}
+  #ui:is([data-level=domain],[data-level=role]) .scrim{background:linear-gradient(180deg,rgba(8,2,5,.72) 0,rgba(8,2,5,.4) 30%,rgba(8,2,5,0) 52%)}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
+  .w{opacity:1}
+}
+</style>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+<canvas id="warp" aria-hidden="true"></canvas>
+<div id="glow" aria-hidden="true"></div>
+<div id="labels"></div>
+
+<div id="loader"><div class="mark">LD</div><div class="ld-bar"><i></i></div><p>Initialisation de l’univers</p></div>
+<div id="nogl" hidden><h2>Votre navigateur ne peut pas afficher l’univers 3D.</h2><p>L’exploration demande WebGL. Essayez avec une version récente de Chrome, Edge, Firefox ou Safari, ou ouvrez le catalogue directement.</p><p><a class="hero-link" id="nogl-cat" href="#" target="_blank" rel="noreferrer">Ouvrir le catalogue 2027</a></p></div>
+
+<div id="ui" data-level="loading">
+  <div class="scrim"></div>
+  <header class="top">
+    <button class="brand" id="brand" aria-label="Retour à la vue d’ensemble de l’univers">
+      <span class="mark">LD</span>
+      <span><strong>Lefebvre Dalloz Compétences</strong><small>Technologies numériques · 2027</small></span>
+    </button>
+    <nav class="crumbs lv" aria-label="Fil d’Ariane"><ol id="crumbs"></ol></nav>
+    <div class="tools">
+      <button class="chip-btn" id="searchBtn" aria-label="Trouver une compétence">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        <span>Trouver une compétence</span><kbd>Ctrl K</kbd>
+      </button>
+      <a class="chip-btn solid" id="catalogBtn" href="#" target="_blank" rel="noreferrer" aria-label="Ouvrir le catalogue 2027">
+        <span>Catalogue 2027</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <section id="hero" class="lv" aria-labelledby="h1">
+    <p class="eyebrow"><i></i>Univers Techno Numérique · Édition 2027</p>
+    <h1 id="h1"><span class="w" style="--i:0">Votre</span> <span class="w" style="--i:1">prochaine</span> <span class="w" style="--i:2">compétence</span> <em><span class="w" style="--i:3">est</span> <span class="w" style="--i:4">quelque</span> <span class="w" style="--i:5">part</span> <span class="w" style="--i:6">ici.</span></em></h1>
+    <p class="lede">Sept galaxies, une quarantaine de métiers, une formation pour chaque trajectoire. Entrez dans l’univers et zoomez jusqu’au bon module.</p>
+    <div class="hero-actions">
+      <button class="cta" id="enter"><span>Entrer dans l’univers</span><span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+    </div>
+    <dl class="stats" id="stats"></dl>
+  </section>
+
+  <section id="dpanel" class="ptitle lv" aria-live="polite"></section>
+  <section id="rpanel" class="ptitle lv" aria-live="polite"></section>
+  <aside id="dock" class="glass lv" aria-label="Formations et compétences du métier"></aside>
+
+  <nav id="gdock" class="glass lv" aria-label="Aller directement à une galaxie"></nav>
+  <div id="hint" class="lv"><span class="mouse"></span><span id="hintTxt"></span></div>
+
+  <div class="rncp lv" id="rncp">
+    <button class="rncp-btn" id="rncpBtn" aria-expanded="false"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.1L22 12l-7.6 2.9L12 22l-2.4-7.1L2 12l7.6-2.9z"/></svg>Repères compétences / RNCP</button>
+    <div class="rncp-pop glass" role="region" aria-label="Repères RNCP">
+      <strong>Une boussole, pas une certification.</strong>
+      <p>Les compétences sont formulées dans la logique des blocs RNCP : une activité professionnelle, des compétences observables et mobilisables en autonomie. Elles servent ici de repères de navigation ; cela ne signifie pas que chaque module délivre un bloc RNCP.</p>
+      <a href="https://www.francecompetences.fr/app/uploads/2022/11/Vademecum-RNCP-VF.pdf" target="_blank" rel="noreferrer">Méthodologie France Compétences ↗</a>
+      <a href="https://www.francecompetences.fr/recherche/rncp/42652" target="_blank" rel="noreferrer">Exemple : Data Analyst RNCP 42652 ↗</a>
+      <a href="https://www.francecompetences.fr/recherche/rncp/40363" target="_blank" rel="noreferrer">Exemple : pilotage de projets informatiques ↗</a>
+    </div>
+  </div>
+</div>
+
+<div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-label="Recherche">
+  <div class="searchbox glass">
+    <div class="searchhead">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <input id="searchInput" type="search" placeholder="Métier, compétence, outil, formation…" autocomplete="off" aria-label="Rechercher">
+      <button class="esc" id="closeSearch" aria-label="Fermer la recherche">ÉCHAP</button>
+    </div>
+    <div class="results" id="results"></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>window.THREE||document.write('<script src="vendor/three.min.js"><\/script>')</script>
+<script>
+(function(){
+'use strict';
+const domains = {
+      ia:{
+        title:'Intelligence Artificielle', kicker:'PLANÈTE IA', icon:'✦', c1:'#ffd1ec', c2:'#e93992',
+        desc:"Faire de l'IA un levier concret de productivité, d'automatisation, d'innovation et de transformation des métiers.",
+        roles:[
+          {name:'Chef·fe de projet / Architecte IA',type:'PROJET & AGENTS',tag:'Concevoir et déployer des systèmes IA',skills:['Cadrage de cas d’usage','Orchestration d’agents','Prompt engineering','Évaluation des risques','Déploiement à l’échelle'],courses:[['703297','Agents IA : concevoir, orchestrer et déployer des systèmes d’IA autonomes','2 J'],['702769','Chef de projet IA : méthodologies et bonnes pratiques','2 J'],['703303','Use cases IA à forte valeur business : identifier, prioriser et cadrer des projets IA créateurs de ROI','1 J'],['703482','Industrialiser l’usage de l’IA : du prototype au déploiement à l’échelle','3 H']]},
+          {name:'Responsable automatisation & opérations',type:'PROCESS & NO-CODE',tag:'Transformer les processus en workflows intelligents',skills:['Cartographie des processus','No-code / low-code','Automatisation','Connexion CRM / ERP','Pilotage de workflows'],courses:[['703302','Automatisation IA avancée : concevoir, industrialiser et piloter des workflows intelligents No-code/low-code','1 J'],['703304','Automatiser ses processus métier sans coder : premiers pas avec les outils No-code','1 J'],['703307','Process IA : cartographier, optimiser et structurer ses processus internes avec l’IA','1 J'],['703301','IA & Outils métiers : connecter l’IA à Notion, CRM, ERP et ses workflows','1 J']]},
+          {name:'Manager augmenté',type:'MANAGEMENT',tag:'Piloter la performance et la décision avec l’IA',skills:['Décision augmentée','Management de l’innovation','Productivité d’équipe','Adoption des usages','Copilotes métiers'],courses:[['703484','IA pour managers : piloter la performance et la prise de décision','3 H'],['701689','IA : un levier de performance incontournable pour le manager','1 J'],['703489','Management de l’innovation et IA : créer et déployer des projets innovants','1 J'],['703300','Assistants IA personnalisés : concevoir, déployer et piloter des copilotes métiers pour ses équipes','1 J']]},
+          {name:'Knowledge worker / Expert métier',type:'EFFICACITÉ',tag:'Gagner du temps sans perdre la maîtrise',skills:['Prompting','Veille augmentée','Gestion de l’information','Production de contenu','Assistant personnel'],courses:[['703305','Productivité IA : optimiser son quotidien professionnel avec l’IA et les outils digitaux','3 H'],['703306','PKM + IA : créer son système personnel de gestion de l’information','3 H'],['701536','IA pour débutants : le Prompt Engineering','1 J'],['703300','Assistants IA personnalisés : concevoir, déployer et piloter des copilotes métiers','1 J']]},
+          {name:'Direction transformation IA',type:'STRATÉGIE & GOUVERNANCE',tag:'Passer des expérimentations à une stratégie IA',skills:['Gouvernance IA','Conduite du changement','Conformité','ROI IA','Stratégie d’entreprise'],courses:[['703478','Gouvernance IA : cartographier et évaluer les usages de l’IA','3 H'],['703480','Réussir l’adoption de l’IA : conduire le changement dans son organisation','1 J'],['703481','Sécuriser l’usage de l’IA : conformité, RGPD et gouvernance','1 J'],['703488','Structurer une stratégie IA à l’échelle de l’entreprise','1 J'],['703483','Mesurer et piloter le ROI de l’IA : méthodologie et indicateurs','3 H']]},
+          {name:'Fonctions Droit, RH & Finance',type:'IA MÉTIER',tag:'Appliquer l’IA à des environnements métier exigeants',skills:['Cas d’usage métier','Analyse & synthèse','Conformité','Prompting métier','Décision assistée'],courses:[['701593','L’Intelligence Artificielle en droit : cadre juridique depuis l’AI Act et pratiques conformes','2 J'],['701653','Intégrer l’Intelligence Artificielle dans ses pratiques RH','2 J'],['701693','IA pour Directions Financières : intégrer l’IA dans votre pratique quotidienne','1 J'],['703015','IA pour comptables : intégrer l’Intelligence Artificielle dans vos activités quotidiennes','1 J']]}
+        ]
+      },
+      public:{
+        title:'IA Secteur Public', kicker:'PLANÈTE SERVICE PUBLIC', icon:'◈', c1:'#d8d1ff', c2:'#7659ff',
+        desc:"Moderniser les services publics avec l'IA tout en intégrant les exigences de légalité, d'éthique, de gouvernance et de responsabilité.",
+        roles:[
+          {name:'Cadre / Manager public',type:'ENCADREMENT',tag:'Accompagner les équipes dans la transformation IA',skills:['Acculturation IA','Management du changement','Cas d’usage public','Pilotage responsable'],courses:[['702005','Acculturation à l’IA pour les cadres encadrants, managers du secteur public','1 J'],['702010','Opportunités et impacts de l’IA pour les décideurs du secteur public','1 J'],['703310','Conduite du changement IA : déployer l’IA dans une administration','1 J']]},
+          {name:'Juriste en collectivité',type:'DROIT PUBLIC',tag:'Sécuriser la décision et les usages algorithmiques',skills:['Légalité','Responsabilité publique','Conformité','Éthique','Analyse juridique'],courses:[['702003','IA pour juristes en collectivité territoriale','1 J'],['703311','IA et décision administrative : sécuriser la légalité à l’ère des algorithmes','1 J'],['703312','IA et responsabilité publique : sécuriser juridiquement et opérationnellement les usages','1 J']]},
+          {name:'DSI / Chef·fe de projet public',type:'IT & GOUVERNANCE',tag:'Intégrer l’IA dans les systèmes et projets publics',skills:['Architecture de projet','Gouvernance IA','Achat de solutions IA','Risques','Transformation SI'],courses:[['702008','Intégration de l’IA dans les projets informatiques des collectivités','1 J'],['703313','Mettre en place une gouvernance de l’IA dans une collectivité','1 J'],['703314','Sécuriser l’achat d’une solution d’Intelligence Artificielle dans le secteur public','1 J']]},
+          {name:'RH du secteur public',type:'TALENTS',tag:'Réinventer recrutement et développement des compétences',skills:['Recrutement augmenté','Gestion des talents','Formation','Performance','Accompagnement RH'],courses:[['702013','Accompagnement de la transformation des services RH par l’IA','1 J'],['702030','Transformer la gestion des talents dans le secteur public grâce à l’IA','1 H'],['701999','Optimisation de la gestion des talents dans la fonction publique grâce à l’IA','3 H 30']]},
+          {name:'Agent administratif',type:'EFFICACITÉ',tag:'Utiliser l’IA dans les missions quotidiennes',skills:['Prompting','Productivité','Éthique','Outils IA','Services aux usagers'],courses:[['702011','Acculturation à l’IA pour la filière administrative du secteur public','1 J'],['702006','Acculturation à l’IA pour tous les agents du secteur public','1 J'],['702012','IA générative au service des collectivités : maîtriser les outils et techniques','1 J']]},
+          {name:'Élu / Décideur public',type:'STRATÉGIE',tag:'Identifier les opportunités et arbitrer les transformations',skills:['Vision stratégique','Impact territorial','Innovation publique','Risques & arbitrages'],courses:[['702004','Stratégies d’IA pour les élus membres de cabinet du service public','1 J'],['702025','Quels défis en territoire l’IA peut-elle relever ?','1 H'],['702044','Avancées technologiques et innovation : quelles opportunités pour le secteur public local ?','3 H 30']]}
+        ]
+      },
+      office:{
+        title:'Bureautique', kicker:'PLANÈTE PRODUCTIVITÉ', icon:'⌁', c1:'#c8ecff', c2:'#3b86ff',
+        desc:"Transformer les outils bureautiques en leviers de productivité, d'analyse et de communication professionnelle.",
+        roles:[
+          {name:'Analyste / Reporting Power BI',type:'BUSINESS INTELLIGENCE',tag:'Passer de la donnée brute aux insights',skills:['Connexion des données','Modélisation','Dataviz','Partage Power BI','Gouvernance'],courses:[['702747','Power BI fondamentaux : de la connexion aux données à la visualisation','3 J'],['702745','Power BI perfectionnement : maîtriser et révéler les insights de vos données','2 J'],['702748','Power BI Online : exploiter tout le potentiel de Power BI','1 J'],['702744','Power BI : fondamentaux de l’administration et de la gouvernance','1 J']]},
+          {name:'Contrôleur·se de gestion',type:'PILOTAGE',tag:'Automatiser l’analyse et fiabiliser les tableaux de bord',skills:['Excel avancé','Power Query','Power Pivot','Tableaux de bord','Analyse financière'],courses:[['1374','Excel pour contrôleur de gestion','2 J'],['702741','Power Pivot : du modèle de données au tableau de bord interactif sur Excel','2 J'],['702743','Power Query : maîtriser la transformation de vos données sur Excel','2 J'],['703167','Excel avancé et Power Pivot : transformez vos données massives en analyses percutantes','4 J']]},
+          {name:'Expert·e Excel & automatisation',type:'EXCEL',tag:'Aller de la maîtrise avancée à l’automatisation',skills:['Formules avancées','Automatisation VBA','Modèles de données','Nettoyage','Analyse complexe'],courses:[['703166','Excel - Avancé : de l’analyse complexe à l’automatisation','3 J'],['702738','VBA - Débutant : utiliser les macros pour automatiser vos tâches sur Excel','2 J'],['702740','VBA - Intermédiaire : maîtriser le fonctionnement avancé sur Excel','2 J'],['703168','VBA - Avancé : maîtrisez le code qui multiplie votre productivité','2 J']]},
+          {name:'Assistant·e / Office Manager',type:'PACK OFFICE',tag:'Structurer, présenter et organiser l’information',skills:['Word','PowerPoint','Outlook','OneNote','Organisation numérique'],courses:[['703387','Word - Débutant : créer, mettre en forme et imprimer ses premiers documents professionnels','2 J'],['703388','Word - Intermédiaire : structurer, réviser et enrichir des documents professionnels','2 J'],['702742','Outlook : optimiser votre organisation et gagner en productivité','1 J'],['702739','OneNote : organiser et partager vos notes pour booster votre productivité','1 J']]},
+          {name:'Finance / Comptabilité',type:'OUTILS MÉTIER',tag:'Adapter Excel et la BI aux usages financiers',skills:['Excel métier','Reporting financier','Power BI Finance','Transformation de données'],courses:[['2440','Excel pour comptables','2 J'],['701062','Power BI pour les fonctions comptables et financières','2 J'],['701722','Power Query Excel pour les fonctions comptables et financières','2 J']]},
+          {name:'Communicant·e / Présentateur·rice',type:'PRÉSENTATION',tag:'Créer des documents et présentations plus impactants',skills:['Storytelling visuel','PowerPoint','Mise en forme','Documents professionnels'],courses:[['702750','PowerPoint - Débutant : les fondamentaux de la présentation','1 J'],['702749','PowerPoint - Intermédiaire : des slides efficaces pour des présentations impactantes','2 J'],['703426','Word - Avancé : concevoir, automatiser et finaliser des documents longs et complexes','3 J']]}
+        ]
+      },
+      marketing:{
+        title:'Marketing Digital', kicker:'PLANÈTE CROISSANCE', icon:'◎', c1:'#ffd3f0', c2:'#d71e8a',
+        desc:"Transformer les données, les contenus et les canaux digitaux en acquisition, expérience client et croissance mesurable.",
+        roles:[
+          {name:'Responsable marketing digital',type:'STRATÉGIE',tag:'Piloter une stratégie digitale complète et data-driven',skills:['Stratégie digitale','Data marketing','IA marketing','Pilotage de performance','Expérience client'],courses:[['702808','Responsable marketing digital - Débutant : les compétences clés','3 J'],['702809','Responsable marketing digital - Intermédiaire : booster sa stratégie marketing digital','3 J'],['703299','Marketing IA : exploiter et activer ses données clients avec l’IA','1 J']]},
+          {name:'Acquisition / Growth Manager',type:'SEO · SEA · ADS',tag:'Attirer, convertir et optimiser le ROI',skills:['SEO','SEA','Paid media','Conversion','Google Analytics 4'],courses:[['702817','Acquisition client : conversion et engagement au profit de la performance web','2 J'],['702799','SEO et SEA : piloter sa stratégie de référencement et booster sa visibilité','2 J'],['702794','Publicité digitale : booster le ROI avec SEA, Display, Social ads, Retargeting','2 J'],['702831','SEO : techniques et tendances pour réussir','2 J']]},
+          {name:'Social Media Manager',type:'RÉSEAUX SOCIAUX',tag:'Créer une présence sociale performante et cohérente',skills:['Stratégie social media','Création de contenu','Community management','Paid social','Mesure de performance'],courses:[['702795','Réseaux Sociaux - Débutant : présentation, utilisation et tendances pour bien débuter','2 J'],['702818','Réseaux Sociaux - Intermédiaire : stratégies de communication Social Media efficaces','2 J'],['702794','Publicité digitale : booster le ROI avec SEA, Display, Social ads, Retargeting','2 J']]},
+          {name:'CRM / E-commerce Manager',type:'RELATION CLIENT',tag:'Activer la donnée client pour fidéliser et convertir',skills:['CRM','E-commerce','Personnalisation','Marketing relationnel','Data client'],courses:[['702806','CRM et Marketing relationnel : les clés pour développer son business','2 J'],['702802','E-commerce : stratégie, marketing, outils et optimisation pour une meilleure performance','2 J'],['703299','Marketing IA : exploiter et activer ses données clients avec l’IA','1 J']]},
+          {name:'UX / CX Designer',type:'EXPÉRIENCE UTILISATEUR',tag:'Concevoir des expériences utiles, fluides et mémorables',skills:['UX research','CX design','Ergonomie','Parcours client','Design d’expérience'],courses:[['702830','CX/UX Design - Débutant : les fondamentaux de l’expérience client','3 J'],['702829','UX/CX Design - Intermédiaire : créer des expériences qui marquent','3 J'],['702798','UX Design et Ergonomie : pour une expérience utilisateur optimale','2 J'],['703498','Parcours client et IA : optimiser l’expérience client avec la Data','1 J']]},
+          {name:'Content & Creative Specialist',type:'CRÉATION',tag:'Produire plus vite des contenus visuels de qualité',skills:['Canva','Photoshop','Illustrator','InDesign','Création visuelle'],courses:[['702811','Canva - Débutant : les outils pour réussir sa communication visuelle','1 J'],['702812','Canva - Intermédiaire : techniques avancées pour créer des contenus marquants','1 J'],['702819','Photoshop - Débutant : retoucher, corriger et améliorer ses images','3 J'],['702792','Illustrator - Débutant : les bases de la création de visuels','3 J']]}
+        ]
+      },
+      it:{
+        title:'Informatique', kicker:'PLANÈTE BUILD', icon:'⌘', c1:'#d4ffff', c2:'#37c5de',
+        desc:"Concevoir, piloter et faire évoluer les produits, projets et systèmes d'information qui soutiennent les métiers.",
+        roles:[
+          {name:'Product Owner',type:'PRODUIT',tag:'Piloter la valeur, les besoins et le backlog',skills:['Vision produit','User stories','Priorisation','Scrum','Valeur business'],courses:[['702820','Product Owner - Débutant : acquérir les compétences clés de gestion de projet agile','2 J'],['702788','Product Owner - Intermédiaire : maîtriser le cœur de Scrum et valider ses compétences','2 J'],['703477','Design thinking et IA : innover et concevoir de nouveaux usages','1 J']]},
+          {name:'Scrum Master / Coach Agile',type:'AGILITÉ',tag:'Faire fonctionner l’agilité au quotidien',skills:['Scrum','Facilitation','Coaching agile','Amélioration continue','Jira'],courses:[['702800','Scrum Master - Débutant : maîtriser la gestion de projet agile','2 J'],['702791','Scrum Master - Intermédiaire : piloter ses projets agiles avec succès','2 J'],['702785','Coach agile : méthodologies, techniques et bonnes pratiques','2 J'],['702805','Jira Software - Débutant : booster la gestion de vos projets agiles','2 J']]},
+          {name:'Chef·fe de projet IT',type:'GESTION DE PROJET',tag:'Piloter toutes les phases d’un projet informatique',skills:['Planification','Budget','Risques','Indicateurs projet','Coordination des parties prenantes'],courses:[['702787','Gestion de projet informatique - Débutant : techniques et outils pour les projets IT','3 J'],['702786','Gestion de projet informatique - Intermédiaire : méthodologies pour des projets IT innovants','2 J'],['702821','Gestion de projet informatique : maîtriser toutes les phases d’un projet informatique IT','3 J'],['703476','Mesurer la performance d’un projet Data & IA : KPIs, Dashboards et ROI','3 H']]},
+          {name:'Architecte SI',type:'ARCHITECTURE',tag:'Concevoir et gouverner des architectures applicatives cohérentes',skills:['Architecture applicative','Gouvernance SI','Urbanisation','IA dans le SI','Systèmes d’entreprise'],courses:[['703490','Architecture applicative : comprendre les systèmes et applications d’entreprise','3 H'],['703494','Architecture SI : concevoir et gouverner les Systèmes d’Information','1 J'],['703495','Intégrer l’IA dans un système applicatif : architecture et bonnes pratiques','1 J']]},
+          {name:'Développeur·se / Maker',type:'PROGRAMMATION',tag:'Construire et automatiser des applications métier',skills:['Python','Automatisation','Application métier','Manipulation de données','Prototypage'],courses:[['703496','Python-Débutant : apprendre les bases de Python pour les métiers','3 H'],['703497','Python : automatiser ses tâches et manipuler ses données métier','1 J'],['703491','Construire une application métier : de l’idée au déploiement','1 J']]},
+          {name:'Intégration & Flux Specialist',type:'API · WEBHOOKS · DATA FLOWS',tag:'Faire circuler la donnée entre applications et métiers',skills:['API','Webhooks','Flux de données','Intégration applicative','ETL'],courses:[['703492','Intégrer la donnée dans les systèmes applicatifs : API, Webhooks et flux','3 H'],['703493','Gérer les flux de données dans un système d’information','1 J'],['703470','ETL : collecter, transformer et exploiter ses données métier','1 J']]}
+        ]
+      },
+      cyber:{
+        title:'Cybersécurité', kicker:'PLANÈTE RÉSILIENCE', icon:'◇', c1:'#ffe2bd', c2:'#ff9b3d',
+        desc:"Développer une culture cyber capable de prévenir les risques, protéger les données et réagir efficacement en situation d'incident.",
+        roles:[
+          {name:'Responsable sécurité / RSSI',type:'GOUVERNANCE CYBER',tag:'Structurer la sécurité et piloter les risques',skills:['Politique de sécurité','Gestion des risques','Conformité','Gouvernance','Indicateurs cyber'],courses:[['701038','Cybersécurité : aspects juridiques, techniques et organisationnels','1 J'],['703454','Cybersécurité opérationnelle et RGPD : mettre en œuvre la sécurité et la protection des données','3 H'],['703455','Cybersécurité et RGPD : sécuriser les données et assurer la conformité','3 H']]},
+          {name:'Incident Responder',type:'GESTION DE CRISE',tag:'Détecter, qualifier, contenir et coordonner la réponse',skills:['Détection','Threat intelligence','Réponse à incident','Confinement','Gestion de crise'],courses:[['703453','Gestion de crise cyber : simuler et réagir à une cyberattaque','1 J'],['701076','E-learning - Que faire en cas de cyberattaque ?','45 min']]},
+          {name:'DPO / Privacy Officer',type:'DONNÉES PERSONNELLES',tag:'Relier sécurité, RGPD et protection des données',skills:['RGPD','Sécurité des données','Évaluation des risques','Mesures de protection','Conformité'],courses:[['600578','Cybersécurité et traitement de données personnelles','1 J'],['703455','Cybersécurité et RGPD : sécuriser les données et assurer la conformité','3 H'],['703454','Cybersécurité opérationnelle et RGPD : mettre en œuvre la sécurité et la protection des données','3 H']]},
+          {name:'Juriste cyber',type:'DROIT & CONFORMITÉ',tag:'Traiter les enjeux juridiques avant et après l’incident',skills:['Cadre juridique','Actions juridiques','Gestion des incidents','Conformité','Prévention'],courses:[['701038','Cybersécurité : aspects juridiques, techniques et organisationnels','1 J'],['600578','Cybersécurité et traitement de données personnelles','1 J']]},
+          {name:'Manager risques numériques',type:'RISK',tag:'Intégrer le cyber-risque dans les décisions métier',skills:['Cartographie des risques','Plans d’action','Résilience','Conformité','Gestion de crise'],courses:[['703454','Cybersécurité opérationnelle et RGPD : mettre en œuvre la sécurité et la protection des données','3 H'],['703455','Cybersécurité et RGPD : sécuriser les données et assurer la conformité','3 H'],['703453','Gestion de crise cyber : simuler et réagir à une cyberattaque','1 J']]},
+          {name:'Collaborateur·rice sensibilisé·e',type:'CULTURE CYBER',tag:'Acquérir les bons réflexes face aux attaques',skills:['Réflexes cyber','Signalement','Réaction en cas d’attaque','Protection des données'],courses:[['701076','E-learning - Que faire en cas de cyberattaque ?','45 min'],['703453','Gestion de crise cyber : simuler et réagir à une cyberattaque','1 J']]}
+        ]
+      },
+      data:{
+        title:'Data', kicker:'PLANÈTE DÉCISION', icon:'∿', c1:'#d7ffe9', c2:'#3fd3a0',
+        desc:"Transformer les données métier en leviers de décision et de performance, de la collecte à l'analyse augmentée par l'IA.",
+        roles:[
+          {name:'Data Analyst',type:'ANALYSE',tag:'Interroger, visualiser et raconter les données',skills:['Python','SQL','Dataviz','Analyse exploratoire','Data storytelling'],courses:[['703456','Analyse de données avec Python : maîtriser la visualisation des données','2 J'],['703459','Analyse de données avec l’IA : automatiser et exploiter les données','3 H'],['703463','SQL débutant : interroger et analyser des données','1 J'],['703466','Data storytelling : présenter et communiquer efficacement des données','3 H']]},
+          {name:'Data Engineer',type:'DATA ENGINEERING',tag:'Construire les pipelines et structures de données métier',skills:['Pipelines','ETL','Data Warehouse','Structuration','Qualité des flux'],courses:[['703457','Concevoir un pipeline Data métier de la source à la décision','3 H'],['703469','Data Warehouse : structurer ses données pour piloter l’entreprise','1 J'],['703470','ETL : collecter, transformer et exploiter ses données métier','1 J'],['703465','Structurer des données : organiser les données pour mieux les analyser','3 H']]},
+          {name:'BI / Dashboard Specialist',type:'PILOTAGE',tag:'Industrialiser le reporting et anticiper les tendances',skills:['Tableaux de bord','Power BI','Excel','KPIs','Analyse prédictive'],courses:[['703460','Tableaux de bord avec IA : automatiser et améliorer l’analyse des données','3 H'],['703467','Industrialiser ses Tableaux de bord avec Power BI et Excel','1 J'],['703473','IA pour analyser ses KPIs et anticiper les tendances','3 H']]},
+          {name:'Manager Data-Driven',type:'DÉCISION',tag:'Décider avec la donnée dans l’incertitude',skills:['Décision data-driven','OKR','Pilotage stratégique','Biais cognitifs','ROI Data / IA'],courses:[['703458','Décider avec la data et l’IA dans son métier','1 J'],['703461','Décider dans l’incertitude : stratégies et outils pour les décideurs','1 J'],['703462','Analyse stratégique et prise de décision Data-Driven','1 J']]},
+          {name:'Data Quality & Governance Lead',type:'QUALITÉ',tag:'Fiabiliser les données avant de les exploiter',skills:['Data quality','Nettoyage','Structuration','Traçabilité','Fiabilité'],courses:[['703468','Qualité des données : fiabiliser et nettoyer les données pour l’analyse','3 H'],['703465','Structurer des données : organiser les données pour mieux les analyser','3 H']]},
+          {name:'AI / Document Data Analyst',type:'DATA + IA',tag:'Exploiter modèles prédictifs, LLMs et automatisation',skills:['Modèles prédictifs','LLMs','Analyse documentaire','Automatisation décisionnelle','IA appliquée'],courses:[['703472','Modèle prédictif : construire un modèle simple pour son métier','1 J'],['703474','Exploiter les LLMs pour l’analyse documentaire métier','3 H'],['703475','Data et IA : de la collecte des données à l’automatisation des décisions','1 J']]}
+        ]
+      }
+    };
+const CATALOG_URL='https://formation.lefebvre-dalloz.fr/sites/default/files/medias/documents/2026-10/cata-technos-ldc-27-bd.pdf';
+const familyMap=[
+  {name:'Analyser & cadrer',match:/analyse|besoin|cadr|diagnostic|veille|audit|cartograph|stratég|vision|prioris/i},
+  {name:'Concevoir & structurer',match:/concep|architect|design|structur|modél|user stor|process|planification|parcours|système/i},
+  {name:'Mettre en œuvre',match:/déploi|outil|python|sql|no-code|automati|prompt|production|création|canva|photoshop|illustrator|jira|api|webhook|etl|configuration|crm/i},
+  {name:'Piloter & mesurer',match:/pilot|performance|indicateur|kpi|roi|budget|management|scrum|agile|report|tableau de bord|conversion|analytics/i},
+  {name:'Sécuriser & conformer',match:/risque|sécur|cyber|rgpd|conform|jurid|protection|incident|résilience|responsabilit/i},
+  {name:'Accompagner & communiquer',match:/changement|adoption|coaching|communication|social media|community|facilitation|collaboration|parties prenantes|sensibilis/i}
+];
+function familyFor(skill){const f=familyMap.find(x=>x.match.test(skill));return f?f.name:'Mobiliser & professionnaliser'}
+function competenceSentence(skill){
+  const s=skill.trim(); const lower=s.toLowerCase();
+  if(/risque|sécur|cyber|rgpd|conform|jurid|protection|incident|résilience/.test(lower)) return `Évaluer les enjeux liés à ${s.toLowerCase()} et mettre en œuvre les mesures de sécurisation, de conformité ou de maîtrise des risques adaptées.`;
+  if(/pilot|performance|kpi|roi|budget|indicateur|management/.test(lower)) return `Piloter ${s.toLowerCase()} à l’aide d’objectifs, d’indicateurs et d’arbitrages permettant de mesurer la valeur produite.`;
+  if(/analyse|data|veille|diagnostic|audit|cartograph|décision/.test(lower)) return `Collecter, structurer et analyser les informations utiles à ${s.toLowerCase()} afin d’éclairer une décision professionnelle argumentée.`;
+  if(/concep|architect|design|structur|modél|process|vision|stratég|parcours/.test(lower)) return `Concevoir et formaliser ${s.toLowerCase()} en traduisant un besoin métier en solution, règles ou livrables opérationnels.`;
+  if(/outil|python|sql|no-code|automati|prompt|canva|photoshop|illustrator|jira|api|webhook|etl|crm|erp/.test(lower)) return `Mettre en œuvre ${s.toLowerCase()} dans un contexte métier, paramétrer la solution et vérifier la qualité du résultat obtenu.`;
+  if(/changement|adoption|coaching|communication|collaboration|facilitation|social media|community/.test(lower)) return `Mobiliser ${s.toLowerCase()} pour embarquer les parties prenantes, favoriser l’appropriation et produire une communication adaptée.`;
+  return `Mobiliser ${s.toLowerCase()} dans une situation professionnelle, choisir l’approche adaptée et produire un résultat exploitable.`;
+}
+function moduleCompetencies(course,role){
+  const t=course[1].toLowerCase(); let picks=[];
+  const weighted=role.skills.map((s,i)=>({s,i,score:0}));
+  weighted.forEach(o=>{const words=o.s.toLowerCase().split(/\s+|\/|·|-/).filter(w=>w.length>3);o.score=words.reduce((n,w)=>n+(t.includes(w)?3:0),0)});
+  weighted.sort((a,b)=>b.score-a.score||a.i-b.i);picks=weighted.slice(0,Math.min(3,weighted.length)).map(x=>x.s);
+  return picks.map(s=>({label:s,text:competenceSentence(s),family:familyFor(s)}));
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+
+/* =====================================================================
+   Outils
+   ===================================================================== */
+const $=id=>document.getElementById(id);
+const TAU=Math.PI*2;
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const damp=(c,t,l,dt)=>c+(t-c)*(1-Math.exp(-l*dt));
+const easeIO=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const easeOut=t=>1-Math.pow(1-t,3);
+const mulberry=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const TS=1;
+const order=Object.keys(domains);
+const nn=i=>String(i+1).padStart(2,'0');
+const courseCount=d=>d.roles.reduce((n,r)=>n+r.courses.length,0);
+const fmtDur=s=>{const m=String(s).match(/^(\d+)\s*J$/i);if(m)return `${m[1]} ${+m[1]>1?'jours':'jour'}`;return String(s).replace(/\s*H\s*/i,' h ').replace(/\s+$/,'').replace(/ h $/,' h')};
+const svgArrow='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg>';
+
+if(/Mac|iPhone|iPad/.test(navigator.platform||navigator.userAgent))document.querySelector('#searchBtn kbd').textContent='⌘ K';
+$('catalogBtn').href=CATALOG_URL;$('nogl-cat').href=CATALOG_URL;
+
+const stats=(()=>{const s=new Set();let roles=0;Object.values(domains).forEach(d=>d.roles.forEach(r=>{roles++;r.courses.forEach(c=>s.add(c[0]))}));return{domains:order.length,roles,modules:s.size}})();
+$('stats').innerHTML=`<div><dt>${stats.domains}</dt><dd>galaxies</dd></div><div><dt>${stats.roles}</dt><dd>trajectoires métiers</dd></div><div><dt>${stats.modules}</dt><dd>modules</dd></div>`;
+
+/* =====================================================================
+   Rendu
+   ===================================================================== */
+if(!window.THREE){$('loader').hidden=true;$('nogl').hidden=false;return}
+let renderer;
+try{renderer=new THREE.WebGLRenderer({canvas:$('gl'),antialias:false,powerPreference:'high-performance',stencil:false})}
+catch(e){$('loader').hidden=true;$('nogl').hidden=false;return}
+renderer.setClearColor(0x080205,1);
+let W=innerWidth,H=innerHeight,PR=Math.min(devicePixelRatio||1,1.6),PORT=W/H<.85;
+const HALF=!!(renderer.capabilities.isWebGL2&&(renderer.extensions.get('EXT_color_buffer_float')||renderer.extensions.get('EXT_color_buffer_half_float')));
+const V3=THREE.Vector3,UP=new V3(0,1,0);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(46,W/H,.5,4000);
+const U={uTime:{value:0},uScale:{value:1},uPR:{value:PR}};
+
+/* ---------- Textures procédurales ---------- */
+function radialTex(stops,w=256,h=256,sy=1){
+  const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');
+  g.translate(w/2,h/2);g.scale(1,sy);
+  const gr=g.createRadialGradient(0,0,0,0,0,w/2);stops.forEach(([o,col])=>gr.addColorStop(o,col));
+  g.fillStyle=gr;g.fillRect(-w/2,-h/2/sy,w,h/sy);
+  return new THREE.CanvasTexture(c);
+}
+const texGlow=radialTex([[0,'rgba(255,255,255,1)'],[.12,'rgba(255,255,255,.62)'],[.35,'rgba(255,255,255,.16)'],[.65,'rgba(255,255,255,.04)'],[1,'rgba(255,255,255,0)']]);
+const texStreak=radialTex([[0,'rgba(255,255,255,.95)'],[.2,'rgba(255,255,255,.4)'],[1,'rgba(255,255,255,0)']],512,64,.125);
+const texRing=radialTex([[0,'rgba(255,255,255,0)'],[.7,'rgba(255,255,255,0)'],[.8,'rgba(255,255,255,.9)'],[.84,'rgba(255,255,255,1)'],[.9,'rgba(255,255,255,.25)'],[1,'rgba(255,255,255,0)']]);
+function sprite(tex,color,scale,opacity,sx=1,sy=1){
+  const m=new THREE.SpriteMaterial({map:tex,color,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity});
+  const s=new THREE.Sprite(m);s.scale.set(scale*sx,scale*sy,1);s.userData.base=opacity;return s;
+}
+
+/* ---------- Bruit GLSL partagé ---------- */
+const NOISE=`
+float h31(vec3 p){p=fract(p*.3183099+.1);p*=17.;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
+float n3(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.-2.*f);
+  return mix(mix(mix(h31(i),h31(i+vec3(1,0,0)),f.x),mix(h31(i+vec3(0,1,0)),h31(i+vec3(1,1,0)),f.x),f.y),
+             mix(mix(h31(i+vec3(0,0,1)),h31(i+vec3(1,0,1)),f.x),mix(h31(i+vec3(0,1,1)),h31(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm3(vec3 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*n3(p);p=p*2.03+17.1;a*=.5;}return s;}
+`;
+
+/* ---------- Fond : nébuleuse bordeaux (calculée une fois, puis simple lecture de texture) ---------- */
+const NEB_FS=`varying vec2 vUv;${NOISE}
+void main(){
+  float lon=(vUv.x*2.-1.)*3.14159265,lat=(vUv.y-.5)*3.14159265;
+  vec3 d=vec3(cos(lat)*cos(lon),sin(lat),cos(lat)*sin(lon));
+  vec3 p=d*2.3+vec3(3.1,1.7,5.3);
+  float c=fbm3(p);
+  float c2=fbm3(p*1.9+c*1.4+9.);
+  float cloud=smoothstep(.36,.84,c2)*(.35+.65*smoothstep(.3,.8,c));
+  float fil=pow(1.-abs(2.*fbm3(p*3.2+4.)-1.),5.);
+  vec3 wine=vec3(.28,.018,.055),bord=vec3(.62,.0,.05),beige=vec3(.96,.9,.82);
+  vec3 col=vec3(.010,.003,.008);
+  col+=wine*cloud*.95+bord*cloud*cloud*.5;
+  col+=(beige*.055+bord*.1)*fil*cloud;
+  float band=exp(-pow(d.y*2.4+.2*sin(d.x*3.),2.));
+  col+=wine*band*.4*(.5+c);
+  gl_FragColor=vec4(col,1.);
+}`;
+const nebula=new THREE.Mesh(new THREE.SphereGeometry(1500,32,16),new THREE.ShaderMaterial({
+  side:THREE.BackSide,depthWrite:false,depthTest:false,
+  uniforms:{tNeb:{value:null},uK:{value:1.9}},
+  vertexShader:`varying vec3 vD;void main(){vD=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+  fragmentShader:`varying vec3 vD;uniform sampler2D tNeb;uniform float uK;
+  void main(){vec3 d=normalize(vD);float lon=atan(d.z,d.x),lat=asin(clamp(d.y,-1.,1.));
+    gl_FragColor=vec4(texture2D(tNeb,vec2(lon/6.2831853+.5,lat/3.14159265+.5)).rgb*uK,1.);}`}));
+nebula.renderOrder=-100;nebula.frustumCulled=false;scene.add(nebula);
+
+/* ---------- Étoiles ---------- */
+function makeStars(n,fixedPx,gen){
+  const pos=new Float32Array(n*3),col=new Float32Array(n*3),siz=new Float32Array(n),rn=new Float32Array(n);
+  const rnd=mulberry(fixedPx?11:29),c=new THREE.Color();
+  for(let i=0;i<n;i++){
+    gen(rnd,pos,i*3);
+    const k=rnd();
+    if(k<.7)c.set('#fff6ea');else if(k<.9)c.set('#f4b9ae');else if(k<.97)c.set('#e8cfa8');else c.set('#e0303f');
+    const b=.35+.9*Math.pow(rnd(),2.2);
+    col[i*3]=c.r*b;col[i*3+1]=c.g*b;col[i*3+2]=c.b*b;
+    siz[i]=fixedPx?(.8+rnd()*1.6)*(rnd()<.04?1.8:1):(.35+rnd()*.7);
+    rn[i]=rnd();
+  }
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('aCol',new THREE.BufferAttribute(col,3));
+  g.setAttribute('aSize',new THREE.BufferAttribute(siz,1));g.setAttribute('aRnd',new THREE.BufferAttribute(rn,1));
+  const m=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+    uniforms:{uTime:U.uTime,uScale:U.uScale,uPR:U.uPR,uFixed:{value:fixedPx?1:0}},
+    vertexShader:`attribute vec3 aCol;attribute float aSize,aRnd;uniform float uTime,uScale,uPR,uFixed;varying vec3 vC;varying float vA;
+    void main(){
+      vec4 mv=modelViewMatrix*vec4(position,1.);
+      float tw=.7+.3*sin(uTime*(.5+aRnd*1.9)+aRnd*60.);
+      float px=uFixed>.5?aSize*uPR:aSize*uScale/max(-mv.z,1.);
+      gl_PointSize=clamp(px,1.1*uPR,(uFixed>.5?5.:8.)*uPR);
+      vC=aCol*tw*(uFixed>.5?1.:.7);vA=clamp(px/(1.2*uPR),.25,1.);
+      gl_Position=projectionMatrix*mv;
+    }`,
+    fragmentShader:`varying vec3 vC;varying float vA;void main(){vec2 q=gl_PointCoord-.5;float d=dot(q,q)*4.;float a=exp(-d*4.2)+.25*exp(-d*1.4);gl_FragColor=vec4(vC,a*vA);}`});
+  const p=new THREE.Points(g,m);p.frustumCulled=false;return p;
+}
+const farStars=makeStars(7600,true,(r,p,o)=>{const u=r()*2-1,t=r()*TAU,s=Math.sqrt(1-u*u);p[o]=s*Math.cos(t)*1200;p[o+1]=u*1200;p[o+2]=s*Math.sin(t)*1200});
+farStars.renderOrder=-90;scene.add(farStars);
+const nearStars=makeStars(2600,false,(r,p,o)=>{p[o]=(r()-.5)*560;p[o+1]=(r()-.5)*300;p[o+2]=(r()-.5)*620-40});
+scene.add(nearStars);
+
+/* =====================================================================
+   Galaxies (particules GPU)
+   ===================================================================== */
+const GAL=[
+  {R:15.0,arms:3,twist:1.45,tilt:.55,az:2.4,spin: .030,cols:['#fff3de','#f2b9a2','#e3212f','#58061a']},
+  {R:13.0,arms:2,twist:1.20,tilt:.25,az:.6, spin:-.026,cols:['#f5f0e5','#dba9a6','#b8182c','#4a0a1c']},
+  {R:14.5,arms:4,twist:1.70,tilt:.70,az:4.1,spin: .034,cols:['#fff0d3','#e8c08c','#c83d1f','#561408']},
+  {R:13.5,arms:3,twist:1.30,tilt:.35,az:1.5,spin:-.030,cols:['#fff4ec','#f3a7b6','#b3123f','#4b0622']},
+  {R:15.0,arms:2,twist:1.50,tilt:.60,az:5.3,spin: .028,cols:['#f5f0e5','#e5cbaa','#98000d','#36040d']},
+  {R:13.0,arms:5,twist:1.10,tilt:.30,az:3.2,spin:-.032,cols:['#ffe9c8','#f59a6c','#d2301f','#5e0b0b']},
+  {R:14.5,arms:3,twist:1.60,tilt:.50,az:.1, spin: .027,cols:['#f5f0e5','#e8b8c4','#8e0f3a','#3a0620']}
+];
+const POS_L=[[-50,21,20],[-8,27,-12],[38,19,10],[66,-1,-18],[34,-18,12],[-24,-22,-6],[-67,-12,8]];
+const POS_P=[[-11,72,0],[13,49,-8],[-12,26,6],[12,3,-6],[-13,-20,8],[12,-43,-6],[-9,-66,4]];
+
+const gaussish=r=>(r()+r()+r()-1.5)*1.25;
+function galaxyGeometry(P,idx){
+  const r=mulberry(7919*(idx+3)),N=reduce?20000:27000,R=P.R;
+  const pos=new Float32Array(N*3),col=new Float32Array(N*3),siz=new Float32Array(N),rn=new Float32Array(N);
+  const c0=new THREE.Color(P.cols[0]),c1=new THREE.Color(P.cols[1]),c2=new THREE.Color(P.cols[2]),c3=new THREE.Color(P.cols[3]),t=new THREE.Color();
+  for(let i=0;i<N;i++){
+    let x,y,z,s,b,u;const k=r();
+    if(k<.085){
+      const rr=Math.pow(r(),1.7)*R*.3,th=r()*TAU,ph=Math.acos(2*r()-1);
+      x=rr*Math.sin(ph)*Math.cos(th);z=rr*Math.sin(ph)*Math.sin(th);y=rr*Math.cos(ph)*.55;
+      u=rr/(R*.3)*.28;t.copy(c0).lerp(c1,u/.28*.6);s=.1+.22*r();b=.62-.3*u;
+    }else if(k<.968){
+      u=Math.pow(r(),1.45);const rad=u*R+R*.03,ang=(i%P.arms)/P.arms*TAU+u*P.twist*Math.PI*1.25;
+      const diffuse=r()<.22,sig=R*(diffuse?.26:(.028+.085*u));
+      x=Math.cos(ang)*rad+gaussish(r)*sig;z=Math.sin(ang)*rad+gaussish(r)*sig;y=gaussish(r)*R*.03*(1-.55*u);
+      if(u<.3)t.copy(c0).lerp(c1,u/.3);else if(u<.65)t.copy(c1).lerp(c2,(u-.3)/.35);else t.copy(c2).lerp(c3,(u-.65)/.35);
+      b=(.36+r()*.8)*(1-.42*u);s=.09+.3*Math.pow(r(),3);
+      if(r()<.02){t.copy(c0);s=.45+.35*r();b=1.1}
+    }else{
+      const rr=R*(.25+r()*1.05),th=r()*TAU,ph=Math.acos(2*r()-1);
+      x=rr*Math.sin(ph)*Math.cos(th);z=rr*Math.sin(ph)*Math.sin(th);y=rr*Math.cos(ph)*.7;
+      t.copy(c3).lerp(c2,r());s=.1+.12*r();b=.4;
+    }
+    pos[i*3]=x;pos[i*3+1]=y;pos[i*3+2]=z;
+    col[i*3]=t.r*b;col[i*3+1]=t.g*b;col[i*3+2]=t.b*b;siz[i]=s;rn[i]=r();
+  }
+  const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('aCol',new THREE.BufferAttribute(col,3));
+  g.setAttribute('aSize',new THREE.BufferAttribute(siz,1));g.setAttribute('aRnd',new THREE.BufferAttribute(rn,1));
+  return g;
+}
+function hazeGeometry(P,idx){
+  const r=mulberry(313*(idx+5)),M=200,R=P.R;
+  const off=new Float32Array(M*3),col=new Float32Array(M*3),sz=new Float32Array(M);
+  const c1=new THREE.Color(P.cols[1]),c2=new THREE.Color(P.cols[2]),t=new THREE.Color();
+  for(let i=0;i<M;i++){
+    const core=i<14,u=core?r()*.25:Math.pow(r(),1.1),rad=u*R,ang=(i%P.arms)/P.arms*TAU+u*P.twist*Math.PI*1.25;
+    const sg=R*.05;
+    off[i*3]=Math.cos(ang)*rad+gaussish(r)*sg;off[i*3+1]=gaussish(r)*R*.02;off[i*3+2]=Math.sin(ang)*rad+gaussish(r)*sg;
+    t.copy(c1).lerp(c2,clamp(u*1.3,0,1));
+    const k=core?.026:.03+.035*r();
+    col[i*3]=t.r*k;col[i*3+1]=t.g*k;col[i*3+2]=t.b*k;
+    sz[i]=core?R*(.3+.25*r()):R*(.11+.2*r());
+  }
+  const g=new THREE.InstancedBufferGeometry();
+  g.setAttribute('position',new THREE.Float32BufferAttribute([-1,-1,0,1,-1,0,1,1,0,-1,1,0],3));
+  g.setIndex([0,1,2,0,2,3]);
+  g.setAttribute('aOff',new THREE.InstancedBufferAttribute(off,3));g.setAttribute('aCol',new THREE.InstancedBufferAttribute(col,3));g.setAttribute('aS',new THREE.InstancedBufferAttribute(sz,1));
+  g.instanceCount=M;return g;
+}
+function galaxyMaterials(uOp,uBoost){
+  const shared={uTime:U.uTime,uScale:U.uScale,uPR:U.uPR,uOp,uBoost};
+  const pts=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:shared,
+    vertexShader:`attribute vec3 aCol;attribute float aSize,aRnd;uniform float uTime,uScale,uPR,uOp,uBoost;varying vec3 vC;varying float vA;
+    void main(){
+      vec4 mv=modelViewMatrix*vec4(position,1.);
+      float tw=.8+.2*sin(uTime*(.8+aRnd*2.)+aRnd*50.);
+      float px=aSize*uScale/max(-mv.z,.5);
+      gl_PointSize=clamp(px,1.25*uPR,34.*uPR);
+      vC=aCol*tw*(1.+uBoost*.8);vA=uOp*mix(.3,1.,clamp(px/(1.8*uPR),0.,1.));
+      gl_Position=projectionMatrix*mv;
+    }`,
+    fragmentShader:`varying vec3 vC;varying float vA;void main(){vec2 q=gl_PointCoord-.5;float d=dot(q,q)*4.;float a=exp(-d*5.)+.3*exp(-d*1.6);gl_FragColor=vec4(vC,a*vA);}`});
+  const haze=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,uniforms:shared,
+    vertexShader:`attribute vec3 aOff,aCol;attribute float aS;uniform float uOp,uBoost;varying vec2 vUv;varying vec3 vC;
+    void main(){vec4 mv=modelViewMatrix*vec4(aOff,1.);mv.xy+=position.xy*aS;vUv=position.xy;vC=aCol*(1.+uBoost*.9);gl_Position=projectionMatrix*mv;}`,
+    fragmentShader:`uniform float uOp;varying vec2 vUv;varying vec3 vC;void main(){float d=dot(vUv,vUv);float a=exp(-d*3.4);gl_FragColor=vec4(vC,a*uOp);}`});
+  return{pts,haze};
+}
+
+const galaxies=order.map((id,i)=>{
+  const d=domains[id],P=GAL[i];
+  const root=new THREE.Group(),spin=new THREE.Group();root.add(spin);
+  const uOp={value:1},uBoost={value:0};
+  const mats=galaxyMaterials(uOp,uBoost);
+  const pts=new THREE.Points(galaxyGeometry(P,i),mats.pts);spin.add(pts);
+  const haze=new THREE.Mesh(hazeGeometry(P,i),mats.haze);haze.frustumCulled=false;spin.add(haze);
+  const fade=[];
+  const disc=new THREE.Mesh(new THREE.PlaneGeometry(P.R*2.7,P.R*2.7),new THREE.MeshBasicMaterial({map:texGlow,color:P.cols[2],blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:.08,side:THREE.DoubleSide}));
+  disc.rotation.x=-Math.PI/2;disc.userData.base=.08;root.add(disc);fade.push(disc);
+  const core1=sprite(texGlow,P.cols[1],P.R*1.0,.3),core2=sprite(texGlow,P.cols[1],P.R*.24,.42),streak=sprite(texStreak,P.cols[0],P.R*4.6,.12);
+  [core1,core2,streak].forEach(s=>{root.add(s);fade.push(s)});
+  const sys=new THREE.Group();root.add(sys);
+  // plan du disque : la normale regarde grossièrement la caméra de l'univers, avec une inclinaison propre à chaque galaxie
+  const n=new V3(Math.sin(P.tilt)*Math.cos(P.az),Math.sin(P.tilt)*Math.sin(P.az)+.22,Math.cos(P.tilt)).normalize();
+  root.quaternion.setFromUnitVectors(UP,n);
+  scene.add(root);
+  return{id,i,d,P,root,spin,pts,haze,sys,fade,uOp,uBoost,normal:n,boost:0,op:1,coreK:1,sysK:0,ringSpeed:1,ringAngle:i*1.3,core1,core2,streak,sx:0,sy:0,sr:0,vis:true,dist:100,hov:false};
+});
+
+/* ---------- Noyau central : trou noir et disque d'accrétion ---------- */
+const nucleus=new THREE.Group();nucleus.position.set(0,-3,-8);nucleus.scale.setScalar(1.2);scene.add(nucleus);
+{
+  const hole=new THREE.Mesh(new THREE.SphereGeometry(2.6,48,32),new THREE.MeshBasicMaterial({color:0x000000}));nucleus.add(hole);
+  const dm=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,
+    uniforms:{uTime:U.uTime,uIn:{value:3.1},uOut:{value:13},uInt:{value:2.2}},
+    vertexShader:`varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader:`varying vec2 vP;uniform float uTime,uIn,uOut,uInt;${NOISE}
+    void main(){
+      float r=length(vP),a=atan(vP.y,vP.x);
+      float t=clamp((r-uIn)/(uOut-uIn),0.,1.);
+      float sw=a+uTime*(2.2/(.6+r*.2));
+      float n=n3(vec3(cos(sw)*r*.35,sin(sw)*r*.35,r*.8))*.55+n3(vec3(cos(sw*2.)*r*.9,sin(sw*2.)*r*.9,r*2.))*.45;
+      float heat=pow(1.-t,1.45);
+      vec3 c=mix(vec3(.45,0.,.04),vec3(.95,.16,.12),smoothstep(0.,.7,heat));
+      c=mix(c,vec3(1.,.8,.6),pow(heat,2.6));c=mix(c,vec3(1.,.97,.9),pow(heat,7.));
+      float dop=.55+.75*(.5+.5*cos(a-.7));
+      float edge=smoothstep(0.,.05,t)*(1.-smoothstep(.55,1.,t));
+      float I=(.3+1.5*n)*heat*dop;
+      gl_FragColor=vec4(c*I*uInt,edge);
+    }`});
+  const disc=new THREE.Mesh(new THREE.RingGeometry(3.0,13,180,1),dm);disc.rotation.set(-Math.PI/2+.27,0,.1);nucleus.add(disc);
+  const photon=sprite(texRing,'#f6e3c4',13.5,1);nucleus.add(photon);
+  const halo=sprite(texGlow,'#e0303f',34,.45);nucleus.add(halo);
+  const halo2=sprite(texGlow,'#f5f0e5',13,.45);nucleus.add(halo2);
+  nucleus.userData={disc,photon,halo,halo2};
+}
+
+/* =====================================================================
+   Systèmes planétaires (métiers = planètes, modules = lunes)
+   ===================================================================== */
+const sphereGeo=new THREE.SphereGeometry(1,72,48);
+const PLAN=[
+  {A:'#3a0710',B:'#a8101c',C:'#f5f0e5',atm:'#ff8a7a',mix:.7,sc:1.6,bands:9,sw:1.2,lava:0},
+  {A:'#f5f0e5',B:'#e6b3aa',C:'#b0182a',atm:'#ffd2c4',mix:.4,sc:1.3,bands:7,sw:1.6,lava:0},
+  {A:'#5a141a',B:'#c99a5a',C:'#f4dca8',atm:'#ffcf8f',mix:.35,sc:2.1,bands:5,sw:.8,lava:0},
+  {A:'#1a0309',B:'#5a0a16',C:'#ff6a3c',atm:'#ff6a4a',mix:0,sc:2.6,bands:0,sw:0,lava:1},
+  {A:'#d2b3a6',B:'#8a1a2c',C:'#f5f0e5',atm:'#f6c0b4',mix:.55,sc:1.1,bands:12,sw:1,lava:0},
+  {A:'#2a070d',B:'#a8101c',C:'#e8cfa8',atm:'#ff8f86',mix:.4,sc:1.9,bands:6,sw:2,lava:0}
+];
+const planetVS=`varying vec3 vObj;varying vec3 vN;varying vec3 vW;
+void main(){vObj=normalize(position);vN=normalize(mat3(modelMatrix)*normal);vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`;
+const planetFS=`varying vec3 vObj;varying vec3 vN;varying vec3 vW;
+uniform vec3 uLight,uA,uB,uC,uAtm;uniform float uSeed,uScale,uBands,uSwirl,uMix,uLava,uDim,uHover,uTime;${NOISE}
+void main(){
+  vec3 o=vObj;float ca=cos(uTime*.035+uSeed),sa=sin(uTime*.035+uSeed);
+  o=vec3(ca*o.x+sa*o.z,o.y,-sa*o.x+ca*o.z);
+  vec3 p=o*uScale+vec3(uSeed*5.3,uSeed*2.1,uSeed*7.7);
+  vec3 q=p+.9*vec3(fbm3(p+1.7),fbm3(p+8.3),fbm3(p+4.1));
+  float f=fbm3(q);
+  float bands=.5+.5*sin(o.y*uBands+f*uSwirl*6.+fbm3(p*.9)*4.);
+  float t=mix(f,bands,uMix*.85);
+  vec3 alb=mix(uA,uB,smoothstep(.2,.8,t));
+  alb=mix(alb,uC,smoothstep(.62,.95,fbm3(q*1.6+3.))*(1.-uMix*.4));
+  vec3 N=normalize(vN),L=normalize(uLight-vW),V=normalize(cameraPosition-vW);
+  float ndl=dot(N,L),diff=smoothstep(-.3,.85,ndl);
+  vec3 col=alb*(.12+1.35*diff);
+  col+=alb*.2*pow(max(dot(N,V),0.),1.5);
+  float crack=(1.-smoothstep(0.,.03,abs(f-.5)))*uLava;
+  col+=uC*crack*(1.3-diff*.7);
+  float fr=pow(1.-max(dot(N,V),0.),3.2);
+  col+=uAtm*fr*(.28+.95*smoothstep(-.2,.8,ndl));
+  col+=vec3(1.,.86,.72)*fr*uHover*.9;
+  gl_FragColor=vec4(col*uDim*(1.+uHover*.12),1.);
+}`;
+const atmFS=`varying vec3 vObj;varying vec3 vN;varying vec3 vW;uniform vec3 uLight,uAtm;uniform float uK0,uDim,uHover;
+void main(){
+  vec3 N=normalize(vN),V=normalize(cameraPosition-vW),L=normalize(uLight-vW);
+  float k=clamp(-dot(N,V)/uK0,0.,1.);
+  float a=pow(k,2.2),lit=.25+.75*smoothstep(-.4,.7,dot(N,L));
+  gl_FragColor=vec4(uAtm*a*lit*(1.25+uHover*.9)*uDim,1.);
+}`;
+const ringFS=`varying vec2 vUv;uniform vec3 uA,uB;uniform float uIn,uDim,uOp;${NOISE}
+void main(){
+  float r=length(vUv-.5)*2.,t=(r-uIn)/(1.-uIn);
+  if(t<0.||t>1.)discard;
+  float band=n3(vec3(t*38.,1.3,0.))*.6+n3(vec3(t*95.,4.,2.))*.4;
+  float gap=smoothstep(0.,.04,abs(t-.62));
+  float a=smoothstep(0.,.08,t)*smoothstep(1.,.88,t)*(.25+.75*band)*gap;
+  gl_FragColor=vec4(mix(uA,uB,band)*uDim*.9,a*uOp);
+}`;
+const lightPos=new V3();
+function planetMat(p,seed,lightU){
+  return new THREE.ShaderMaterial({vertexShader:planetVS,fragmentShader:planetFS,uniforms:{
+    uLight:lightU,uTime:U.uTime,uA:{value:new THREE.Color(p.A)},uB:{value:new THREE.Color(p.B)},uC:{value:new THREE.Color(p.C)},uAtm:{value:new THREE.Color(p.atm)},
+    uSeed:{value:seed},uScale:{value:p.sc},uBands:{value:p.bands},uSwirl:{value:p.sw},uMix:{value:p.mix},uLava:{value:p.lava},uDim:{value:1},uHover:{value:0}}});
+}
+const planets=galaxies.map(gal=>{
+  const d=gal.d,n=d.roles.length,rnd=mulberry(5000+gal.i*91);
+  const lightU={value:new V3()};gal.lightU=lightU;
+  const ring=new THREE.Group();gal.sys.add(ring);gal.ring=ring;
+  [8.4,11.6].forEach((rad,k)=>{
+    const m=new THREE.Mesh(new THREE.RingGeometry(rad-.035,rad+.035,256),new THREE.MeshBasicMaterial({color:'#f5f0e5',transparent:true,opacity:.2,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
+    m.rotation.x=-Math.PI/2;m.userData.base=.2;gal.sys.add(m);gal.sysRings=(gal.sysRings||[]);gal.sysRings.push(m);
+  });
+  { // ceinture d'astéroïdes
+    const M=1400,pos=new Float32Array(M*3),col=new Float32Array(M*3),siz=new Float32Array(M),rn=new Float32Array(M),c=new THREE.Color('#e8cfa8');
+    for(let i=0;i<M;i++){const a=rnd()*TAU,r=13.4+gaussish(rnd)*.55;pos[i*3]=Math.cos(a)*r;pos[i*3+1]=gaussish(rnd)*.22;pos[i*3+2]=Math.sin(a)*r;const b=.3+rnd()*.5;col[i*3]=c.r*b;col[i*3+1]=c.g*b;col[i*3+2]=c.b*b;siz[i]=.05+rnd()*.07;rn[i]=rnd()}
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('aCol',new THREE.BufferAttribute(col,3));g.setAttribute('aSize',new THREE.BufferAttribute(siz,1));g.setAttribute('aRnd',new THREE.BufferAttribute(rn,1));
+    const belt=new THREE.Points(g,galaxyMaterials(gal.uOp,gal.uBoost).pts);belt.userData.sysOnly=true;gal.belt=belt;ring.add(belt);
+  }
+  return d.roles.map((role,r)=>{
+    const pal=PLAN[(r+gal.i*2)%PLAN.length],baseR=[1.25,1.05,1.4,1.1,1.3,1.0][(r*5+gal.i)%6]*1.22;
+    const ang=r/n*TAU+(gal.i*.37),rad=r%2?11.6:8.4;
+    const anchor=new THREE.Group();anchor.position.set(Math.cos(ang)*rad,gaussish(rnd)*.35,Math.sin(ang)*rad);ring.add(anchor);
+    const mat=planetMat(pal,gal.i*13+r*3.7,lightU),mesh=new THREE.Mesh(sphereGeo,mat);anchor.add(mesh);
+    const k0=Math.sqrt(1-1/(1.24*1.24));
+    const atmMat=new THREE.ShaderMaterial({vertexShader:planetVS,fragmentShader:atmFS,side:THREE.BackSide,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+      uniforms:{uLight:lightU,uAtm:{value:new THREE.Color(pal.atm)},uK0:{value:k0},uDim:{value:1},uHover:{value:0}}});
+    const atmo=new THREE.Mesh(sphereGeo,atmMat);anchor.add(atmo);
+    let ringMesh=null,ringMat=null;
+    if((r+gal.i)%3===0){
+      ringMat=new THREE.ShaderMaterial({vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:ringFS,transparent:true,depthWrite:false,side:THREE.DoubleSide,
+        uniforms:{uA:{value:new THREE.Color(pal.C)},uB:{value:new THREE.Color(pal.B)},uIn:{value:.62},uDim:{value:1},uOp:{value:.9}}});
+      ringMesh=new THREE.Mesh(new THREE.RingGeometry(1.6,2.6,96),ringMat);ringMesh.rotation.set(-Math.PI/2+.42,0,.35);anchor.add(ringMesh);
+    }
+    const pivot=new THREE.Group();pivot.rotation.set((rnd()-.5)*.9,0,(rnd()-.5)*.9+.25);anchor.add(pivot);
+    const moons=role.courses.map((c,k)=>{
+      const mp={A:'#f5f0e5',B:k%2?'#e6b3aa':'#e8cfa8',C:'#98000d',atm:'#ffe2cf',mix:.2,sc:3.4,bands:4,sw:.6,lava:0};
+      const mm=new THREE.Mesh(sphereGeo,planetMat(mp,k*5.1+r,lightU));pivot.add(mm);
+      const halo=sprite(texGlow,'#f5e6d0',1,.55);mm.add(halo);
+      return{mesh:mm,halo,rm:1.95+k*.3,phi:rnd()*TAU,w:(.32+rnd()*.16)*(rnd()<.5?1:-1),size:.2+rnd()*.05,hi:0};
+    });
+    const orbits=moons.map(m=>{const o=new THREE.Mesh(new THREE.RingGeometry(m.rm-.012,m.rm+.012,128),new THREE.MeshBasicMaterial({color:'#f5f0e5',transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));o.rotation.x=-Math.PI/2;o.visible=false;pivot.add(o);return o});
+    return{g:gal.i,r,role,baseR,anchor,mesh,mat,atmo,atmMat,ringMesh,ringMat,pivot,moons,orbits,k:0,dim:1,hover:0,sx:0,sy:0,sr:0,vis:false,pal};
+  });
+});
+
+/* =====================================================================
+   Post-traitement maison : lueur, grain, aberration, flou de vitesse
+   ===================================================================== */
+const quad=new THREE.Mesh(new THREE.PlaneGeometry(2,2));
+const pscene=new THREE.Scene();pscene.add(quad);
+const pcam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+const QVS=`varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`;
+const pmat=(fs,u)=>new THREE.ShaderMaterial({vertexShader:QVS,fragmentShader:fs,uniforms:u,depthTest:false,depthWrite:false});
+const matBright=pmat(`varying vec2 vUv;uniform sampler2D tD;uniform float uTh;
+  void main(){vec3 c=texture2D(tD,vUv).rgb;float l=max(c.r,max(c.g,c.b));float k=smoothstep(uTh,uTh+.55,l);gl_FragColor=vec4(c*k,1.);}`,{tD:{value:null},uTh:{value:.75}});
+const matBlur=pmat(`varying vec2 vUv;uniform sampler2D tD;uniform vec2 uDir;
+  void main(){vec3 s=texture2D(tD,vUv).rgb*.227027027;
+    s+=(texture2D(tD,vUv+uDir*1.3846153846).rgb+texture2D(tD,vUv-uDir*1.3846153846).rgb)*.3162162162;
+    s+=(texture2D(tD,vUv+uDir*3.2307692308).rgb+texture2D(tD,vUv-uDir*3.2307692308).rgb)*.0702702703;
+    gl_FragColor=vec4(s,1.);}`,{tD:{value:null},uDir:{value:new THREE.Vector2()}});
+const matComp=pmat(`varying vec2 vUv;uniform sampler2D tS,tB0,tB1,tB2,tB3;uniform float uBloom,uWarp,uTime,uExp;uniform vec2 uRes;
+  float hs(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
+  void main(){
+    vec2 c=vUv-.5;float r2=dot(c,c);
+    float ab=(.0006+uWarp*.013)*(.4+r2*3.);
+    vec3 s=vec3(texture2D(tS,vUv+c*ab).r,texture2D(tS,vUv).g,texture2D(tS,vUv-c*ab).b);
+    if(uWarp>.02){vec3 acc=s;for(int i=1;i<8;i++){acc+=texture2D(tS,vUv-c*(float(i)/8.*uWarp*.1)).rgb;}s=mix(s,acc/8.,clamp(uWarp*.9,0.,.85));}
+    vec3 b=texture2D(tB0,vUv).rgb*.5+texture2D(tB1,vUv).rgb*.62+texture2D(tB2,vUv).rgb*.78+texture2D(tB3,vUv).rgb*.95;
+    vec3 col=(s+b*uBloom)*uExp;
+    float mx=max(col.r,max(col.g,col.b));
+    vec3 tm=col/(1.+mx*.85);
+    col=mix(tm,vec3(mx/(1.+mx*.85)),smoothstep(1.8,11.,mx)*.4);
+    col*=1.-smoothstep(.3,.95,length(c)*1.3)*.5;
+    col+=(hs(vUv*uRes+fract(uTime))-.5)*.02;
+    gl_FragColor=vec4(col,1.);}`,{tS:{value:null},tB0:{value:null},tB1:{value:null},tB2:{value:null},tB3:{value:null},uBloom:{value:1},uWarp:{value:0},uTime:U.uTime,uExp:{value:1.55},uRes:{value:new THREE.Vector2(1,1)}});
+let rtS,rtB,bl=[],bloomOn=true;
+function bakeNebula(){
+  const rt=new THREE.WebGLRenderTarget(2048,1024,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat,type:HALF?THREE.HalfFloatType:THREE.UnsignedByteType,depthBuffer:false});
+  rt.texture.wrapS=THREE.RepeatWrapping;
+  const m=pmat(NEB_FS,{});quad.material=m;renderer.setRenderTarget(rt);renderer.render(pscene,pcam);renderer.setRenderTarget(null);m.dispose();
+  nebula.material.uniforms.tNeb.value=rt.texture;
+}
+const mkRT=(w,h,depth)=>new THREE.WebGLRenderTarget(Math.max(2,w|0),Math.max(2,h|0),{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,format:THREE.RGBAFormat,type:HALF?THREE.HalfFloatType:THREE.UnsignedByteType,depthBuffer:!!depth,stencilBuffer:false});
+function buildTargets(){
+  [rtS,rtB,...bl.flatMap(l=>[l.a,l.b])].forEach(t=>t&&t.dispose());
+  const w=W*PR,h=H*PR;rtS=mkRT(w,h,true);rtB=mkRT(w/2,h/2);bl=[];
+  for(let i=0;i<4;i++){const s=2<<i;bl.push({a:mkRT(w/s,h/s),b:mkRT(w/s,h/s),w:w/s,h:h/s})}
+  matComp.uniforms.uRes.value.set(w,h);
+}
+function pass(mat,target){quad.material=mat;renderer.setRenderTarget(target);renderer.render(pscene,pcam)}
+function renderPost(){
+  renderer.setRenderTarget(rtS);renderer.render(scene,camera);
+  if(bloomOn){
+    matBright.uniforms.tD.value=rtS.texture;pass(matBright,rtB);
+    let src=rtB.texture,sw=rtB.width,sh=rtB.height;
+    for(let i=0;i<4;i++){
+      const l=bl[i];
+      matBlur.uniforms.tD.value=src;matBlur.uniforms.uDir.value.set(1/sw,0);pass(matBlur,l.a);
+      matBlur.uniforms.tD.value=l.a.texture;matBlur.uniforms.uDir.value.set(0,1/l.a.height);pass(matBlur,l.b);
+      src=l.b.texture;sw=l.b.width;sh=l.b.height;
+    }
+  }
+  const u=matComp.uniforms;u.tS.value=rtS.texture;
+  for(let i=0;i<4;i++)u['tB'+i].value=bloomOn?bl[i].b.texture:rtS.texture;
+  u.uBloom.value=bloomOn?(.85+warp*.8):0;u.uWarp.value=warp;
+  pass(matComp,null);
+}
+
+/* =====================================================================
+   État, caméra et poses
+   ===================================================================== */
+const S={level:'loading',g:-1,r:-1,c:-1,tab:'f',hoverG:-1,hoverP:-1,hoverM:-1,cardHi:-1};
+const ptr={x:innerWidth/2,y:innerHeight/2,nx:0,ny:0,down:false,lx:0,ly:0,moved:0,over:false,lblG:-1,lblP:-1,lblM:-1};
+const cam={pos:new V3(0,60,560),look:new V3(0,0,-10),fov:44,sx:0,sy:0};
+const orbit={y:0,p:0,ty:0,tp:0};
+let flight=null,warp=0,T=0;
+const _a=new V3(),_b=new V3(),_c=new V3(),_d=new V3(),_e=new V3(),_w=new V3(),_down=new V3();
+
+function applyLayout(){
+  PORT=W/H<.85;
+  galaxies.forEach((g,i)=>{const p=(PORT?POS_P:POS_L)[i];g.root.position.set(p[0],p[1],p[2])});
+}
+function fitDist(ex,ey,fov){
+  const th=Math.tan(fov*Math.PI/360),a=W/H;
+  return Math.max(ex/(th*a),ey/th);
+}
+function poseIntro(t){
+  const k=reduce?0:Math.sin(t*.09);
+  return{pos:new V3(k*16,20+k*3,PORT?480:250-k*12),look:new V3(0,PORT?-6:-2,-8),fov:44,sx:PORT?0:.2,sy:PORT?-.27:.01};
+}
+function poseUniverse(){
+  const d=PORT?fitDist(36,114,46)*1.02:fitDist(96,46,46);
+  return{pos:new V3(0,d*.075,d),look:new V3(0,PORT?0:-1,-6),fov:46,sx:0,sy:PORT?.01:.02};
+}
+function poseDomain(g){
+  const gal=galaxies[g],P=gal.root.position,N=gal.normal;
+  const toCam=_a.copy(poseUniverse().pos).sub(P).normalize();
+  const inPlane=_b.copy(toCam).addScaledVector(N,-toCam.dot(N));
+  if(inPlane.lengthSq()<1e-4)inPlane.set(1,0,0).addScaledVector(N,-N.x);
+  inPlane.normalize();
+  const E=.66,dir=inPlane.multiplyScalar(Math.cos(E)).addScaledVector(N,Math.sin(E)).normalize();
+  const D=PORT?74:35;
+  return{pos:P.clone().addScaledVector(dir,D),look:P.clone(),fov:46,sx:PORT?0:.14,sy:PORT?.15:.01};
+}
+function poseRole(g,r){
+  const gal=galaxies[g],pl=planets[g][r],N=gal.normal;
+  pl.anchor.getWorldPosition(_w);
+  const P=_w.clone(),C=gal.root.position;
+  const d=_a.copy(C).sub(P).normalize(),t=_b.crossVectors(N,d).normalize();
+  const dir=_c.copy(d).multiplyScalar(.62).addScaledVector(t,.7).addScaledVector(N,.42).normalize();
+  const D=PORT?19:14.5;
+  return{pos:P.clone().addScaledVector(dir,D),look:P,fov:46,sx:PORT?0:-.05,sy:PORT?-.12:.05};
+}
+function idlePose(t){
+  switch(S.level){
+    case'loading':case'intro':return poseIntro(t);
+    case'universe':return poseUniverse();
+    case'domain':return poseDomain(S.g);
+    default:return poseRole(S.g,S.r);
+  }
+}
+function flyTo(dur,arc=.2){
+  flight={t:0,dur:reduce?Math.min(dur,.7):dur,arc,side:Math.random()<.5?1:-1,from:{pos:cam.pos.clone(),look:cam.look.clone(),fov:cam.fov,sx:cam.sx,sy:cam.sy}};
+  orbit.ty=0;orbit.tp=0;
+}
+function stepCamera(dt){
+  const to=idlePose(T);
+  if(flight){
+    flight.t=Math.min(1,flight.t+dt/flight.dur);
+    const u=easeIO(flight.t),f=flight.from;
+    _a.copy(to.pos).sub(f.pos);const len=_a.length();
+    _b.crossVectors(_a.normalize(),UP).normalize().multiplyScalar(flight.side*flight.arc*len);
+    _c.copy(f.pos).lerp(to.pos,.5).add(_b);_c.y+=len*flight.arc*.3;
+    const a=1-u;
+    cam.pos.set(0,0,0).addScaledVector(f.pos,a*a).addScaledVector(_c,2*a*u).addScaledVector(to.pos,u*u);
+    cam.look.lerpVectors(f.look,to.look,easeIO(clamp(u*1.1-.02,0,1)));
+    const wp=Math.sin(Math.PI*u);
+    cam.fov=lerp(f.fov,to.fov,u)+(reduce?0:wp*15);
+    cam.sx=lerp(f.sx,to.sx,u);cam.sy=lerp(f.sy,to.sy,u);
+    warp=reduce?0:Math.pow(wp,1.7);
+    if(flight.t>=1)flight=null;
+  }else{
+    const k=1-Math.exp(-5*dt);
+    cam.pos.lerp(to.pos,k);cam.look.lerp(to.look,k);
+    cam.fov=lerp(cam.fov,to.fov,k);cam.sx=lerp(cam.sx,to.sx,k);cam.sy=lerp(cam.sy,to.sy,k);
+    warp=damp(warp,0,6,dt);
+  }
+}
+function applyCamera(dt){
+  orbit.y=damp(orbit.y,orbit.ty,4,dt);orbit.p=damp(orbit.p,orbit.tp,4,dt);
+  const par=reduce?0:1,yaw=orbit.y+ptr.nx*.05*par,pit=orbit.p-ptr.ny*.035*par;
+  _d.copy(cam.pos).sub(cam.look).applyAxisAngle(UP,yaw);
+  _e.copy(_d).negate().cross(UP);
+  if(_e.lengthSq()>1e-6)_d.applyAxisAngle(_e.normalize(),pit);
+  camera.position.copy(cam.look).add(_d);
+  camera.fov=cam.fov;camera.lookAt(cam.look);
+  camera.setViewOffset(W,H,-cam.sx*W,-cam.sy*H,W,H);
+  camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
+  U.uScale.value=H*PR/(2*Math.tan(camera.fov*Math.PI/360));
+  nebula.position.copy(camera.position);farStars.position.copy(camera.position);nebula.rotation.y=T*.0025;
+}
+const _p=new V3(),_sc={x:0,y:0,z:0};
+function toScreen(v){_p.copy(v).project(camera);_sc.x=(_p.x*.5+.5)*W;_sc.y=(-_p.y*.5+.5)*H;_sc.z=_p.z;return _sc}
+const pxPerUnit=dist=>(H/2)/(Math.tan(camera.fov*Math.PI/360)*dist);
+
+/* =====================================================================
+   Étiquettes HTML suivies en 3D
+   ===================================================================== */
+const labelsEl=$('labels');
+const uniq=d=>{const s=new Set();d.roles.forEach(r=>r.courses.forEach(c=>s.add(c[0])));return s.size};
+const gLabels=galaxies.map(gal=>{
+  const el=document.createElement('button');el.className='g-label';el.setAttribute('aria-label',`Explorer la galaxie ${gal.d.title}`);
+  el.innerHTML=`<span class="n">${nn(gal.i)}</span><strong>${esc(gal.d.title)}</strong><span class="m">${gal.d.roles.length} métiers · ${uniq(gal.d)} modules</span><span class="d"><span>${esc(gal.d.desc)}</span></span><span class="go">Explorer ${svgArrow}</span>`;
+  el.addEventListener('pointerenter',()=>{ptr.lblG=gal.i});
+  el.addEventListener('pointerleave',()=>{if(ptr.lblG===gal.i)ptr.lblG=-1});
+  el.addEventListener('click',()=>{if(S.level==='universe')goDomain(gal.i)});
+  labelsEl.appendChild(el);return el;
+});
+const nLabel=document.createElement('div');nLabel.className='n-label';nLabel.innerHTML='<strong>Lefebvre Dalloz Compétences</strong><span>Technologies numériques 2027</span>';labelsEl.appendChild(nLabel);
+let pLabels=[],mTags=[];
+function clearEls(list){list.forEach(e=>e.remove());return[]}
+function buildPlanetLabels(g){
+  pLabels=clearEls(pLabels);ptr.lblP=-1;
+  pLabels=planets[g].map(pl=>{
+    const el=document.createElement('button');el.className='p-label';el.setAttribute('aria-label',`Explorer ${pl.role.name}`);
+    el.innerHTML=`<strong>${esc(pl.role.name)}</strong><span class="m">${esc(pl.role.type)}</span><span class="d"><span>${esc(pl.role.tag)}</span></span>`;
+    el.addEventListener('pointerenter',()=>{ptr.lblP=pl.r});el.addEventListener('pointerleave',()=>{if(ptr.lblP===pl.r)ptr.lblP=-1});
+    el.addEventListener('click',()=>{if(S.level==='domain')goRole(g,pl.r)});
+    labelsEl.appendChild(el);return el;
+  });
+}
+function buildMoonTags(g,r){
+  mTags=clearEls(mTags);ptr.lblM=-1;
+  const pl=planets[g][r];
+  mTags=pl.moons.map((m,k)=>{
+    const el=document.createElement('button');el.className='m-tag';el.textContent=k+1;el.setAttribute('aria-label',`Module ${k+1} : ${pl.role.courses[k][1]}`);
+    el.addEventListener('pointerenter',()=>{ptr.lblM=k});el.addEventListener('pointerleave',()=>{if(ptr.lblM===k)ptr.lblM=-1});
+    el.addEventListener('click',()=>selectCourse(k));
+    labelsEl.appendChild(el);return el;
+  });
+}
+const setT=(el,x,y,s)=>{el.style.transform=`translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) translateX(-50%)${s&&s!==1?` scale(${s.toFixed(3)})`:''}`};
+const show=(el,on)=>{const v=on?'1':'0';if(el._v!==v){el._v=v;el.style.opacity=v;el.style.pointerEvents=on?'':'none'}};
+
+function updateScreen(){
+  const lvl=S.level;
+  // galaxies
+  galaxies.forEach((g,i)=>{
+    const dist=camera.position.distanceTo(g.root.position);g.dist=dist;
+    const s=toScreen(g.root.position);g.sx=s.x;g.sy=s.y;g.sr=g.P.R*pxPerUnit(dist)*.85;g.vis=s.z<1;
+    const el=gLabels[i],on=lvl==='universe'&&g.vis;
+    show(el,on);
+    if(on){_down.set(0,-1,0).applyQuaternion(camera.quaternion);_a.copy(g.root.position).addScaledVector(_down,g.P.R*.82);const q=toScreen(_a);setT(el,q.x,q.y,clamp(112/dist,.82,1.12))}
+  });
+  const nOn=(lvl==='universe'||lvl==='intro')&&nucleus.visible&&lvl==='universe';
+  show(nLabel,nOn);
+  if(nOn){_down.set(0,-1,0).applyQuaternion(camera.quaternion);_a.copy(nucleus.position).addScaledVector(_down,12);const q=toScreen(_a);setT(nLabel,q.x,q.y,1)}
+  // planètes
+  if(S.g>=0){
+    const arr=planets[S.g];
+    arr.forEach(pl=>{
+      pl.anchor.getWorldPosition(_w);const dist=camera.position.distanceTo(_w);
+      const s=toScreen(_w);pl.sx=s.x;pl.sy=s.y;pl.sr=Math.max(pl.baseR*pl.k*pxPerUnit(dist),0);pl.vis=s.z<1&&pl.k>.4;pl.dist=dist;
+    });
+    pLabels.forEach((el,r)=>{
+      const pl=arr[r],on=lvl==='domain'&&pl.vis;show(el,on);
+      if(on){_down.set(0,-1,0).applyQuaternion(camera.quaternion);pl.anchor.getWorldPosition(_a);_a.addScaledVector(_down,pl.baseR*pl.k*1.5+.9);const q=toScreen(_a);setT(el,q.x,q.y,clamp(34/pl.dist,.8,1.15))}
+    });
+    if(lvl==='role'&&mTags.length){
+      const pl=arr[S.r];
+      pl.moons.forEach((m,k)=>{m.mesh.getWorldPosition(_a);const q=toScreen(_a);const el=mTags[k];show(el,q.z<1);m.sx=q.x;m.sy=q.y;m.sr=Math.max(m.size*(1+m.hi*.7)*pl.baseR*pl.k*.9*pxPerUnit(camera.position.distanceTo(_a)),10);let ux=q.x-pl.sx,uy=q.y-pl.sy;const ul=Math.hypot(ux,uy)||1;ux/=ul;uy/=ul;el.style.transform=`translate3d(${(q.x+ux*(m.sr+17)).toFixed(1)}px,${(q.y+uy*(m.sr+17)).toFixed(1)}px,0)`});
+    }
+  }
+  if(lvl!=='role'&&mTags.length)mTags.forEach(el=>show(el,false));
+  if(lvl!=='domain')pLabels.forEach(el=>show(el,false));
+}
+function resolveHover(){
+  let g=-1,p=-1,m=-1;
+  const px=ptr.x,py=ptr.y;
+  if(!flight&&!ptr.down){
+    if(S.level==='universe'){
+      if(ptr.lblG>=0)g=ptr.lblG;
+      else if(ptr.over){let best=1e9;galaxies.forEach(o=>{const d=Math.hypot(o.sx-px,o.sy-py);if(o.vis&&d<o.sr&&d<best){best=d;g=o.i}})}
+    }else if(S.level==='domain'){
+      if(ptr.lblP>=0)p=ptr.lblP;
+      else if(ptr.over){let best=1e9;planets[S.g].forEach(o=>{const d=Math.hypot(o.sx-px,o.sy-py),rr=Math.max(o.sr*1.15,30);if(o.vis&&d<rr&&d<best){best=d;p=o.r}})}
+    }else if(S.level==='role'){
+      if(ptr.lblM>=0)m=ptr.lblM;
+      else if(ptr.over){let best=1e9;planets[S.g][S.r].moons.forEach((o,k)=>{const d=Math.hypot(o.sx-px,o.sy-py);if(d<Math.max(o.sr*1.4,22)&&d<best){best=d;m=k}})}
+    }
+  }
+  S.hoverG=g;S.hoverP=p;S.hoverM=m;
+  gLabels.forEach((el,i)=>el.classList.toggle('hov',i===g));
+  pLabels.forEach((el,i)=>el.classList.toggle('hov',i===p));
+  const hot=g>=0||p>=0||m>=0;
+  $('gl').classList.toggle('hot',hot);$('gl').classList.toggle('drag',ptr.down&&ptr.moved>6);
+}
+
+/* =====================================================================
+   Mise à jour de la scène
+   ===================================================================== */
+let nK=1;
+function updateScene(dt){
+  const lvl=S.level;
+  nK=damp(nK,(lvl==='universe'||lvl==='intro'||lvl==='loading')&&!PORT?1:0,3,dt);
+  nucleus.visible=nK>.01&&!PORT;nucleus.scale.setScalar(1.2*Math.max(nK,.001));
+  galaxies.forEach(gal=>{
+    const act=gal.i===S.g;
+    let tOp=1;if(lvl==='domain')tOp=act?.62:.2;else if(lvl==='role')tOp=act?.32:.1;
+    gal.coreK=damp(gal.coreK,(lvl==='domain'||lvl==='role')&&act?.2:1,3,dt);
+    gal.op=damp(gal.op,tOp,3,dt);
+    gal.boost=damp(gal.boost,(lvl==='universe'&&S.hoverG===gal.i)?1:0,6,dt);
+    gal.uOp.value=gal.op;gal.uBoost.value=gal.boost;
+    gal.spin.rotation.y+=dt*gal.P.spin*(1+gal.boost*2.5);
+    gal.fade.forEach(o=>{o.material.opacity=o.userData.base*gal.op*gal.coreK*(1+gal.boost*.55)});
+    const inSys=(lvl==='domain'||lvl==='role')&&act;
+    gal.sysK=damp(gal.sysK,inSys?1:0,3.2,dt);
+    gal.ringSpeed=damp(gal.ringSpeed,(lvl==='role'&&act)?0:((lvl==='domain'&&act&&S.hoverP>=0)?.12:1),2.5,dt);
+    gal.ringAngle+=dt*.028*gal.ringSpeed;gal.ring.rotation.y=gal.ringAngle;
+    gal.sysRings.forEach(m=>{m.material.opacity=.22*gal.sysK;m.visible=gal.sysK>.02});
+    gal.belt.visible=gal.sysK>.02;
+    gal.lightU.value.copy(gal.root.position);
+  });
+  scene.updateMatrixWorld();
+  const hiM=S.cardHi>=0?S.cardHi:(S.hoverM>=0?S.hoverM:S.c);
+  planets.forEach((arr,gi)=>{
+    const gal=galaxies[gi];
+    arr.forEach(pl=>{
+      let tk=0,td=1;
+      if(gal.sysK>.01){if(lvl==='role'){tk=pl.r===S.r?1.2:.8;td=pl.r===S.r?1:.28}else tk=1;tk*=clamp((gal.sysK-.09*pl.r)*1.7,0,1)}
+      pl.k=damp(pl.k,tk,3.2,dt);pl.dim=damp(pl.dim,td,4,dt);
+      const sel=lvl==='role'&&S.g===gi&&S.r===pl.r;
+      pl.hover=damp(pl.hover,(lvl==='domain'&&S.g===gi&&S.hoverP===pl.r)?1:(sel?.25:0),8,dt);
+      const on=pl.k>.004,s=pl.baseR*Math.max(pl.k,1e-4);
+      pl.anchor.visible=on;if(!on)return;
+      pl.mesh.scale.setScalar(s);pl.atmo.scale.setScalar(s*1.24);
+      pl.mat.uniforms.uDim.value=pl.dim;pl.mat.uniforms.uHover.value=pl.hover;
+      pl.atmMat.uniforms.uDim.value=pl.dim;pl.atmMat.uniforms.uHover.value=pl.hover;
+      if(pl.ringMesh){pl.ringMesh.scale.setScalar(s);pl.ringMat.uniforms.uDim.value=pl.dim}
+      pl.pivot.scale.setScalar(s*(sel?1:.9));
+      pl.orbits.forEach(o=>{o.visible=sel;o.material.opacity=.22*Math.min(1,pl.k)});
+      pl.moons.forEach((m,k)=>{
+        m.phi+=dt*m.w*(sel?1:.7);
+        m.mesh.position.set(Math.cos(m.phi)*m.rm,0,Math.sin(m.phi)*m.rm);
+        m.hi=damp(m.hi,(sel&&hiM===k)?1:0,8,dt);
+        m.mesh.scale.setScalar(m.size*(1+m.hi*.7));
+        m.halo.scale.setScalar(3.6+m.hi*4);
+        m.halo.material.opacity=.5*pl.dim*(sel?1:.8)+m.hi*.4;
+        m.mesh.material.uniforms.uDim.value=pl.dim;
+      });
+    });
+  });
+}
+
+/* ---------- Effet de saut (étirement des étoiles) ---------- */
+const wc=$('warp'),wx=wc.getContext('2d');
+const streaks=Array.from({length:260},()=>({a:Math.random()*TAU,r0:.03+Math.random()*.22,l:.12+Math.random()*.75,s:.35+Math.random()*1.3,c:Math.random(),w:.6+Math.random()*1.6}));
+let meteor=null,nextMeteor=5;
+function drawMeteor(dt){
+  if(reduce||S.level==='loading')return;
+  if(!meteor){nextMeteor-=dt;if(nextMeteor<=0){nextMeteor=7+Math.random()*9;const dir=Math.random()<.5?1:-1,a=(.18+Math.random()*.25)*Math.PI;meteor={x:wc.width*(dir>0?.05+Math.random()*.5:.45+Math.random()*.5),y:wc.height*(.04+Math.random()*.4),vx:Math.cos(a)*dir*1100,vy:Math.sin(a)*1100,life:0,len:150+Math.random()*120}}return}
+  meteor.life+=dt;meteor.x+=meteor.vx*dt;meteor.y+=meteor.vy*dt;
+  const k=Math.sin(Math.min(1,meteor.life/.85)*Math.PI),n=Math.hypot(meteor.vx,meteor.vy),tx=meteor.x-meteor.vx/n*meteor.len,ty=meteor.y-meteor.vy/n*meteor.len;
+  const g=wx.createLinearGradient(tx,ty,meteor.x,meteor.y);g.addColorStop(0,'rgba(245,240,229,0)');g.addColorStop(1,`rgba(245,240,229,${(.85*k).toFixed(3)})`);
+  wx.globalCompositeOperation='lighter';wx.strokeStyle=g;wx.lineWidth=1.6;wx.lineCap='round';wx.beginPath();wx.moveTo(tx,ty);wx.lineTo(meteor.x,meteor.y);wx.stroke();
+  if(meteor.life>.85)meteor=null;
+}
+function drawWarp(dt){
+  wx.clearRect(0,0,wc.width,wc.height);
+  drawMeteor(dt);
+  if(warp<.03||reduce)return;
+  const cx=wc.width/2+cam.sx*wc.width*.35,cy=wc.height/2+cam.sy*wc.height*.35,R=Math.hypot(wc.width,wc.height)*.55;
+  wx.globalCompositeOperation='lighter';wx.lineCap='round';
+  for(const s of streaks){
+    const r1=R*(s.r0+s.s*warp*.5),r2=r1+R*s.l*warp*.55,ca=Math.cos(s.a),sa=Math.sin(s.a);
+    const al=Math.min(.55,warp*(.12+s.c*.4));
+    wx.strokeStyle=s.c<.55?`rgba(245,240,229,${al})`:(s.c<.85?`rgba(240,138,140,${al})`:`rgba(224,48,63,${al})`);
+    wx.lineWidth=s.w*(.6+warp);
+    wx.beginPath();wx.moveTo(cx+ca*r1,cy+sa*r1);wx.lineTo(cx+ca*r2,cy+sa*r2);wx.stroke();
+  }
+}
+
+/* =====================================================================
+   Navigation : Univers → Galaxie → Planète → Lune
+   ===================================================================== */
+const ui=$('ui');
+function setLevel(l){S.level=l;ui.dataset.level=l}
+function goUniverse(){
+  if(S.level==='universe'||S.level==='loading')return;
+  S.g=-1;S.r=-1;S.c=-1;setLevel('universe');flyTo(2.6,.16);syncUI();
+}
+function goDomain(g){
+  if(S.level==='loading'||(S.level==='domain'&&S.g===g))return;
+  const from=S.level;S.g=g;S.r=-1;S.c=-1;setLevel('domain');
+  buildPlanetLabels(g);flyTo(from==='universe'||from==='intro'?3:2.4,from==='domain'?.35:.18);syncUI();
+}
+function goRole(g,r){
+  if(S.level==='loading'||(S.level==='role'&&S.g===g&&S.r===r))return;
+  const sameG=S.g===g;S.g=g;S.r=r;S.c=-1;S.tab='f';setLevel('role');
+  if(!sameG||!pLabels.length)buildPlanetLabels(g);
+  buildMoonTags(g,r);flyTo(2.3,.14);syncUI();
+}
+function goBack(){
+  if(S.level==='role')goDomain(S.g);else if(S.level==='domain')goUniverse();
+}
+function enterUniverse(){
+  if(S.level!=='intro')return;
+  S.g=-1;setLevel('universe');flyTo(3.4,.1);syncUI();
+}
+
+/* ---------- Panneaux ---------- */
+const hints={universe:'Cliquez une galaxie · molette pour zoomer',domain:'Cliquez une planète · Échap pour remonter',role:'Choisissez un module · Échap pour remonter'};
+function syncUI(){
+  // fil d'Ariane
+  const crumbs=[];
+  const mk=(label,fn,cur)=>cur?`<li><span aria-current="page">${esc(label)}</span></li>`:`<li><button data-c="${fn}">${esc(label)}</button></li>`;
+  const d=S.g>=0?galaxies[S.g].d:null,r=d&&S.r>=0?d.roles[S.r]:null;
+  crumbs.push(mk('Univers','u',S.level==='universe'));
+  if(d)crumbs.push(mk(d.title,'d',S.level==='domain'));
+  if(r)crumbs.push(mk(r.name,'r',true));
+  $('crumbs').innerHTML=crumbs.join('');
+  $('crumbs').querySelectorAll('button').forEach(b=>b.onclick=()=>{b.dataset.c==='u'?goUniverse():goDomain(S.g)});
+  $('hintTxt').textContent=hints[S.level]||'';
+  document.querySelectorAll('#gdock button').forEach(b=>b.classList.toggle('on',+b.dataset.i===S.g));
+  if(S.level==='domain')renderDomainPanel();
+  if(S.level==='role'){renderRolePanel();renderDock()}
+}
+function renderDomainPanel(){
+  const gal=galaxies[S.g],d=gal.d;
+  $('dpanel').innerHTML=`<p class="kicker">Galaxie ${nn(S.g)} sur ${nn(order.length-1)}</p><h2>${esc(d.title)}</h2><p>${esc(d.desc)}</p>
+  <div class="facts"><span class="fact"><b>${d.roles.length}</b>trajectoires métiers</span><span class="fact"><b>${uniq(d)}</b>modules</span></div>
+  <p class="nudge"><i></i>Choisissez une planète pour découvrir le métier</p>`;
+}
+function renderRolePanel(){
+  const d=galaxies[S.g].d,r=d.roles[S.r];
+  $('rpanel').innerHTML=`<p class="kicker">${esc(d.title)} · ${esc(r.type)}</p><h2>${esc(r.name)}</h2><p>${esc(r.tag)}</p>
+  <div class="facts"><span class="fact"><b>${r.courses.length}</b>modules</span><span class="fact"><b>${r.skills.length}</b>compétences</span></div>`;
+}
+function renderDock(){
+  const d=galaxies[S.g].d,r=d.roles[S.r];
+  const mods=r.courses.map((c,i)=>{
+    const comps=moduleCompetencies(c,r);
+    return`<article class="mod${S.c===i?' open':''}" data-i="${i}">
+      <button class="mod-h" aria-expanded="${S.c===i}"><span class="mod-n">${i+1}</span><span class="mod-t">${esc(c[1])}</span><span class="mod-d">${esc(fmtDur(c[2]))}</span></button>
+      <div class="mod-b"><div class="mod-in"><div>
+        <p class="mod-ref">Réf. ${esc(c[0])} · Compétences travaillées</p>
+        <div class="chips">${comps.map(x=>`<div class="chip"><small>${esc(x.family)}</small><span>${esc(x.label)}</span></div>`).join('')}</div>
+        <a class="link" href="${CATALOG_URL}" target="_blank" rel="noreferrer">Voir au catalogue 2027 ${svgArrow}</a>
+      </div></div></div></article>`}).join('');
+  const skills=r.skills.map(s=>`<div class="comp"><b>${esc(s)}</b><p>${esc(competenceSentence(s))}</p><span class="fam">${esc(familyFor(s))}</span></div>`).join('');
+  $('dock').innerHTML=`<div class="dock-head"><div class="tabs" role="tablist">
+    <button role="tab" data-tab="f" aria-selected="${S.tab==='f'}">Formations <b>${r.courses.length}</b></button>
+    <button role="tab" data-tab="c" aria-selected="${S.tab==='c'}">Compétences <b>${r.skills.length}</b></button></div></div>
+    <div class="dock-body">${S.tab==='f'?`<p class="dock-note">Chaque lune qui orbite autour de la planète est un module. Survolez une carte pour la repérer.</p>${mods}`:`<p class="dock-note">Formulation orientée activité, inspirée de la logique des référentiels RNCP. Repères indicatifs, non blocs certifiants.</p>${skills}`}</div>`;
+  $('dock').querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;renderDock()});
+  $('dock').querySelectorAll('.mod').forEach(el=>{
+    const i=+el.dataset.i;
+    el.querySelector('.mod-h').onclick=()=>selectCourse(S.c===i?-1:i);
+    el.addEventListener('pointerenter',()=>{S.cardHi=i;el.classList.add('hi')});
+    el.addEventListener('pointerleave',()=>{S.cardHi=-1;el.classList.remove('hi')});
+  });
+}
+function selectCourse(i){
+  S.c=i;
+  if(S.tab!=='f'){S.tab='f';renderDock()}
+  document.querySelectorAll('#dock .mod').forEach((el,j)=>{const on=j===i;el.classList.toggle('open',on);el.querySelector('.mod-h').setAttribute('aria-expanded',on)});
+  mTags.forEach((el,k)=>el.classList.toggle('hi',k===i));
+  const el=document.querySelector(`#dock .mod[data-i="${i}"]`);if(el)setTimeout(()=>el.scrollIntoView({block:'nearest',behavior:reduce?'auto':'smooth'}),60);
+}
+
+/* ---------- Dock des galaxies ---------- */
+$('gdock').innerHTML=galaxies.map(g=>`<button data-i="${g.i}" data-label="${esc(g.d.title)}" aria-label="Galaxie ${nn(g.i)} : ${esc(g.d.title)}">${g.i+1}</button>`).join('');
+$('gdock').querySelectorAll('button').forEach(b=>b.onclick=()=>goDomain(+b.dataset.i));
+
+/* ---------- Recherche ---------- */
+const flat=[];
+galaxies.forEach(gal=>gal.d.roles.forEach((r,ri)=>{
+  flat.push({kind:'role',g:gal.i,ri,domain:gal.d.title,title:r.name,sub:r.type,blob:[r.name,r.type,r.tag,...r.skills].join(' ')});
+  r.courses.forEach((c,ci)=>flat.push({kind:'course',g:gal.i,ri,ci,domain:gal.d.title,title:c[1],sub:`${r.name} · Réf. ${c[0]}`,blob:[c.join(' '),r.name,r.type,...r.skills].join(' ')}));
+}));
+const overlay=$('searchOverlay'),input=$('searchInput'),results=$('results');
+let hits=[],sel=0;
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+function openSearch(){if(S.level==='loading')return;overlay.classList.add('open');input.value='';renderSearch('');setTimeout(()=>input.focus(),60)}
+function closeSearch(){overlay.classList.remove('open');input.blur()}
+function renderSearch(q){
+  const s=norm(q.trim());
+  hits=flat.filter(x=>!s||norm(x.blob).includes(s)).slice(0,24);sel=0;
+  results.innerHTML=hits.length?hits.map((x,i)=>`<button class="result${i===0?' sel':''}" data-i="${i}"><span class="dot">${x.kind==='course'?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>':'<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/><ellipse cx="12" cy="12" rx="10" ry="3.2" fill="none" stroke="currentColor" stroke-width="1.6" transform="rotate(-20 12 12)"/></svg>'}</span><span><strong>${esc(x.title)}</strong><small>${esc(x.domain)} · ${esc(x.sub)}</small></span><em>${x.kind==='course'?'module':'métier'}</em></button>`).join(''):'<div class="nores">Aucun résultat. Essayez « data », « cyber », « automatisation » ou « ROI ».</div>';
+  results.querySelectorAll('.result').forEach(el=>el.onclick=()=>pick(+el.dataset.i));
+}
+function pick(i){
+  const x=hits[i];if(!x)return;closeSearch();
+  goRole(x.g,x.ri);
+  if(x.kind==='course')setTimeout(()=>selectCourse(x.ci),flight?2400:300);
+}
+input.addEventListener('input',e=>renderSearch(e.target.value));
+input.addEventListener('keydown',e=>{
+  if(!hits.length)return;
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();sel=(sel+(e.key==='ArrowDown'?1:-1)+hits.length)%hits.length;results.querySelectorAll('.result').forEach((el,i)=>{el.classList.toggle('sel',i===sel);if(i===sel)el.scrollIntoView({block:'nearest'})})}
+  if(e.key==='Enter'){e.preventDefault();pick(sel)}
+});
+$('searchBtn').onclick=openSearch;$('closeSearch').onclick=closeSearch;overlay.addEventListener('click',e=>{if(e.target===overlay)closeSearch()});
+
+/* ---------- Divers : RNCP, clavier, souris ---------- */
+const rp=$('rncp');$('rncpBtn').onclick=()=>{rp.classList.toggle('open');$('rncpBtn').setAttribute('aria-expanded',rp.classList.contains('open'))};
+$('brand').onclick=()=>{if(S.level!=='intro')goUniverse()};
+$('enter').onclick=enterUniverse;
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if(overlay.classList.contains('open'))closeSearch();else if(rp.classList.contains('open'))rp.classList.remove('open');else goBack();return}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openSearch();return}
+  if(e.target.matches&&e.target.matches('input,textarea'))return;
+  if(e.key==='Enter'&&S.level==='intro'){enterUniverse();return}
+  if(/^[1-7]$/.test(e.key)&&S.level!=='intro'&&S.level!=='loading')goDomain(+e.key-1);
+});
+const cv=$('gl');
+cv.addEventListener('pointerdown',e=>{ptr.down=true;ptr.moved=0;ptr.lx=e.clientX;ptr.ly=e.clientY;try{cv.setPointerCapture(e.pointerId)}catch(_){}});
+addEventListener('pointermove',e=>{
+  ptr.x=e.clientX;ptr.y=e.clientY;ptr.nx=e.clientX/W-.5;ptr.ny=e.clientY/H-.5;ptr.over=e.target===cv;
+  if(ptr.down){
+    const dx=e.clientX-ptr.lx,dy=e.clientY-ptr.ly;ptr.lx=e.clientX;ptr.ly=e.clientY;ptr.moved+=Math.abs(dx)+Math.abs(dy);
+    if(S.level!=='intro'&&S.level!=='loading'){orbit.ty=clamp(orbit.ty-dx*.0035,-1.1,1.1);orbit.tp=clamp(orbit.tp-dy*.003,-.5,.5)}
+  }
+});
+cv.addEventListener('pointerup',e=>{
+  const click=ptr.down&&ptr.moved<6;ptr.down=false;try{cv.releasePointerCapture(e.pointerId)}catch(_){}
+  if(!click||flight)return;
+  if(S.level==='universe'&&S.hoverG>=0)goDomain(S.hoverG);
+  else if(S.level==='domain'&&S.hoverP>=0)goRole(S.g,S.hoverP);
+  else if(S.level==='role'&&S.hoverM>=0)selectCourse(S.hoverM);
+});
+cv.addEventListener('pointercancel',()=>{ptr.down=false});
+cv.addEventListener('pointerleave',()=>{ptr.over=false});
+let wheelAcc=0,wheelTimer=0;
+addEventListener('wheel',e=>{
+  if(e.target.closest&&(e.target.closest('.glass')||e.target.closest('#searchOverlay')))return;
+  if(flight||S.level==='intro'||S.level==='loading')return;
+  wheelAcc+=e.deltaY;clearTimeout(wheelTimer);wheelTimer=setTimeout(()=>{wheelAcc=0},200);
+  if(Math.abs(wheelAcc)<70)return;
+  const inward=wheelAcc<0;wheelAcc=0;
+  if(!inward){goBack();return}
+  if(S.level==='universe'){let g=S.hoverG,b=1e9;if(g<0)galaxies.forEach(o=>{const d=Math.hypot(o.sx-ptr.x,o.sy-ptr.y);if(d<b){b=d;g=o.i}});goDomain(g)}
+  else if(S.level==='domain'){let p=S.hoverP,b=1e9;if(p<0)planets[S.g].forEach(o=>{const d=Math.hypot(o.sx-ptr.x,o.sy-ptr.y);if(d<b){b=d;p=o.r}});goRole(S.g,p)}
+},{passive:true});
+let toastT=0;
+function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200)}
+
+/* =====================================================================
+   Boucle de rendu et qualité adaptative
+   ===================================================================== */
+function resize(){
+  W=innerWidth;H=innerHeight;
+  renderer.setPixelRatio(PR);renderer.setSize(W,H,false);
+  camera.aspect=W/H;wc.width=W;wc.height=H;U.uPR.value=PR;
+  buildTargets();applyLayout();
+}
+addEventListener('resize',resize);
+let qLevel=0,slow=0,fps=60,last=performance.now(),frames=0,gx=innerWidth/2,gy=innerHeight/2;
+const glowEl=$('glow');
+function degrade(){
+  qLevel++;
+  if(qLevel===1){PR=1;resize()}
+  else if(qLevel===2){bloomOn=false;galaxies.forEach(g=>g.pts.geometry.setDrawRange(0,Math.floor(g.pts.geometry.getAttribute('position').count*.55)))}
+}
+function frame(now){
+  requestAnimationFrame(frame);
+  const raw=Math.min((now-last)/1000,.1);last=now;const dt=raw*TS;T+=dt;frames++;
+  U.uTime.value=T;
+  updateScene(dt);
+  stepCamera(dt);applyCamera(dt);
+  updateScreen();resolveHover();
+  renderPost();drawWarp(raw);
+  gx=lerp(gx,ptr.x,.14);gy=lerp(gy,ptr.y,.14);glowEl.style.transform=`translate3d(${gx.toFixed(1)}px,${gy.toFixed(1)}px,0)`;
+  labelsEl.classList.toggle('flying',!!flight&&flight.t>.02&&flight.t<.98);
+  const fl=flight?'1':'0';if(ui.dataset.flying!==fl)ui.dataset.flying=fl;
+  if(S.level!=='loading'&&!flight){fps=lerp(fps,1/Math.max(raw,.001),.06);if(fps<26)slow+=raw;else slow=Math.max(0,slow-raw*.5);if(slow>3&&qLevel<2){slow=0;degrade()}}
+}
+resize();
+bakeNebula();
+galaxies.forEach(g=>{g.sx=W/2;g.sy=H/2});
+// Cinématique d'ouverture : depuis le vide jusqu'à la vue lointaine de l'univers
+S.level='loading';
+cam.pos.set(0,70,640);cam.look.set(0,0,-10);cam.fov=44;cam.sx=PORT?0:.2;cam.sy=PORT?-.27:.01;
+syncUI();
+requestAnimationFrame(frame);
+setTimeout(()=>{
+  $('loader').classList.add('done');
+  setLevel('intro');flyTo(5,.06);syncUI();
+},700);
+})();
+</script>
+</body>
+</html>
