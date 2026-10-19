@@ -1199,25 +1199,25 @@ const ui=$('ui');
 function setLevel(l){S.level=l;ui.dataset.level=l}
 function goUniverse(){
   if(S.level==='universe'||S.level==='loading')return;
-  S.g=-1;S.r=-1;S.c=-1;setLevel('universe');flyTo(2.6,.16);syncUI();
+  S.g=-1;S.r=-1;S.c=-1;setLevel('universe');flyTo(1.8,.16);syncUI();
 }
 function goDomain(g){
   if(S.level==='loading'||(S.level==='domain'&&S.g===g))return;
   const from=S.level;S.g=g;S.r=-1;S.c=-1;setLevel('domain');
-  buildPlanetLabels(g);flyTo(from==='universe'||from==='intro'?3:2.4,from==='domain'?.35:.18);syncUI();
+  buildPlanetLabels(g);flyTo(from==='universe'||from==='intro'?2.1:1.7,from==='domain'?.35:.18);syncUI();
 }
 function goRole(g,r){
   if(S.level==='loading'||(S.level==='role'&&S.g===g&&S.r===r))return;
   const sameG=S.g===g;S.g=g;S.r=r;S.c=-1;S.tab='f';setLevel('role');
   if(!sameG||!pLabels.length)buildPlanetLabels(g);
-  buildMoonTags(g,r);flyTo(2.3,.14);syncUI();
+  buildMoonTags(g,r);flyTo(1.6,.14);syncUI();
 }
 function goBack(){
   if(S.level==='role')goDomain(S.g);else if(S.level==='domain')goUniverse();
 }
 function enterUniverse(){
   if(S.level!=='intro')return;
-  S.g=-1;setLevel('universe');flyTo(3.4,.1);syncUI();
+  S.g=-1;setLevel('universe');flyTo(2.4,.1);syncUI();
 }
 
 /* ---------- Panneaux ---------- */
@@ -1304,7 +1304,7 @@ function renderSearch(q){
 function pick(i){
   const x=hits[i];if(!x)return;closeSearch();
   goRole(x.g,x.ri);
-  if(x.kind==='course')setTimeout(()=>selectCourse(x.ci),flight?2400:300);
+  if(x.kind==='course')setTimeout(()=>selectCourse(x.ci),flight?1800:300);
 }
 input.addEventListener('input',e=>renderSearch(e.target.value));
 input.addEventListener('keydown',e=>{
@@ -1397,7 +1397,7 @@ syncUI();
 requestAnimationFrame(frame);
 setTimeout(()=>{
   $('loader').classList.add('done');
-  setLevel('intro');flyTo(5,.06);syncUI();
+  setLevel('intro');flyTo(3.6,.06);syncUI();
 },700);
 })();
 </script>

@@ -1,7 +1,7 @@
 # Univers Techno Numérique 2027
 
 Exploration 3D du catalogue Technologies Numériques 2027 de Lefebvre Dalloz Compétences.
-Un seul fichier à ouvrir : `index.html` (aucune installation, aucun serveur).
+Deux façons de l’ouvrir, sans installation ni serveur : `univers-techno-numerique-2027.html` (fichier autonome, fonctionne sans réseau) ou `index.html` (version éditable, avec `vendor/` en secours).
 
 ## Parcours
 
