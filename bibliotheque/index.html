@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La Bibliothèque des Compétences · Skilia par Lefebvre Dalloz Compétences</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="gl" aria-label="La bibliothèque en 3D"></canvas>
+
+<!-- Écran d'entrée et « Bibliothécaire » (filtre des rayons) -->
+<section id="gate" class="gate" aria-labelledby="gateTitle">
+  <div class="gate-card">
+    <div class="g-top"><span class="wordmark">Skilia</span><span class="byline">par Lefebvre Dalloz<br>Compétences</span><span class="g-kicker">Catalogue 2027</span></div>
+    <h1 id="gateTitle">La Bibliothèque <em>des Compétences</em></h1>
+    <p class="g-lead" id="gateLead">Un rayon par domaine, une travée par thématique, un grand livre par formation. Ouvrez-les, reliez-les à France compétences, composez votre parcours.</p>
+
+    <div class="g-step"><h2><span class="n">1</span>Qui êtes-vous ?</h2><div id="personas" class="chips"></div></div>
+    <div class="g-step"><h2><span class="n">2</span>Un besoin précis ?</h2>
+      <input id="needQ" class="input" type="search" placeholder="Ex. : paie, bail commercial, IA, document unique, prise de parole…" autocomplete="off" aria-label="Décrivez votre besoin">
+      <ul id="needRes" class="need-res"></ul>
+    </div>
+    <div class="g-step"><h2><span class="n">3</span>Vos rayons <span class="g-tools"><button id="selAll" class="linklike">tout ouvrir</button> · <button id="selNone" class="linklike">tout fermer</button></span></h2><div id="doms" class="doms"></div></div>
+
+    <div class="g-foot">
+      <button id="enter" class="btn btn-primary">Entrer dans la bibliothèque</button>
+      <button id="gateClose" class="btn btn-ghost" hidden>Fermer</button>
+      <span id="gateSum" class="g-sum"></span>
+    </div>
+    <p class="g-note">Les rayons fermés restent visibles, grille baissée : vous pourrez les rouvrir à tout moment. Contenu de démonstration, à brancher sur le catalogue 2027.</p>
+  </div>
+</section>
+
+<!-- Interface en jeu -->
+<div id="hud" class="hud" hidden>
+  <div class="hud-tl"><span class="wordmark">Skilia</span><span class="byline">par Lefebvre Dalloz<br>Compétences</span></div>
+  <nav id="crumbs" class="hud-tc" aria-label="Où suis-je ?"></nav>
+  <div class="hud-tr">
+    <button id="xpChip" class="xp" title="Ouvrir le carnet du lecteur"><span id="xpLevel">Lecteur curieux</span><span class="xp-bar"><i id="xpFill"></i></span><span id="xpVal">0 XP</span></button>
+    <button id="btnFilter" class="hbtn">Rayons <kbd>F</kbd></button>
+    <button id="btnJourney" class="hbtn">Mon parcours <span id="jCount" class="count">0</span> <kbd>P</kbd></button>
+    <button id="btnQuests" class="hbtn">Carnet <kbd>J</kbd></button>
+    <button id="btnSound" class="hbtn icon" title="Son (M)" aria-label="Activer ou couper le son">♪</button>
+    <button id="btnHelp" class="hbtn icon" title="Aide (H)" aria-label="Aide">?</button>
+  </div>
+  <div class="hud-bl"><canvas id="mini" width="320" height="320" aria-hidden="true"></canvas><div id="joy" class="joy" hidden><i></i></div></div>
+  <div class="hud-bc">
+    <div class="search"><input id="searchQ" class="input" type="search" placeholder="Chercher un livre, un métier, une compétence…" autocomplete="off" aria-label="Rechercher dans le catalogue"><ul id="searchRes" class="search-res" hidden></ul></div>
+    <p id="hint" class="hint"></p>
+  </div>
+  <div class="hud-br"><button id="btnNext" class="hbtn big" hidden>★ Livre recommandé suivant <kbd>N</kbd></button></div>
+</div>
+
+<div id="tip" class="tip" hidden></div>
+
+<!-- Fiche d'un livre -->
+<aside id="bookPanel" class="bpanel" hidden aria-live="polite"></aside>
+
+<!-- Tiroirs -->
+<aside id="journey" class="drawer" hidden aria-label="Mon parcours"></aside>
+<aside id="quests" class="drawer" hidden aria-label="Carnet du lecteur"></aside>
+<aside id="help" class="helpbox" hidden>
+  <h3>Se repérer</h3>
+  <p><b>Regarder</b> : glissez la souris (ou le doigt).<br><b>Marcher</b> : <kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> ou <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd>, <kbd>Maj</kbd> pour courir, molette pour avancer.<br><b>Aller quelque part</b> : cliquez une porte, une travée ou un livre.</p>
+  <p><kbd>F</kbd> rayons · <kbd>P</kbd> parcours · <kbd>J</kbd> carnet · <kbd>N</kbd> livre recommandé suivant · <kbd>M</kbd> son · <kbd>Échap</kbd> fermer / sortir du rayon</p>
+  <button class="btn btn-ghost small" id="helpClose">Compris</button>
+</aside>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<div id="curtain" class="curtain"><span class="wordmark">Skilia</span><p id="curtainTxt"></p></div>
+
+<script src="vendor/three.min.js"></script>
+<script src="data.js"></script>
+<script src="textures.js"></script>
+<script src="book.js"></script>
+<script src="world.js"></script>
+<script src="ui.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
