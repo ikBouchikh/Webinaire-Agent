@@ -258,6 +258,220 @@ a{color:inherit;text-decoration:none}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
 /* ---------- Adaptatif ---------- */
+/* ---------- Mission diagnostic ---------- */
+.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border-radius:999px;font-size:14px;font-weight:700;color:var(--beige);background:rgba(245,240,229,.06);border:1px solid var(--line-strong);transition:background .25s,transform .3s var(--ease),border-color .25s,box-shadow .3s}
+.btn:hover{background:rgba(245,240,229,.13);transform:translateY(-2px)}
+.btn.solid{background:var(--bordeaux);border-color:rgba(245,240,229,.3);box-shadow:0 14px 40px -14px rgba(224,48,63,.85)}
+.btn.solid:hover{background:#b3001a}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--txt-2)}
+.btn.ghost:hover{color:var(--beige);background:rgba(245,240,229,.07)}
+.btn.big{padding:16px 26px;font-size:16px}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.btn .cnt{font:400 15px/1 var(--f-display);padding:3px 9px;border-radius:999px;background:rgba(8,2,5,.4);font-variant-numeric:tabular-nums}
+.hero-actions .btn.ghost{border-color:var(--line-strong);padding:14px 22px;font-size:15px;color:var(--beige)}
+.hero-actions .btn.ghost:hover{background:rgba(245,240,229,.1)}
+.hero-actions .btn small{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:rgba(232,207,168,.16);color:var(--champagne)}
+.q-only{opacity:0;visibility:hidden;transform:translate3d(0,22px,0);transition:opacity .5s ease,transform .8s var(--ease),visibility 0s linear .8s}
+.q-hud{opacity:0;visibility:hidden;transform:translate3d(0,-14px,0);transition:opacity .5s ease,transform .7s var(--ease),visibility 0s linear .7s}
+body[data-mode=quiz] .q-hud{opacity:1;visibility:visible;transform:none;transition-delay:.3s,.3s,0s}
+body[data-qs=brief] #qbrief,body[data-qs=pick] #qpick,body[data-qs=ask] #qask,body[data-qs=recap] #qrecap,body[data-qs=final] #qfinal{opacity:1;visibility:visible;transform:none;transition-delay:.55s,.55s,0s}
+body[data-mode=quiz] #ui :is(.crumbs,#gdock,#hint,#dpanel,#rpanel,#dock,.rncp,#searchBtn,#quizBtn){opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+body[data-qs=brief] .g-label,body[data-qs=final] .g-label{opacity:0!important;pointer-events:none!important}
+body[data-qs=ask] .p-label,body[data-qs=final] .p-label{opacity:0!important;pointer-events:none!important}
+body[data-qs=brief] #qrail,body[data-qs=final] #qrail{opacity:0!important;visibility:hidden!important;pointer-events:none}
+body[data-mode=quiz] .scrim{opacity:1}
+body[data-qs=brief] .scrim,body[data-qs=final] .scrim{background:radial-gradient(ellipse at 50% 50%,rgba(8,2,5,.78),rgba(8,2,5,.45) 70%)}
+body[data-qs=ask] .scrim{background:linear-gradient(270deg,rgba(8,2,5,.6) 0,rgba(8,2,5,.3) 36%,rgba(8,2,5,0) 60%)}
+.qcard{position:absolute;border-radius:28px;padding:28px}
+.qcard h2{margin-top:16px;font:300 clamp(30px,3.1vw,46px)/1.02 var(--f-display);font-variation-settings:"opsz" 144;letter-spacing:-.03em;text-wrap:balance}
+.q-lede{margin-top:16px;font-size:15px;line-height:1.6;color:var(--txt-2);max-width:60ch}
+.q-sub{margin-top:24px;font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--txt-3)}
+.q-actions{margin-top:26px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.q-est{font-size:13px;font-weight:600;color:var(--txt-3);margin:0 6px}
+#qbrief{inset:calc(88px + env(safe-area-inset-top,0px)) 0 calc(36px + env(safe-area-inset-bottom,0px)) 0;margin:auto;height:max-content;max-height:calc(100% - 124px);overflow:auto;width:min(780px,calc(100vw - 32px))}
+.q-steps{list-style:none;padding:0;margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.q-steps li{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(245,240,229,.04);font-size:13.5px;font-weight:600}
+.q-steps b{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:10px;background:var(--beige);color:var(--bordeaux);font:400 16px/1 var(--f-display)}
+.q-gals{margin-top:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.q-gal,.q-chip{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:11px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(245,240,229,.04);font-size:14px;font-weight:600;transition:background .25s,border-color .25s,transform .3s var(--ease)}
+.q-gal:hover,.q-chip:hover{background:rgba(245,240,229,.09);transform:translateY(-1px)}
+.q-gal .n,.q-chip .n{display:grid;place-items:center;width:28px;height:28px;border-radius:9px;border:1px solid var(--line-strong);font:400 14px/1 var(--f-display);font-variant-numeric:tabular-nums;color:var(--champagne)}
+.q-gal .ck,.q-chip .ck{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;border:1px solid var(--line-strong);color:transparent;transition:background .25s,color .25s,border-color .25s}
+.q-gal.on,.q-chip.on{border-color:rgba(224,48,63,.65);background:linear-gradient(160deg,rgba(152,0,13,.34),rgba(245,240,229,.05))}
+.q-gal.on .ck,.q-chip.on .ck{background:var(--beige);color:var(--bordeaux);border-color:var(--beige)}
+.q-gal.on .n,.q-chip.on .n{background:var(--beige);color:var(--bordeaux);border-color:var(--beige)}
+#qpick,#qrecap{left:var(--gut-l);top:calc(96px + env(safe-area-inset-top,0px));width:min(440px,calc(100vw - 32px));max-height:calc(100% - 186px);display:flex;flex-direction:column;overflow:hidden}
+#qrecap{overflow:auto}
+#qpick .q-lede{font-size:14px;margin-top:12px}
+#qpick .q-actions{flex:none;margin-top:16px}
+.q-picks{margin-top:16px;display:flex;flex-direction:column;gap:6px;overflow:auto;min-height:0;flex:1 1 auto;padding-right:2px;scrollbar-width:thin;scrollbar-color:rgba(245,240,229,.25) transparent}
+.q-chip{padding:9px 12px}
+.q-chip .t{display:flex;flex-direction:column;gap:2px;min-width:0;text-align:left}
+.q-chip b{font-size:14px;font-weight:700;line-height:1.25}
+.q-chip small{font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--txt-3)}
+#qask{right:var(--gut-r);top:calc(88px + env(safe-area-inset-top,0px));bottom:calc(88px + env(safe-area-inset-bottom,0px));width:min(480px,41vw);min-width:350px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:22px}
+.q-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.q-role{margin-top:6px;font:400 18px/1.2 var(--f-display)}
+.q-timer{flex:none;width:38px;height:38px;transform:rotate(-90deg)}
+.q-timer circle{fill:none;stroke-width:3}
+.q-timer .bg{stroke:rgba(245,240,229,.14)}
+.q-timer .fg{stroke:var(--champagne);stroke-linecap:round;stroke-dasharray:94.25;animation:qtimer 20s linear .6s forwards}
+#qask.answered .q-timer .fg{animation-play-state:paused}
+@keyframes qtimer{from{stroke-dashoffset:0}to{stroke-dashoffset:94.25;stroke:var(--ember)}}
+.q-stem{font:400 clamp(18px,1.5vw,22px)/1.32 var(--f-display);letter-spacing:-.01em;text-wrap:pretty}
+.q-opts{display:flex;flex-direction:column;gap:8px}
+.qopt{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:start;width:100%;padding:11px 13px;border-radius:15px;border:1px solid var(--line);background:rgba(245,240,229,.045);font-size:13.5px;line-height:1.45;font-weight:500;transition:background .25s,border-color .25s,transform .3s var(--ease),opacity .3s}
+.qopt .k{grid-row:1/3;display:grid;place-items:center;width:28px;height:28px;border-radius:10px;border:1px solid var(--line-strong);font:400 15px/1 var(--f-display);color:var(--champagne);transition:background .25s,color .25s}
+.qopt .tag{grid-column:2;font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--txt-3);display:none}
+.qopt:not(:disabled):hover{background:rgba(245,240,229,.1);border-color:var(--line-strong);transform:translateX(-3px)}
+.qopt:not(:disabled):hover .k{background:var(--beige);color:var(--bordeaux)}
+.qopt:disabled{cursor:default}
+#qask.answered .qopt{opacity:.62}
+#qask.answered .qopt .tag{display:block}
+#qask.answered .qopt.best{opacity:1;border-color:rgba(255,217,160,.7);background:rgba(255,217,160,.1)}
+#qask.answered .qopt.best .tag{color:#ffd9a0}
+#qask.answered .qopt.picked{opacity:1;border-color:var(--beige);box-shadow:0 0 0 1px var(--beige) inset}
+#qask.answered .qopt.picked .k{background:var(--beige);color:var(--bordeaux)}
+.qfb{display:none}
+.qfb.show{display:block;padding-bottom:4px;animation:fbin .5s var(--ease) both}
+@keyframes fbin{from{opacity:0;transform:translateY(10px)}}
+.qfb-h{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-top:4px}
+.qfb-h .lvl{font:400 22px/1 var(--f-display)}
+.qfb-h.l3 .lvl{color:#ffd9a0}.qfb-h.l2 .lvl{color:#f08a8c}.qfb-h.l1 .lvl{color:#ff7080}.qfb-h.l0 .lvl{color:#cdb4be}
+.qfb-h .xp{font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;background:var(--beige);color:var(--bordeaux);animation:xpin .6s var(--ease) both}
+.qfb-h .bonus{font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;border:1px solid rgba(232,207,168,.45);color:var(--champagne)}
+@keyframes xpin{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.qfb-m{margin-top:10px;font-size:14px;line-height:1.5;color:var(--txt-2)}
+.qfb-t{margin-top:12px;padding:12px 14px;border-radius:14px;background:rgba(8,2,5,.45);border:1px solid var(--line);font-size:13.5px;line-height:1.55;color:var(--beige)}
+.qfb-t b{display:block;margin-bottom:4px;font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--champagne)}
+.qfb .btn{margin-top:16px}
+.q-hud{position:absolute;z-index:6}
+#qhud{left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100% - 32px);top:calc(18px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:14px;padding:8px 10px 8px 8px;border-radius:999px}
+#qhud .rank{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:conic-gradient(from 200deg,var(--beige),#d9c2a0,var(--beige));color:var(--bordeaux);font:600 20px/1 var(--f-display);box-shadow:0 0 30px rgba(224,48,63,.5)}
+.xpwrap{display:flex;flex-direction:column;gap:6px;min-width:170px}
+.xptop{display:flex;justify-content:space-between;gap:14px;font-size:12.5px;font-weight:700}
+.xptop .num{font-variant-numeric:tabular-nums;color:var(--champagne)}
+.xptop .num.pop{animation:xppop .6s var(--ease)}
+@keyframes xppop{40%{transform:scale(1.25);color:var(--beige)}}
+.xpbar{height:6px;border-radius:6px;background:rgba(245,240,229,.14);overflow:hidden}
+.xpbar i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,var(--bordeaux),var(--ember) 60%,var(--champagne));transition:width .8s var(--ease)}
+.combo{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:999px;background:rgba(224,48,63,.25);border:1px solid rgba(224,48,63,.6);color:#ffb3a8;font-weight:800;font-size:13px;animation:combo .5s var(--ease)}
+.combo b{font-weight:800;font-variant-numeric:tabular-nums}
+@keyframes combo{from{transform:scale(.7)}60%{transform:scale(1.15)}}
+.ico{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;color:var(--txt-2);transition:background .2s,color .2s}
+.ico:hover{background:rgba(245,240,229,.12);color:var(--beige)}
+#qConfirm{position:absolute;top:calc(84px + env(safe-area-inset-top,0px));left:0;right:0;margin:0 auto;width:min(340px,calc(100% - 32px));z-index:7;padding:18px;border-radius:20px;text-align:center}
+#qConfirm p{font-size:14px;line-height:1.5;color:var(--txt-2)}
+#qConfirm div{margin-top:14px;display:flex;gap:8px;justify-content:center}
+#qrail{left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100% - 24px);bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;align-items:flex-start;gap:4px;padding:8px 14px;border-radius:22px}
+.rn{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:62px;padding:0 4px;color:var(--txt-3);transition:color .3s}
+.rn:not(:last-child)::after{content:"";position:absolute;top:13px;left:calc(50% + 16px);width:calc(100% - 32px);height:1px;background:var(--line)}
+.rn span{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;border:1px solid var(--line-strong);font:400 14px/1 var(--f-display);transition:background .3s,color .3s,box-shadow .4s,border-color .3s}
+.rn em{font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.06em;white-space:nowrap}
+.rn.cur{color:var(--beige)}.rn.cur span{background:var(--beige);color:var(--bordeaux);box-shadow:0 0 0 5px rgba(245,240,229,.16),0 0 24px rgba(224,48,63,.7);border-color:var(--beige)}
+.rn.todo span{color:var(--champagne)}
+.rn.done{color:var(--beige)}.rn.done span{background:var(--bordeaux);border-color:var(--bordeaux);color:var(--beige)}
+.rn.off{opacity:.35}
+.rn .st,.qf-gl .mini{display:flex;gap:2px;height:10px}
+.rn .st s,.qf-gl .mini s,.q-stars span svg{display:block}
+.rn .st s,.qf-gl .mini s{width:9px;height:9px;background:rgba(245,240,229,.2);clip-path:polygon(50% 0,62% 36%,100% 38%,70% 60%,80% 100%,50% 76%,20% 100%,30% 60%,0 38%,38% 36%)}
+.rn .st s.on,.qf-gl .mini s.on{background:#ffd9a0}
+#qlevel{position:fixed;left:0;right:0;margin:0 auto;width:max-content;top:calc(96px + env(safe-area-inset-top,0px));z-index:60;pointer-events:none;padding:14px 26px;border-radius:999px;background:var(--beige);color:var(--wine);text-align:center;box-shadow:0 20px 60px -10px rgba(224,48,63,.8);opacity:0;transform:translateY(-14px) scale(.9)}
+#qlevel span{display:block;font-size:10.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--bordeaux)}
+#qlevel b{font:600 22px/1.1 var(--f-display)}
+#qlevel.show{animation:lvlin 2.8s var(--ease) both}
+@keyframes lvlin{0%{opacity:0;transform:translateY(-14px) scale(.9)}12%,80%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-8px)}}
+.q-stars{margin-top:18px;display:flex;gap:6px;color:rgba(245,240,229,.2)}
+.q-stars span.on{color:#ffd9a0;filter:drop-shadow(0 0 14px rgba(255,217,160,.7));animation:starin .8s var(--ease) both;animation-delay:var(--d)}
+.q-stars svg{width:44px;height:44px}
+@keyframes starin{from{transform:scale(0) rotate(-40deg)}60%{transform:scale(1.3) rotate(8deg)}}
+.q-res{list-style:none;padding:0;margin-top:20px;display:flex;flex-direction:column;gap:12px}
+.q-res li{display:grid;grid-template-columns:1fr auto;gap:5px 12px;align-items:center}
+.q-res .nm{font-size:14px;font-weight:600;line-height:1.3}
+.q-res .lb{grid-column:2;grid-row:1;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.meter{grid-column:1/3;display:flex;gap:4px}
+.meter i{flex:1;height:5px;border-radius:5px;background:rgba(245,240,229,.14)}
+.meter i.on{background:var(--champagne)}
+.meter.l3 i.on{background:#ffd9a0}.meter.l2 i.on{background:#f08a8c}.meter.l1 i.on{background:var(--ember)}.meter.l0 i.on{background:#b79aa6}
+.q-note{margin-top:14px;font-size:14px;line-height:1.5;color:var(--txt-2)}
+.q-note b{display:block;font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--champagne);margin-bottom:3px}
+#qfinal{inset:calc(88px + env(safe-area-inset-top,0px)) var(--gut-r) calc(24px + env(safe-area-inset-bottom,0px)) var(--gut-l);margin:0 auto;max-width:1180px;overflow:auto;padding:28px 32px}
+.qf-head{display:flex;justify-content:space-between;gap:24px;align-items:flex-start}
+.qf-rank{flex:none;display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;gap:0 14px;align-items:center;padding:12px 18px 12px 12px;border-radius:22px;border:1px solid var(--line-strong);background:rgba(8,2,5,.4)}
+.qf-rank b{grid-row:1/3;display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:conic-gradient(from 200deg,var(--beige),#d9c2a0,var(--beige));color:var(--bordeaux);font:600 24px/1 var(--f-display)}
+.qf-rank span{font:400 18px/1.1 var(--f-display)}
+.qf-rank em{font-style:normal;font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--champagne);font-variant-numeric:tabular-nums}
+.qf-grid{margin-top:22px;display:grid;grid-template-columns:minmax(300px,.85fr) 1.15fr;gap:28px;align-items:start}
+.qf-radar{padding:14px;border-radius:22px;border:1px solid var(--line);background:rgba(8,2,5,.4)}
+.radar{width:100%;height:auto;max-height:310px;display:block;overflow:visible}
+.radar .sp{stroke:var(--ember);stroke-width:3.5;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(224,48,63,.9));animation:radardot .8s ease .5s both}
+.radar .rg{fill:none;stroke:rgba(245,240,229,.16);stroke-width:1}
+.radar .ax{stroke:rgba(245,240,229,.12)}
+.radar .val{fill:rgba(224,48,63,.32);stroke:var(--beige);stroke-width:2;stroke-linejoin:round;transform-origin:170px 150px;animation:radarin 1.3s var(--ease) .4s both;filter:drop-shadow(0 0 12px rgba(224,48,63,.6))}
+.radar .dot{fill:var(--beige);animation:radardot .6s ease 1.2s both}
+.radar text{font:700 11.5px var(--f-body);fill:var(--beige)}
+.radar text.dim{fill:rgba(245,240,229,.4)}
+@keyframes radarin{from{transform:scale(.05);opacity:0}}
+@keyframes radardot{from{opacity:0}}
+.qf-gl{list-style:none;padding:0;margin-top:8px;display:flex;flex-direction:column;gap:7px}
+.qf-gl li{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--txt-2)}
+.qf-col h3{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--champagne);display:flex;justify-content:space-between;gap:10px;margin:0 0 10px}
+.qf-col h3 .tot{letter-spacing:.06em;color:var(--beige)}
+.qf-col h3:not(:first-child){margin-top:24px}
+.qf-prios{display:flex;flex-direction:column;gap:8px}
+.prio{display:grid;grid-template-columns:auto 1fr;gap:14px;padding:14px 16px;border-radius:18px;border:1px solid var(--line);background:rgba(245,240,229,.045)}
+.prio .rk{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:var(--beige);color:var(--bordeaux);font:400 17px/1 var(--f-display)}
+.prio b{display:block;font:400 18px/1.2 var(--f-display)}
+.prio small{display:block;margin-top:4px;font-size:12px;font-weight:700;color:var(--txt-3)}
+.prio small i{font-style:normal}
+.prio p{margin-top:8px;font-size:13px;line-height:1.5;color:var(--txt-2)}
+.qf-path{list-style:none;padding:0;display:flex;flex-direction:column;gap:6px}
+.qf-path button{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:11px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(245,240,229,.04);transition:background .25s,transform .3s var(--ease),border-color .25s}
+.qf-path button:hover{background:rgba(245,240,229,.1);border-color:var(--line-strong);transform:translateX(3px)}
+.qf-path .tg{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:rgba(245,240,229,.12);white-space:nowrap}
+.qf-path .tg.l0,.qf-path .tg.l1{background:rgba(224,48,63,.3);color:#ffd2cc}.qf-path .tg.l2{background:rgba(240,138,140,.25);color:#ffe0dc}.qf-path .tg.l3{background:rgba(255,217,160,.22);color:#ffe6c2}
+.qf-path .tt{font-size:13.5px;font-weight:600;line-height:1.35}
+.qf-path .du{font-size:12px;font-weight:700;color:var(--champagne);white-space:nowrap}
+.qf-badges{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.qf-badges>span{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--txt-3);margin-right:6px}
+.qf-badges i{font-style:normal;display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:999px;background:linear-gradient(135deg,rgba(255,217,160,.2),rgba(224,48,63,.18));border:1px solid rgba(255,217,160,.4);font-size:12.5px;font-weight:700;color:#ffe6c2}
+.p-label .pk{display:none;margin-top:7px;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--wine);background:var(--beige);padding:4px 10px;border-radius:999px;text-shadow:none}
+.p-label.picked .pk{display:inline-flex}
+.p-label.picked strong{text-shadow:0 0 26px rgba(255,217,160,.9),0 2px 18px rgba(8,2,5,.95)}
+.p-label[data-lvl="3"] .m{color:#ffd9a0}.p-label[data-lvl="2"] .m{color:#f08a8c}.p-label[data-lvl="1"] .m{color:#ff7080}.p-label[data-lvl="0"] .m{color:#cdb4be}
+@media (max-height:800px){.q-steps{display:none}.qcard{padding:22px}#qbrief .q-lede,.qf-head .q-lede{font-size:14px}.qf-head .q-lede{display:none}.qf-grid{margin-top:16px}}
+@media (max-width:1100px){#qask{width:min(440px,44vw);min-width:320px}.qf-grid{grid-template-columns:1fr}}
+@media (max-width:820px){
+  .hero-actions .btn.ghost{padding:13px 18px}
+  #qhud{top:calc(70px + env(safe-area-inset-top,0px));gap:10px;padding:6px 8px 6px 6px;width:calc(100% - 32px);justify-content:space-between}
+  #qhud .rank{width:38px;height:38px;font-size:17px}
+  .xpwrap{flex:1;min-width:0}
+  .ico{width:34px;height:34px}
+  #qConfirm{top:calc(130px + env(safe-area-inset-top,0px))}
+  #qrail{padding:8px 8px;bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+  .rn{min-width:44px}.rn em{display:none}
+  .rn:not(:last-child)::after{left:calc(50% + 16px);width:calc(100% - 32px)}
+  .qcard{padding:20px}
+  #qbrief{inset:auto 16px calc(80px + env(safe-area-inset-bottom,0px)) 16px;margin:0;width:auto;max-height:calc(100% - 150px)}
+  .q-steps{display:none}.q-lede{font-size:14px}
+  .q-gals{grid-template-columns:1fr 1fr;gap:6px}
+  .q-gal{padding:9px 10px;gap:8px;font-size:13px;grid-template-columns:auto 1fr auto}
+  .q-gal .ck{width:18px;height:18px}
+  #qbrief .q-actions{position:sticky;bottom:-20px;margin:18px -20px -20px;padding:14px 20px 20px;background:linear-gradient(180deg,rgba(14,3,8,0),rgba(14,3,8,.96) 32%);z-index:2}
+  #qbrief .q-est{display:none}
+  .q-gals>*{min-width:0}
+  #qrecap .q-actions{position:sticky;bottom:-20px;margin:14px -20px -20px;padding:12px 20px 20px;background:linear-gradient(180deg,rgba(14,3,8,0),rgba(14,3,8,.96) 32%);z-index:2}
+  #qpick,#qrecap{left:16px;right:16px;width:auto;top:auto;bottom:calc(76px + env(safe-area-inset-bottom,0px));max-height:42vh}
+  #qpick .q-picks{max-height:20vh}
+  #qpick h2,#qrecap h2{font-size:26px;margin-top:10px}
+  .q-stars{margin-top:10px}.q-stars svg{width:34px;height:34px}
+  .q-res{margin-top:12px;gap:8px}
+  #qpick .q-lede{display:none}
+  .q-picks{margin-top:14px}
+  #qask{left:16px;right:16px;width:auto;min-width:0;top:auto;bottom:calc(76px + env(safe-area-inset-bottom,0px));max-height:58vh;padding:18px}
+  #qfinal{inset:calc(124px + env(safe-area-inset-top,0px)) 12px calc(76px + env(safe-area-inset-bottom,0px)) 12px;padding:20px}
+  .qf-head{flex-direction:column}
+}
 @media (max-width:1100px){
   #hint{display:none}
   #dock{width:min(400px,42vw);min-width:320px}
@@ -323,6 +537,7 @@ a{color:inherit;text-decoration:none}
     </button>
     <nav class="crumbs lv" aria-label="Fil d’Ariane"><ol id="crumbs"></ol></nav>
     <div class="tools">
+      <button class="chip-btn" id="quizBtn" aria-label="Lancer le diagnostic de compétences"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.1L22 12l-7.6 2.9L12 22l-2.4-7.1L2 12l7.6-2.9z"/></svg><span>Diagnostic</span></button>
       <button class="chip-btn" id="searchBtn" aria-label="Trouver une compétence">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
         <span>Trouver une compétence</span><kbd>Ctrl K</kbd>
@@ -340,6 +555,7 @@ a{color:inherit;text-decoration:none}
     <p class="lede">Sept galaxies, une quarantaine de métiers, une formation pour chaque trajectoire. Entrez dans l’univers et zoomez jusqu’au bon module.</p>
     <div class="hero-actions">
       <button class="cta" id="enter"><span>Entrer dans l’univers</span><span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+      <button class="btn ghost" id="startQuiz"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.1L22 12l-7.6 2.9L12 22l-2.4-7.1L2 12l7.6-2.9z"/></svg><span>Lancer le diagnostic</span><small>5 min</small></button>
     </div>
     <dl class="stats" id="stats"></dl>
   </section>
@@ -361,6 +577,20 @@ a{color:inherit;text-decoration:none}
       <a href="https://www.francecompetences.fr/recherche/rncp/40363" target="_blank" rel="noreferrer">Exemple : pilotage de projets informatiques ↗</a>
     </div>
   </div>
+<div id="qhud" class="q-hud glass" role="status" aria-label="Progression du diagnostic">
+  <div class="rank"><span id="qRankN">1</span></div>
+  <div class="xpwrap"><div class="xptop"><span id="qRank">Cadet·te</span><span class="num" id="qXp">0 XP</span></div><div class="xpbar"><i id="qXpBar"></i></div></div>
+  <div class="combo" id="qCombo" hidden aria-label="Série de bonnes réponses"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c.6 3.2-1 4.8-2.4 6.4C8.2 10 7 11.4 7 14a5 5 0 0 0 10 0c0-2-1-3.4-2-4.6.1 1.6-.5 2.6-1.4 3.2.6-3.8-.4-7.4-1.6-10.6Z"/></svg><b>×2</b></div>
+  <button class="ico" id="qSfx" aria-label="Activer ou couper le son"></button>
+  <button class="ico" id="qQuit" aria-label="Quitter le diagnostic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+</div>
+<div id="qConfirm" class="glass" hidden role="alertdialog" aria-label="Quitter le diagnostic"><p>Quitter le diagnostic ? Votre progression sera perdue.</p><div><button class="btn solid" id="qStay">Continuer</button><button class="btn ghost" id="qLeave">Quitter</button></div></div>
+<nav id="qrail" class="q-hud glass" aria-label="Galaxies du diagnostic"></nav>
+<section id="qbrief" class="qcard glass q-only" aria-live="polite"></section>
+<section id="qpick" class="qcard glass q-only" aria-live="polite"></section>
+<section id="qask" class="qcard glass q-only" aria-live="polite"></section>
+<section id="qrecap" class="qcard glass q-only" aria-live="polite"></section>
+<section id="qfinal" class="qcard glass q-only" aria-live="polite"></section>
 </div>
 
 <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-label="Recherche">
@@ -373,6 +603,7 @@ a{color:inherit;text-decoration:none}
     <div class="results" id="results"></div>
   </div>
 </div>
+<div id="qlevel" aria-live="polite"></div>
 <div class="toast" id="toast" role="status"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -724,7 +955,7 @@ const galaxies=order.map((id,i)=>{
   const n=new V3(Math.sin(P.tilt)*Math.cos(P.az),Math.sin(P.tilt)*Math.sin(P.az)+.22,Math.cos(P.tilt)).normalize();
   root.quaternion.setFromUnitVectors(UP,n);
   scene.add(root);
-  return{id,i,d,P,root,spin,pts,haze,sys,fade,uOp,uBoost,normal:n,boost:0,op:1,coreK:1,sysK:0,ringSpeed:1,ringAngle:i*1.3,core1,core2,streak,sx:0,sy:0,sr:0,vis:true,dist:100,hov:false};
+  return{id,i,d,P,root,spin,pts,haze,sys,fade,uOp,uBoost,normal:n,boost:0,op:1,coreK:1,qGlow:0,visited:false,sysK:0,ringSpeed:1,ringAngle:i*1.3,core1,core2,streak,sx:0,sy:0,sr:0,vis:true,dist:100,hov:false};
 });
 
 /* ---------- Noyau central : trou noir et disque d'accrétion ---------- */
@@ -850,8 +1081,9 @@ const planets=galaxies.map(gal=>{
       const halo=sprite(texGlow,'#f5e6d0',1,.55);mm.add(halo);
       return{mesh:mm,halo,rm:1.95+k*.3,phi:rnd()*TAU,w:(.32+rnd()*.16)*(rnd()<.5?1:-1),size:.2+rnd()*.05,hi:0};
     });
+    const halo=sprite(texGlow,'#ffd9a0',1,0);anchor.add(halo);
     const orbits=moons.map(m=>{const o=new THREE.Mesh(new THREE.RingGeometry(m.rm-.012,m.rm+.012,128),new THREE.MeshBasicMaterial({color:'#f5f0e5',transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));o.rotation.x=-Math.PI/2;o.visible=false;pivot.add(o);return o});
-    return{g:gal.i,r,role,baseR,anchor,mesh,mat,atmo,atmMat,ringMesh,ringMat,pivot,moons,orbits,k:0,dim:1,hover:0,sx:0,sy:0,sr:0,vis:false,pal};
+    return{g:gal.i,r,role,baseR,anchor,mesh,mat,atmo,atmMat,ringMesh,ringMat,pivot,moons,orbits,halo,picked:false,lvl:-1,k:0,dim:1,hover:0,sx:0,sy:0,sr:0,vis:false,pal};
   });
 });
 
@@ -952,7 +1184,7 @@ function poseDomain(g){
   inPlane.normalize();
   const E=.66,dir=inPlane.multiplyScalar(Math.cos(E)).addScaledVector(N,Math.sin(E)).normalize();
   const D=PORT?74:35;
-  return{pos:P.clone().addScaledVector(dir,D),look:P.clone(),fov:46,sx:PORT?0:.14,sy:PORT?.15:.01};
+  return{pos:P.clone().addScaledVector(dir,D),look:P.clone(),fov:46,sx:PORT?0:.14,sy:PORT?(Q.on?-.17:.15):.01};
 }
 function poseRole(g,r){
   const gal=galaxies[g],pl=planets[g][r],N=gal.normal;
@@ -961,7 +1193,7 @@ function poseRole(g,r){
   const d=_a.copy(C).sub(P).normalize(),t=_b.crossVectors(N,d).normalize();
   const dir=_c.copy(d).multiplyScalar(.62).addScaledVector(t,.7).addScaledVector(N,.42).normalize();
   const D=PORT?19:14.5;
-  return{pos:P.clone().addScaledVector(dir,D),look:P,fov:46,sx:PORT?0:-.05,sy:PORT?-.12:.05};
+  return{pos:P.clone().addScaledVector(dir,D),look:P,fov:46,sx:PORT?0:-.05,sy:PORT?(Q.on?-.27:-.12):.05};
 }
 function idlePose(t){
   switch(S.level){
@@ -1025,7 +1257,7 @@ const gLabels=galaxies.map(gal=>{
   el.innerHTML=`<span class="n">${nn(gal.i)}</span><strong>${esc(gal.d.title)}</strong><span class="m">${gal.d.roles.length} métiers · ${uniq(gal.d)} modules</span><span class="d"><span>${esc(gal.d.desc)}</span></span><span class="go">Explorer ${svgArrow}</span>`;
   el.addEventListener('pointerenter',()=>{ptr.lblG=gal.i});
   el.addEventListener('pointerleave',()=>{if(ptr.lblG===gal.i)ptr.lblG=-1});
-  el.addEventListener('click',()=>{if(S.level==='universe')goDomain(gal.i)});
+  el.addEventListener('click',()=>{if(S.level==='universe'&&!Q.on)goDomain(gal.i)});
   labelsEl.appendChild(el);return el;
 });
 const nLabel=document.createElement('div');nLabel.className='n-label';nLabel.innerHTML='<strong>Lefebvre Dalloz Compétences</strong><span>Technologies numériques 2027</span>';labelsEl.appendChild(nLabel);
@@ -1035,9 +1267,9 @@ function buildPlanetLabels(g){
   pLabels=clearEls(pLabels);ptr.lblP=-1;
   pLabels=planets[g].map(pl=>{
     const el=document.createElement('button');el.className='p-label';el.setAttribute('aria-label',`Explorer ${pl.role.name}`);
-    el.innerHTML=`<strong>${esc(pl.role.name)}</strong><span class="m">${esc(pl.role.type)}</span><span class="d"><span>${esc(pl.role.tag)}</span></span>`;
+    el.innerHTML=`<strong>${esc(pl.role.name)}</strong><span class="m">${esc(pl.role.type)}</span><span class="d"><span>${esc(pl.role.tag)}</span></span><span class="pk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Choisie</span>`;
     el.addEventListener('pointerenter',()=>{ptr.lblP=pl.r});el.addEventListener('pointerleave',()=>{if(ptr.lblP===pl.r)ptr.lblP=-1});
-    el.addEventListener('click',()=>{if(S.level==='domain')goRole(g,pl.r)});
+    el.addEventListener('click',()=>{if(S.level==='domain'){if(Q.on)togglePick(pl.r);else goRole(g,pl.r)}});
     labelsEl.appendChild(el);return el;
   });
 }
@@ -1119,9 +1351,10 @@ function updateScene(dt){
   galaxies.forEach(gal=>{
     const act=gal.i===S.g;
     let tOp=1;if(lvl==='domain')tOp=act?.62:.2;else if(lvl==='role')tOp=act?.32:.1;
+    if(Q.on&&Q.stage==='final'&&!gal.visited)tOp=.5;
     gal.coreK=damp(gal.coreK,(lvl==='domain'||lvl==='role')&&act?.2:1,3,dt);
     gal.op=damp(gal.op,tOp,3,dt);
-    gal.boost=damp(gal.boost,(lvl==='universe'&&S.hoverG===gal.i)?1:0,6,dt);
+    gal.boost=damp(gal.boost,Math.max((lvl==='universe'&&S.hoverG===gal.i)?1:0,(Q.on&&Q.stage==='final')?gal.qGlow*.9:0),6,dt);
     gal.uOp.value=gal.op;gal.uBoost.value=gal.boost;
     gal.spin.rotation.y+=dt*gal.P.spin*(1+gal.boost*2.5);
     gal.fade.forEach(o=>{o.material.opacity=o.userData.base*gal.op*gal.coreK*(1+gal.boost*.55)});
@@ -1142,10 +1375,11 @@ function updateScene(dt){
       if(gal.sysK>.01){if(lvl==='role'){tk=pl.r===S.r?1.2:.8;td=pl.r===S.r?1:.28}else tk=1;tk*=clamp((gal.sysK-.09*pl.r)*1.7,0,1)}
       pl.k=damp(pl.k,tk,3.2,dt);pl.dim=damp(pl.dim,td,4,dt);
       const sel=lvl==='role'&&S.g===gi&&S.r===pl.r;
-      pl.hover=damp(pl.hover,(lvl==='domain'&&S.g===gi&&S.hoverP===pl.r)?1:(sel?.25:0),8,dt);
+      pl.hover=damp(pl.hover,(lvl==='domain'&&S.g===gi&&S.hoverP===pl.r)?1:(pl.picked?.6:(sel?.25:0)),8,dt);
       const on=pl.k>.004,s=pl.baseR*Math.max(pl.k,1e-4);
       pl.anchor.visible=on;if(!on)return;
       pl.mesh.scale.setScalar(s);pl.atmo.scale.setScalar(s*1.24);
+      pl.halo.scale.setScalar(s*5.4);pl.halo.material.opacity=damp(pl.halo.material.opacity,pl.lvl>=0?[.5,.5,.62,.85][pl.lvl]:0,5,dt);
       pl.mat.uniforms.uDim.value=pl.dim;pl.mat.uniforms.uHover.value=pl.hover;
       pl.atmMat.uniforms.uDim.value=pl.dim;pl.atmMat.uniforms.uHover.value=pl.hover;
       if(pl.ringMesh){pl.ringMesh.scale.setScalar(s);pl.ringMat.uniforms.uDim.value=pl.dim}
@@ -1180,6 +1414,7 @@ function drawMeteor(dt){
 function drawWarp(dt){
   wx.clearRect(0,0,wc.width,wc.height);
   drawMeteor(dt);
+  drawConfetti(dt);
   if(warp<.03||reduce)return;
   const cx=wc.width/2+cam.sx*wc.width*.35,cy=wc.height/2+cam.sy*wc.height*.35,R=Math.hypot(wc.width,wc.height)*.55;
   wx.globalCompositeOperation='lighter';wx.lineCap='round';
@@ -1210,7 +1445,8 @@ function goRole(g,r){
   if(S.level==='loading'||(S.level==='role'&&S.g===g&&S.r===r))return;
   const sameG=S.g===g;S.g=g;S.r=r;S.c=-1;S.tab='f';setLevel('role');
   if(!sameG||!pLabels.length)buildPlanetLabels(g);
-  buildMoonTags(g,r);flyTo(1.6,.14);syncUI();
+  if(Q.on)mTags=clearEls(mTags);else buildMoonTags(g,r);
+  flyTo(1.6,.14);syncUI();
 }
 function goBack(){
   if(S.level==='role')goDomain(S.g);else if(S.level==='domain')goUniverse();
@@ -1293,7 +1529,7 @@ galaxies.forEach(gal=>gal.d.roles.forEach((r,ri)=>{
 const overlay=$('searchOverlay'),input=$('searchInput'),results=$('results');
 let hits=[],sel=0;
 const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-function openSearch(){if(S.level==='loading')return;overlay.classList.add('open');input.value='';renderSearch('');setTimeout(()=>input.focus(),60)}
+function openSearch(){if(S.level==='loading'||Q.on)return;overlay.classList.add('open');input.value='';renderSearch('');setTimeout(()=>input.focus(),60)}
 function closeSearch(){overlay.classList.remove('open');input.blur()}
 function renderSearch(q){
   const s=norm(q.trim());
@@ -1319,9 +1555,10 @@ const rp=$('rncp');$('rncpBtn').onclick=()=>{rp.classList.toggle('open');$('rncp
 $('brand').onclick=()=>{if(S.level!=='intro')goUniverse()};
 $('enter').onclick=enterUniverse;
 addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(overlay.classList.contains('open'))closeSearch();else if(rp.classList.contains('open'))rp.classList.remove('open');else goBack();return}
+  if(e.key==='Escape'){if(overlay.classList.contains('open'))closeSearch();else if(rp.classList.contains('open'))rp.classList.remove('open');else if(Q.on)toggleQuit();else goBack();return}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openSearch();return}
   if(e.target.matches&&e.target.matches('input,textarea'))return;
+  if(Q.on){quizKey(e);return}
   if(e.key==='Enter'&&S.level==='intro'){enterUniverse();return}
   if(/^[1-7]$/.test(e.key)&&S.level!=='intro'&&S.level!=='loading')goDomain(+e.key-1);
 });
@@ -1337,6 +1574,7 @@ addEventListener('pointermove',e=>{
 cv.addEventListener('pointerup',e=>{
   const click=ptr.down&&ptr.moved<6;ptr.down=false;try{cv.releasePointerCapture(e.pointerId)}catch(_){}
   if(!click||flight)return;
+  if(Q.on){if(Q.stage==='pick'&&S.level==='domain'&&S.hoverP>=0)togglePick(S.hoverP);return}
   if(S.level==='universe'&&S.hoverG>=0)goDomain(S.hoverG);
   else if(S.level==='domain'&&S.hoverP>=0)goRole(S.g,S.hoverP);
   else if(S.level==='role'&&S.hoverM>=0)selectCourse(S.hoverM);
@@ -1346,7 +1584,7 @@ cv.addEventListener('pointerleave',()=>{ptr.over=false});
 let wheelAcc=0,wheelTimer=0;
 addEventListener('wheel',e=>{
   if(e.target.closest&&(e.target.closest('.glass')||e.target.closest('#searchOverlay')))return;
-  if(flight||S.level==='intro'||S.level==='loading')return;
+  if(flight||Q.on||S.level==='intro'||S.level==='loading')return;
   wheelAcc+=e.deltaY;clearTimeout(wheelTimer);wheelTimer=setTimeout(()=>{wheelAcc=0},200);
   if(Math.abs(wheelAcc)<70)return;
   const inward=wheelAcc<0;wheelAcc=0;
@@ -1356,6 +1594,375 @@ addEventListener('wheel',e=>{
 },{passive:true});
 let toastT=0;
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200)}
+
+/* =====================================================================
+   Situations du diagnostic
+   ===================================================================== */
+/* Une situation par métier (même ordre que les planètes). Format : [situation, niveau 3, niveau 2, niveau 1, niveau 0, à retenir]. */
+const QUIZ={
+ia:[
+["Votre équipe réclame « un agent IA qui traite les réclamations clients ». Par où commencez-vous ?","Je cadre un cas d’usage précis : tâches à déléguer, données disponibles, risques et critère de réussite chiffré.","Je teste plusieurs outils d’agents pour voir lequel donne les meilleurs résultats.","Je demande aux développeurs d’estimer le temps nécessaire.","J’attends que le marché se stabilise avant de m’y intéresser.","Un agent réussi commence par un cas d’usage borné et mesurable, pas par le choix d’un outil."],
+["Chaque lundi, trois personnes recopient à la main des données de mails vers le CRM, environ 2 h chacune. Que faites-vous ?","Je cartographie le processus, je chiffre le gain, puis je construis un workflow no-code avec contrôle humain sur les cas ambigus.","Je branche un outil d’automatisation sur le CRM et je le laisse tourner.","Je suggère d’apprendre des raccourcis clavier pour recopier plus vite.","Je laisse tel quel : ça a toujours fonctionné ainsi.","On cartographie avant d’automatiser : un processus mal compris, automatisé, produit des erreurs plus vite."],
+["Avant un comité, vous préparez un arbitrage budgétaire avec l’aide d’une IA. Quelle est votre méthode ?","Je fournis le contexte et les critères, je demande des options et des risques, puis je vérifie moi-même les chiffres clés avant de décider.","Je demande une recommandation et je la présente telle quelle, en citant l’outil.","Je ne l’utilise que pour reformuler mes e-mails.","Je n’utilise jamais l’IA pour une décision : c’est trop risqué.","L’IA éclaire la décision, elle ne la prend pas : le manager garde la vérification et la responsabilité."],
+["Vous devez synthétiser 40 pages de veille sectorielle pour demain matin. Comment tirez-vous parti de l’IA ?","Je précise le rôle, l’objectif, le public et le format, je demande les sources, puis je contrôle les points clés.","Je colle le texte et je demande « fais-moi un résumé ».","Je lis tout moi-même : l’IA risque de se tromper.","Je ne sais pas par où commencer avec ces outils.","Un bon prompt précise rôle, objectif, public et format : la qualité de la réponse suit celle de la consigne."],
+["Trois équipes testent l’IA chacune de leur côté, sans règles communes. Que mettez-vous en place ?","Une gouvernance légère : cartographie des usages, niveaux de risque, règles RGPD, sponsors métier et indicateurs de valeur partagés.","Une charte d’usage envoyée à tous par e-mail.","Je laisse chaque équipe expérimenter, on verra plus tard.","J’interdis l’IA jusqu’à nouvel ordre.","Passer de l’expérimentation à l’échelle demande gouvernance, conformité et mesure du ROI, pas seulement des outils."],
+["Un collègue RH propose de coller des CV complets dans un chatbot grand public pour présélectionner. Votre réaction ?","Je m’arrête : données personnelles et risque de biais. J’utilise un outil validé, des données anonymisées, et un humain décide.","Je valide, à condition que les résultats soient relus.","Pourquoi pas, le gain de temps est énorme.","Je ne vois pas où est le problème.","En RH, en droit et en finance, l’IA se pilote avec le RGPD, l’AI Act et une supervision humaine."]
+],
+public:[
+["Dans votre service, les agents craignent que l’IA remplace leurs postes. Comment réagissez-vous ?","J’organise un temps d’acculturation, je présente des cas d’usage concrets et j’associe les agents au choix des premiers tests.","Je les rassure par un e-mail en expliquant que rien ne va changer.","J’attends les consignes de la direction générale.","Je minimise : ce sont des peurs sans fondement.","Le changement se conduit par l’acculturation et la co-construction, pas par l’annonce."],
+["Un service veut utiliser un algorithme pour pré-classer des demandes d’aides. Que vérifiez-vous en priorité ?","Le cadre légal de la décision administrative : information de l’usager, intervention humaine, motivation, pas de décision purement automatisée.","Que le prestataire garantisse la sécurité des données.","Que l’outil soit déjà utilisé par d’autres collectivités.","Rien : ce n’est qu’un outil d’aide.","Une décision administrative assistée par algorithme doit rester motivée, explicable et sous contrôle humain."],
+["Vous devez acheter une solution d’IA pour un service aux usagers. Quel est votre premier réflexe ?","Je rédige le besoin, j’évalue risques, réversibilité et hébergement des données, et je prévois des clauses d’audit dans le marché.","Je compare les démonstrations et je retiens la plus convaincante.","Je prends la solution la moins chère.","Je laisse le fournisseur proposer son propre cahier des charges.","Acheter de l’IA publique, c’est sécuriser le marché : réversibilité, données, audit et gouvernance."],
+["Vous voulez utiliser l’IA pour rédiger des fiches de poste et des plans de formation. Comment procédez-vous ?","J’utilise un outil autorisé sans données nominatives, je fais relire par les managers et la décision finale reste côté RH.","Je l’utilise librement pour gagner du temps et je corrige ensuite.","Je rédige comme avant : l’IA n’apporte rien ici.","Je ne sais pas quels outils sont autorisés.","L’IA fait gagner du temps de rédaction à condition de protéger les données et de garder l’humain décisionnaire."],
+["Vous devez répondre à 30 courriers d’usagers qui posent des questions similaires. Comment utilisez-vous l’IA ?","Je prépare des brouillons avec un outil autorisé, sans données personnelles, puis je personnalise et je vérifie chaque réponse.","Je colle les courriers dans un chatbot public pour gagner du temps.","Je tape chaque réponse à la main.","Je réponds par un modèle unique à tout le monde.","Brouillon par l’IA, vérification par l’agent, et jamais de données personnelles dans un outil non autorisé."],
+["Un fournisseur promet de « moderniser tout le territoire » grâce à l’IA. Que lui demandez-vous ?","Des cas d’usage précis pour mes habitants, les risques, les coûts complets et la façon dont on mesurera le bénéfice.","Un projet pilote gratuit pour voir.","Je m’en remets à l’avis de la direction générale.","Je signe vite pour être pionnier.","Un élu arbitre avec des cas d’usage, des risques et des indicateurs, pas avec une promesse."]
+],
+office:[
+["Votre rapport Power BI met 40 secondes à s’ouvrir et ses chiffres diffèrent d’Excel. Que faites-vous ?","J’examine le modèle de données (relations, grain, mesures DAX) et j’enlève les colonnes inutiles avant de comparer les définitions.","Je supprime des visuels pour alléger la page.","Je repasse tout dans Excel.","Je préviens que Power BI est imprécis.","Lenteur et écarts viennent presque toujours du modèle de données : relations, grain et mesures."],
+["Chaque mois, vous consolidez 12 fichiers Excel de filiales aux formats différents. Quelle est votre méthode ?","Power Query pour importer et normaliser automatiquement, un modèle de données, puis un tableau de bord actualisé en un clic.","Des copier-coller et des RECHERCHEV, avec une macro enregistrée.","Je redemande à chaque filiale de me renvoyer son fichier dans mon format.","Je consolide ligne à ligne, fichier par fichier.","Power Query transforme une corvée mensuelle en procédure reproductible."],
+["Une tâche de 20 minutes se répète chaque jour : mise en forme d’un export, filtres, envoi. Que choisissez-vous ?","J’écris une macro VBA commentée et paramétrable, avec gestion d’erreurs, et je la documente pour l’équipe.","J’enregistre une macro et je la garde sur mon poste.","Je note les étapes pour ne rien oublier.","Je continue à la main, ça marche.","Automatiser, c’est aussi documenter et sécuriser : une macro sans gestion d’erreurs fragilise l’équipe."],
+["Vous organisez une réunion de 8 personnes issues de 3 services, avec pièces jointes et suivi des décisions. Comment faites-vous ?","Invitation Outlook avec ordre du jour, documents partagés par lien, notes dans un OneNote partagé et actions assignées.","Un e-mail à tous avec les pièces jointes en gros fichiers.","Des appels individuels pour caler une date.","Je prépare tout sur papier et je distribue en séance.","Les liens partagés et les notes communes évitent les versions multiples et les relances."],
+["Vous devez rapprocher deux listes de 5 000 lignes (banque et comptabilité) en fin de mois. Quelle méthode ?","Power Query pour fusionner sur une clé fiable, puis un tableau croisé dynamique pour isoler les écarts.","RECHERCHEV ligne par ligne avec des filtres.","Pointage visuel en surlignant les lignes.","Je demande un export plus petit.","Les rapprochements se fusionnent sur une clé, ils ne se pointent pas à l’œil."],
+["Vous présentez un bilan chiffré à la direction en 10 minutes. Comment construisez-vous vos diapositives ?","Un message clé par diapositive, un graphique lisible, peu de texte et une conclusion qui appelle une décision.","Les tableaux de chiffres complets, pour montrer la rigueur.","Je reprends les diapositives de l’an dernier.","Je lis les chiffres directement dans Excel.","Une diapositive, un message : le visuel sert la décision attendue."]
+],
+marketing:[
+["Votre budget baisse de 20 % mais l’objectif de leads reste le même. Que faites-vous ?","J’analyse le coût par lead et la conversion de chaque canal, je réaffecte le budget vers les meilleurs et je teste des gains de conversion.","Je réduis tous les canaux de 20 %.","Je coupe le canal le plus cher sans analyse.","Je demande de baisser l’objectif.","Piloter par la donnée, c’est réallouer vers ce qui convertit plutôt que raboter partout."],
+["Votre campagne SEA génère beaucoup de clics mais peu de ventes. Quelle est votre première analyse ?","Je vérifie l’intention des mots-clés, la cohérence annonce / page d’atterrissage et le suivi de conversion dans GA4.","J’augmente le budget pour gagner en volume.","Je change les visuels des annonces.","Je me réjouis du nombre de clics.","Des clics sans ventes révèlent un problème d’intention, de page ou de mesure."],
+["Un post critique devient viral contre votre marque en pleine journée. Quelle est votre réaction ?","J’évalue la situation, j’alerte la direction, je réponds vite sur un ton factuel et humain, et je documente pour la suite.","Je supprime le post et les commentaires.","J’attends que ça passe.","Je réponds avec ironie.","En crise sociale : écouter, répondre vite, rester factuel, ne pas effacer."],
+["Quarante pour cent de vos clients n’achètent qu’une seule fois. Que mettez-vous en place ?","Je segmente par comportement d’achat et je déclenche des scénarios automatisés (bienvenue, relance, réachat) avec mesure de la rétention.","J’envoie une promotion à toute la base chaque semaine.","Je baisse les prix.","Je cible uniquement de nouveaux clients.","La fidélisation vient de la segmentation et des scénarios relationnels."],
+["Le taux d’abandon du panier atteint 70 %. Que faites-vous en premier ?","J’observe des utilisateurs réels et les parcours analytiques pour repérer les frictions, puis je teste des hypothèses simples.","Je redessine la page de paiement selon mes goûts.","J’ajoute un pop-up de réduction.","J’attends que le taux se stabilise.","On repère les frictions avec des utilisateurs réels avant de redessiner."],
+["Il vous faut 5 visuels cohérents pour une campagne, en 2 heures. Comment vous organisez-vous ?","Je pars d’une charte et d’un modèle Canva, je décline les formats et je réutilise les éléments pour garder la cohérence.","Je crée chaque visuel de zéro pour qu’ils soient originaux.","Je reprends des images trouvées en ligne.","Je demande un délai supplémentaire.","La cohérence se gagne avec une charte et des modèles réutilisables."]
+],
+it:[
+["Les parties prenantes vous demandent 25 fonctionnalités « prioritaires » pour le prochain sprint. Que faites-vous ?","Je relie chaque demande à la valeur attendue, j’estime l’effort et je priorise le backlog avec les parties prenantes.","Je retiens celles du demandeur le plus important.","Je lance tout, on verra en cours de sprint.","Je refuse toutes les demandes.","Le Product Owner arbitre par la valeur, avec des critères partagés."],
+["La rétrospective devient un lieu de plaintes sans suite. Que proposez-vous ?","Un format qui mène à une ou deux actions concrètes, assignées et suivies à la rétrospective suivante.","Je raccourcis la rétrospective.","Je la supprime.","Je note les plaintes et je les remonte au management.","Une rétrospective utile débouche sur peu d’actions, mais suivies."],
+["À mi-parcours, le projet a trois semaines de retard et un risque majeur. Que faites-vous ?","Je mets à jour le planning avec les causes, j’analyse le risque, j’expose les options (périmètre, délai, budget) et je décide avec le sponsor.","J’ajoute des ressources pour rattraper.","Je rassure l’équipe et je continue.","J’attends la fin du trimestre pour en parler.","Un retard se traite en transparence, avec des options chiffrées."],
+["Deux applications échangent leurs données par fichiers déposés la nuit. Le métier veut du temps réel. Quelle est votre réflexion ?","J’étudie le besoin de fraîcheur, la volumétrie et la résilience pour choisir entre API et événements, et je pose les principes d’architecture.","Je passe tout en temps réel pour aller plus vite.","Je propose de laisser en l’état.","Je recopie les données dans les deux applications.","On choisit le mode d’échange selon le besoin réel, pas selon la mode."],
+["Vous voulez automatiser la mise en forme d’un rapport hebdomadaire. Quel est votre choix ?","Un script Python qui lit les données, produit le rapport et peut être relancé et testé.","Un copier-coller bien organisé.","Je demande au service informatique.","Je laisse ça manuel.","Un script reproductible vaut mieux qu’une manipulation manuelle répétée."],
+["Un webhook envoie parfois deux fois la même commande à votre système. Que faites-vous ?","Je rends le traitement idempotent avec un identifiant unique et je journalise les doublons.","Je supprime manuellement les doublons chaque matin.","Je désactive le webhook.","Je préviens les clients que cela arrive.","Dans les flux, on conçoit pour les doublons : identifiants uniques et idempotence."]
+],
+cyber:[
+["Avec un budget limité, par quoi commencez-vous pour améliorer la sécurité ?","Une cartographie des risques pour traiter d’abord les plus probables et les plus impactants, avec des indicateurs de suivi.","J’achète l’outil le plus complet du marché.","Je renforce uniquement le pare-feu.","Je ne fais rien tant qu’il n’y a pas d’incident.","Sécuriser, c’est prioriser par les risques, pas empiler des outils."],
+["Un ransomware est détecté sur un poste à 9 h. Quelle est votre première action ?","Isoler le poste du réseau, alerter la cellule de crise, préserver les preuves et qualifier l’étendue.","Redémarrer et réinstaller le poste.","Éteindre la machine et la ranger.","Payer la rançon.","Contenir d’abord, comprendre ensuite : isoler, alerter, préserver les preuves."],
+["Un prestataire a perdu une clé USB contenant des données clients. Que faites-vous ?","J’évalue le risque pour les personnes, je documente l’incident et je notifie la CNIL sous 72 h si nécessaire.","J’attends de voir si quelque chose arrive.","Je demande au prestataire de racheter une clé chiffrée.","Je n’en parle pas pour ne pas inquiéter.","Une violation de données se documente et peut imposer une notification à la CNIL sous 72 h."],
+["Après une cyberattaque, la direction veut communiquer vite. Quel est votre conseil ?","Coordonner la communication avec la cellule de crise et le juridique, rester factuel et respecter les obligations de notification.","Communiquer tout de suite et en détail.","Ne rien dire.","Rejeter la faute sur le prestataire.","La communication de crise s’appuie sur des faits vérifiés et sur les obligations légales."],
+["Un service veut héberger des données sensibles chez un nouveau fournisseur cloud. Que demandez-vous ?","Une analyse de risques, les garanties contractuelles (localisation, sécurité, réversibilité) et un plan de continuité.","Le prix et la facilité d’usage.","L’accord du seul service informatique.","Rien : tout le monde utilise le cloud.","Le risque numérique se pèse avant le contrat : sécurité, localisation, réversibilité."],
+["Vous recevez un e-mail « urgent » de votre direction qui demande un virement. Que faites-vous ?","Je vérifie par un autre canal connu, je ne clique pas et je signale le message à la sécurité.","Je regarde l’adresse de l’expéditeur avant d’agir.","J’effectue le virement : c’est la direction.","Je transfère le message à des collègues.","Face à l’urgence : vérifier par un autre canal, puis signaler."]
+],
+data:[
+["Les ventes semblent baisser de 15 % dans votre tableau. Que faites-vous avant d’alerter ?","Je vérifie la qualité des données, la période et les filtres, puis je compare à une source de référence.","Je communique tout de suite le chiffre.","Je refais un graphique plus parlant.","Je supprime les valeurs aberrantes.","Avant d’alerter, on vérifie données, périmètre et filtres."],
+["Le pipeline nocturne échoue de temps en temps et personne ne le voit. Que faites-vous ?","J’ajoute supervision, alertes, contrôles de qualité et reprise automatique idempotente.","Je le relance chaque matin.","Je le déplace à une autre heure.","Je suppose que tout va bien.","Un pipeline fiable se supervise : alertes, contrôles, reprise."],
+["Votre tableau de bord compte 25 indicateurs et personne ne l’ouvre. Quelle est votre décision ?","Je recueille les décisions que les utilisateurs doivent prendre, je garde 5 à 7 indicateurs lisibles et j’ajoute des alertes.","J’ajoute de nouveaux graphiques.","Je change la palette de couleurs.","Je lance une formation obligatoire.","Un tableau de bord sert une décision : peu d’indicateurs, clairs et actionnables."],
+["Deux indicateurs se contredisent et vous devez décider. Que faites-vous ?","Je clarifie les définitions et la qualité des deux sources, je mesure l’incertitude et je décide en assumant les hypothèses.","Je choisis l’indicateur qui confirme mon intuition.","Je reporte la décision jusqu’à avoir plus de données.","Je tire au sort.","Décider avec la donnée, c’est expliciter l’incertitude et les hypothèses."],
+["Les ventes d’un même client apparaissent sous trois orthographes différentes. Quel est votre plan ?","Des règles de référentiel et de nettoyage, des contrôles à la saisie et un responsable de la donnée.","Un nettoyage ponctuel dans Excel.","Je filtre le client à la main dans chaque rapport.","Je laisse les doublons.","La qualité se gouverne à la source : règles, contrôles, responsable."],
+["Vous voulez extraire les clauses de 200 contrats avec un LLM. Comment vous assurez-vous de la fiabilité ?","Je définis un schéma d’extraction, je teste sur un échantillon annoté, je mesure les erreurs et je garde une relecture humaine sur les cas à risque.","Je lance sur tous les contrats et je regarde quelques résultats.","Je fais confiance au modèle le plus récent.","Je lis les 200 contrats moi-même.","Un LLM s’évalue sur un échantillon annoté avant d’être déployé."]
+]
+};
+
+/* =====================================================================
+   Mission diagnostic : quiz gamifié, galaxie après galaxie
+   ===================================================================== */
+const LVL=[
+  {k:'Terrain neuf',c:'#b79aa6',xp:10,m:'Une zone à explorer : c’est là que le parcours vous apportera le plus.'},
+  {k:'À consolider',c:'#e0303f',xp:30,m:'Un premier pas. Une méthode vous ferait gagner en fiabilité.'},
+  {k:'Bon début',c:'#f08a8c',xp:60,m:'Bonne direction. Il manque un réflexe pour sécuriser le résultat.'},
+  {k:'Réflexe expert',c:'#ffd9a0',xp:100,m:'Exactement ce que ferait un ou une pro du sujet.'}
+];
+const RANKS=[['Cadet·te',0],['Pilote',300],['Navigateur·rice',700],['Commandant·e',1200],['Amiral·e',1800]];
+const SHORT=['IA','IA Public','Bureautique','Marketing','Informatique','Cyber','Data'];
+const rankOf=xp=>{let i=0;RANKS.forEach((r,j)=>{if(xp>=r[1])i=j});return i};
+const ico={
+  check:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  flame:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c.6 3.2-1 4.8-2.4 6.4C8.2 10 7 11.4 7 14a5 5 0 0 0 10 0c0-2-1-3.4-2-4.6.1 1.6-.5 2.6-1.4 3.2.6-3.8-.4-7.4-1.6-10.6Z"/></svg>',
+  star:'<svg viewBox="0 0 24 24" width="30" height="30"><path d="m12 2.8 2.7 5.9 6.4.7-4.8 4.3 1.4 6.3L12 16.7 6.3 20l1.4-6.3L2.9 9.4l6.4-.7Z" fill="currentColor"/></svg>',
+  sound:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5Z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg>',
+  mute:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5Z"/><path d="m16 9.5 5 5m0-5-5 5"/></svg>',
+  close:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  go:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  spark:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.1L22 12l-7.6 2.9L12 22l-2.4-7.1L2 12l7.6-2.9z"/></svg>'
+};
+const Q={on:false,stage:'',sel:new Set(order.map((_,i)=>i)),order:[],gi:0,picks:[],qi:0,ans:{},stars:{},xp:0,rank:0,combo:0,best:0,speed:0,cur:null,t0:0,done:false,sfx:true};
+try{Q.sfx=localStorage.getItem('ldc-sfx')!=='0'}catch(_){}
+const gTitle=g=>galaxies[g].d.title;
+const setStage=st=>{Q.stage=st;document.body.dataset.qs=st};
+const hoursOf=s=>{const t=String(s);let h=0,m;if(m=t.match(/(\d+)\s*J/i))h+=+m[1]*7;if(m=t.match(/(\d+)\s*H\s*(\d+)?/i))h+=+m[1]+(m[2]?+m[2]/60:0);if(m=t.match(/(\d+)\s*min/i))h+=+m[1]/60;return h};
+const fmtHours=h=>h>=7?`${(Math.round(h/7*2)/2).toString().replace('.',',')} jours`:`${Math.round(h)} h`;
+
+/* ---------- Sons (Web Audio, volume bas, coupés d’un clic) ---------- */
+let AC=null;
+function tone(f,t0,d,type,v){
+  const o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.value=f;
+  g.gain.setValueAtTime(0,AC.currentTime+t0);g.gain.linearRampToValueAtTime(v||.05,AC.currentTime+t0+.012);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+t0+d);
+  o.connect(g).connect(AC.destination);o.start(AC.currentTime+t0);o.stop(AC.currentTime+t0+d+.05);
+}
+function sfx(k){
+  if(!Q.sfx)return;
+  try{
+    AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+    const seq={click:[[620,0,.07]],pick:[[740,0,.08],[990,.06,.1]],ok:[[523,0,.14],[659,.1,.2]],best:[[523,0,.12],[659,.08,.12],[784,.16,.12],[1047,.24,.35]],low:[[262,0,.18,'triangle'],[233,.14,.3,'triangle']],level:[[523,0,.14],[659,.12,.14],[784,.24,.14],[1047,.36,.14],[1319,.5,.5]],end:[[392,0,.2],[523,.14,.2],[659,.28,.2],[784,.42,.2],[1047,.56,.7]]}[k]||[];
+    seq.forEach(n=>tone(n[0],n[1],n[2],n[3],.045));
+  }catch(_){}
+}
+
+/* ---------- Confettis (canvas 2D partagé avec l’effet de saut) ---------- */
+const conf=[];
+function burst(x,y,n,power){
+  if(reduce)return;
+  const cols=['#f5f0e5','#e0303f','#ffd9a0','#98000d','#f08a8c'];
+  for(let i=0;i<n;i++){const a=Math.random()*TAU,s=(.4+Math.random())*(power||520);conf.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-(power||520)*.5,r:Math.random()*TAU,vr:(Math.random()-.5)*14,w:5+Math.random()*7,h:3+Math.random()*5,c:cols[i%cols.length],life:0,max:1.3+Math.random()*.9})}
+}
+function drawConfetti(dt){
+  if(!conf.length)return;
+  wx.globalCompositeOperation='source-over';
+  for(let i=conf.length-1;i>=0;i--){
+    const p=conf[i];p.life+=dt;if(p.life>p.max){conf.splice(i,1);continue}
+    p.vy+=1100*dt;p.vx*=.992;p.x+=p.vx*dt;p.y+=p.vy*dt;p.r+=p.vr*dt;
+    wx.save();wx.globalAlpha=Math.min(1,(p.max-p.life)*2);wx.translate(p.x,p.y);wx.rotate(p.r);wx.fillStyle=p.c;wx.fillRect(-p.w/2,-p.h/2,p.w,p.h);wx.restore();
+  }
+}
+const planetXY=(g,r)=>{const pl=planets[g][r];return[pl.sx||W/2,pl.sy||H/2]};
+
+/* ---------- Interface de jeu : XP, série, rail des galaxies ---------- */
+function renderHud(pop){
+  const rk=rankOf(Q.xp),lo=RANKS[rk][1],hi=RANKS[rk+1]?RANKS[rk+1][1]:null;
+  $('qRankN').textContent=rk+1;$('qRank').textContent=RANKS[rk][0];$('qXp').textContent=`${Q.xp} XP`;
+  $('qXpBar').style.width=(hi?clamp((Q.xp-lo)/(hi-lo),0,1)*100:100)+'%';
+  const cb=$('qCombo');cb.hidden=Q.combo<2;cb.querySelector('b').textContent=`×${Q.combo}`;
+  $('qSfx').innerHTML=Q.sfx?ico.sound:ico.mute;$('qSfx').setAttribute('aria-pressed',Q.sfx);
+  if(pop){const x=$('qXp');x.classList.remove('pop');void x.offsetWidth;x.classList.add('pop')}
+  if(rk>Q.rank){Q.rank=rk;levelUp(RANKS[rk][0])}
+}
+function levelUp(name){
+  const el=$('qlevel');el.innerHTML=`<span>Niveau supérieur</span><b>${esc(name)}</b>`;el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
+  sfx('level');burst(W/2,120,70,640);
+}
+function renderRail(){
+  const stars=g=>Q.stars[g]==null?'':`<i class="st">${[1,2,3].map(n=>`<s class="${n<=Q.stars[g]?'on':''}"></s>`).join('')}</i>`;
+  $('qrail').innerHTML=galaxies.map((gal,i)=>{
+    const idx=Q.order.indexOf(i);let st='off';
+    if(Q.stage==='brief')st=Q.sel.has(i)?'todo':'off';
+    else if(idx>=0)st=Q.stars[i]!=null?'done':(Q.order[Q.gi]===i?'cur':'todo');
+    return`<div class="rn ${st}" title="${esc(gal.d.title)}"><span>${i+1}</span><em>${esc(SHORT[i])}</em>${stars(i)}</div>`;
+  }).join('');
+}
+
+/* ---------- Entrée, briefing ---------- */
+function startQuiz(){
+  if(Q.on||S.level==='loading')return;
+  overlay.classList.remove('open');rp.classList.remove('open');
+  Q.on=true;resetQuiz();document.body.dataset.mode='quiz';
+  mTags=clearEls(mTags);pLabels=clearEls(pLabels);
+  if(S.level==='intro')enterUniverse();else goUniverse();
+  setStage('brief');renderBrief();renderHud(false);renderRail();
+}
+function resetQuiz(){
+  Q.sel=new Set(order.map((_,i)=>i));Q.order=[];Q.gi=0;Q.picks=[];Q.qi=0;Q.ans={};Q.stars={};Q.xp=0;Q.rank=0;Q.combo=0;Q.best=0;Q.speed=0;Q.cur=null;
+  planets.flat().forEach(pl=>{pl.picked=false;pl.lvl=-1});galaxies.forEach(g=>{g.qGlow=0;g.visited=false});
+  $('qConfirm').hidden=true;$('qlevel').classList.remove('show');
+}
+function lastResult(){try{return JSON.parse(localStorage.getItem('ldc-quiz-last')||'null')}catch(_){return null}}
+function renderBrief(){
+  const n=Q.sel.size,last=lastResult();
+  $('qbrief').innerHTML=`
+    <p class="kicker">Mission diagnostic</p>
+    <h2>Quelles compétences voulez-vous développer ?</h2>
+    <p class="q-lede">Traversez les galaxies une à une. Dans chacune, choisissez 3 planètes qui vous parlent, puis relevez un défi en situation par planète. Pas de note : vous obtenez une carte de vos compétences et un parcours de formations sur mesure.</p>
+    <ol class="q-steps"><li><b>1</b><span>Choisissez vos planètes</span></li><li><b>2</b><span>Relevez les défis</span></li><li><b>3</b><span>Recevez votre parcours</span></li></ol>
+    <p class="q-sub">Galaxies à traverser</p>
+    <div class="q-gals">${galaxies.map((g,i)=>`<button class="q-gal${Q.sel.has(i)?' on':''}" data-i="${i}" aria-pressed="${Q.sel.has(i)}"><span class="n">${i+1}</span><span>${esc(g.d.title)}</span><span class="ck">${ico.check}</span></button>`).join('')}</div>
+    <div class="q-actions"><button class="btn solid big" id="qBegin"${n?'':' disabled'}>Décoller ${ico.go}</button><span class="q-est">${n} galaxie${n>1?'s':''} · environ ${Math.max(1,Math.round(n*.7))} min</span><button class="btn ghost" id="qCancel">Annuler</button>${last?`<button class="btn ghost" id="qLast">Revoir mon dernier bilan</button>`:''}</div>`;
+  $('qbrief').querySelectorAll('.q-gal').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;Q.sel.has(i)?Q.sel.delete(i):Q.sel.add(i);sfx('click');renderBrief();renderRail()});
+  $('qBegin').onclick=beginMission;$('qCancel').onclick=()=>quitQuiz(true);
+  if(last)$('qLast').onclick=()=>{Object.assign(Q,{order:last.order,ans:last.ans,stars:last.stars,xp:last.xp,best:last.best||0,speed:last.speed||0,gi:last.order.length});last.order.forEach(i=>{galaxies[i].visited=Object.keys(last.ans).some(k=>k.startsWith(i+':'));const v=last.stars[i];galaxies[i].qGlow=last.glow?last.glow[i]||0:0});showFinal(true)};
+}
+function beginMission(){
+  Q.order=[...Q.sel].sort((a,b)=>a-b);if(!Q.order.length)return;
+  Q.gi=0;sfx('level');openGalaxy();
+}
+
+/* ---------- Étape 1 : choisir ses planètes ---------- */
+function openGalaxy(){
+  const g=Q.order[Q.gi];Q.picks=[];Q.qi=0;planets[g].forEach(pl=>{pl.picked=false});
+  setStage('pick');goDomain(g);refreshPicked();renderPick();renderRail();
+}
+function refreshPicked(){
+  const g=Q.order[Q.gi];
+  pLabels.forEach((el,r)=>{const pl=planets[g][r];el.classList.toggle('picked',Q.picks.includes(r));el.dataset.lvl=pl.lvl>=0?pl.lvl:'';const m=el.querySelector('.m');if(m)m.textContent=pl.lvl>=0?LVL[pl.lvl].k:pl.role.type})
+}
+function renderPick(){
+  const g=Q.order[Q.gi],d=galaxies[g].d;
+  $('qpick').innerHTML=`
+    <p class="kicker">Galaxie ${nn(g)} · étape ${Q.gi+1} sur ${Q.order.length}</p>
+    <h2>${esc(d.title)}</h2>
+    <p class="q-lede">Choisissez jusqu’à 3 planètes : les métiers que vous voulez développer ou mieux comprendre. Cliquez sur une planète ou dans la liste.</p>
+    <div class="q-picks">${d.roles.map((r,i)=>`<button class="q-chip${Q.picks.includes(i)?' on':''}" data-r="${i}" aria-pressed="${Q.picks.includes(i)}"><span class="n">${i+1}</span><span class="t"><b>${esc(r.name)}</b><small>${esc(r.type)}</small></span><span class="ck">${ico.check}</span></button>`).join('')}</div>
+    <div class="q-actions"><button class="btn solid" id="qGo"${Q.picks.length?'':' disabled'}>Relever les défis <span class="cnt">${Q.picks.length}/3</span></button><button class="btn ghost" id="qSkip">Passer cette galaxie</button></div>`;
+  $('qpick').querySelectorAll('.q-chip').forEach(b=>{const r=+b.dataset.r;b.onclick=()=>togglePick(r);b.onpointerenter=()=>{ptr.lblP=r};b.onpointerleave=()=>{if(ptr.lblP===r)ptr.lblP=-1}});
+  $('qGo').onclick=validatePicks;$('qSkip').onclick=skipGalaxy;
+}
+function togglePick(r){
+  if(Q.stage!=='pick')return;const g=Q.order[Q.gi],pl=planets[g][r],i=Q.picks.indexOf(r);
+  if(i>=0)Q.picks.splice(i,1);
+  else if(Q.picks.length>=3){toast('3 planètes au maximum : retirez-en une pour en choisir une autre.');sfx('low');return}
+  else{Q.picks.push(r);sfx('pick');const[x,y]=planetXY(g,r);burst(x,y,14,260)}
+  pl.picked=Q.picks.includes(r);refreshPicked();renderPick();
+}
+function skipGalaxy(){Q.stars[Q.order[Q.gi]]=0;sfx('click');nextGalaxy()}
+function validatePicks(){if(!Q.picks.length)return;Q.qi=0;sfx('click');askQuestion()}
+
+/* ---------- Étape 2 : un défi par planète ---------- */
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function askQuestion(){
+  const g=Q.order[Q.gi],r=Q.picks[Q.qi],it=QUIZ[order[g]][r];
+  setStage('ask');goRole(g,r);
+  Q.cur={g,r,it,opts:shuffle([[it[1],3],[it[2],2],[it[3],1],[it[4],0]])};Q.done=false;Q.t0=performance.now();
+  renderAsk();
+}
+function renderAsk(){
+  const{g,r,it,opts}=Q.cur,role=galaxies[g].d.roles[r];
+  $('qask').innerHTML=`
+    <div class="q-head"><div><p class="kicker">Défi ${Q.qi+1} sur ${Q.picks.length} · ${esc(SHORT[g])}</p><p class="q-role">${esc(role.name)}</p></div>
+    <svg class="q-timer" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15" class="bg"/><circle cx="18" cy="18" r="15" class="fg"/></svg></div>
+    <p class="q-stem">${esc(it[0])}</p>
+    <div class="q-opts">${opts.map((o,i)=>`<button class="qopt" data-i="${i}"><span class="k">${'ABCD'[i]}</span><span class="tx">${esc(o[0])}</span><span class="tag"></span></button>`).join('')}</div>
+    <div class="qfb" id="qfb"></div>`;
+  $('qask').querySelectorAll('.qopt').forEach(b=>b.onclick=()=>answer(+b.dataset.i));
+}
+function answer(i){
+  if(Q.done)return;Q.done=true;
+  const{g,r,it,opts}=Q.cur,lv=opts[i][1],pl=planets[g][r],ms=performance.now()-Q.t0;
+  let gain=LVL[lv].xp;const chips=[];
+  if(lv>=2){Q.combo++;Q.best=Math.max(Q.best,Q.combo);if(Q.combo>=2){const b=(Math.min(Q.combo,5)-1)*10;gain+=b;chips.push(`Série ×${Q.combo} +${b}`)}}else Q.combo=0;
+  if(lv>=2&&ms<10000){gain+=20;Q.speed++;chips.push('Éclair +20')}
+  Q.xp+=gain;Q.ans[keyOf(g,r)]={g,r,level:lv,ms};galaxies[g].visited=true;pl.lvl=lv;pl.halo.material.color.set(LVL[lv].c);
+  renderHud(true);
+  $('qask').classList.add('answered');
+  $('qask').querySelectorAll('.qopt').forEach((b,j)=>{const l=opts[j][1];b.disabled=true;b.classList.add('l'+l);b.classList.toggle('picked',j===i);b.classList.toggle('best',l===3);b.querySelector('.tag').textContent=LVL[l].k});
+  const last=Q.qi>=Q.picks.length-1;
+  $('qfb').innerHTML=`<div class="qfb-h l${lv}"><span class="lvl">${LVL[lv].k}</span><span class="xp">+${gain} XP</span>${chips.map(c=>`<span class="bonus">${c}</span>`).join('')}</div>
+    <p class="qfb-m">${LVL[lv].m}</p><p class="qfb-t"><b>À retenir</b>${esc(it[5])}</p>
+    <button class="btn solid" id="qNext">${last?'Bilan de la galaxie':'Défi suivant'} ${ico.go}</button>`;
+  $('qNext').onclick=nextQ;$('qfb').classList.add('show');setTimeout(()=>{const b=$('qNext');if(b)b.scrollIntoView({block:'nearest',behavior:reduce?'auto':'smooth'})},600);
+  sfx(lv===3?'best':lv===2?'ok':'low');
+  const[x,y]=planetXY(g,r);if(lv===3)burst(x,y,46,620);else if(lv===2)burst(x,y,18,380);
+}
+const keyOf=(g,r)=>g+':'+r;
+function nextQ(){if(!Q.done)return;sfx('click');Q.qi++;if(Q.qi<Q.picks.length)askQuestion();else showRecap()}
+
+/* ---------- Bilan de galaxie ---------- */
+const starsOf=sc=>sc>=.8?3:sc>=.5?2:sc>=.2?1:0;
+function showRecap(){
+  const g=Q.order[Q.gi],rows=Q.picks.map(r=>Q.ans[keyOf(g,r)]).filter(Boolean);
+  const sc=rows.reduce((s,a)=>s+a.level,0)/(rows.length*3),st=starsOf(sc);
+  Q.stars[g]=st;galaxies[g].qGlow=sc;setStage('recap');goDomain(g);refreshPicked();renderRail();
+  const sorted=[...rows].sort((a,b)=>b.level-a.level),top=sorted[0],low=sorted[sorted.length-1];
+  const nm=a=>galaxies[g].d.roles[a.r].name;
+  const next=Q.gi+1<Q.order.length?gTitle(Q.order[Q.gi+1]):null;
+  $('qrecap').innerHTML=`
+    <p class="kicker">Bilan · galaxie ${nn(g)}</p><h2>${esc(gTitle(g))}</h2>
+    <div class="q-stars">${[1,2,3].map(n=>`<span class="${n<=st?'on':''}" style="--d:${n*.18}s">${ico.star}</span>`).join('')}</div>
+    <ul class="q-res">${rows.map(a=>`<li><span class="nm">${esc(nm(a))}</span><span class="meter l${a.level}">${[0,1,2,3].map(n=>`<i class="${n<=a.level?'on':''}"></i>`).join('')}</span><span class="lb" style="color:${LVL[a.level].c}">${LVL[a.level].k}</span></li>`).join('')}</ul>
+    ${rows.length>1&&top.level!==low.level?`<p class="q-note"><b>Point fort</b>${esc(nm(top))}</p><p class="q-note"><b>À explorer</b>${esc(nm(low))}</p>`:`<p class="q-note">${st===3?'Vous maîtrisez les réflexes de cette galaxie.':'Cette galaxie vous réserve de belles marges de progression.'}</p>`}
+    <div class="q-actions"><button class="btn solid" id="qNextG">${next?`Cap sur ${esc(next)}`:'Voir ma carte des compétences'} ${ico.go}</button></div>`;
+  $('qNextG').onclick=()=>{sfx('click');nextGalaxy()};
+  sfx(st>=2?'best':'ok');if(st>0){const[x,y]=[W*.62,H*.42];burst(x,y,30+st*14,560)}
+}
+function nextGalaxy(){Q.gi++;if(Q.gi<Q.order.length)openGalaxy();else showFinal(false)}
+
+/* ---------- Carte des compétences et parcours ---------- */
+function radarSVG(){
+  const n=7,C=[170,150],R=100,pt=(i,v)=>{const a=-Math.PI/2+i*TAU/n;return[C[0]+Math.cos(a)*R*v,C[1]+Math.sin(a)*R*v]};
+  const f=p=>p.map(x=>x.toFixed(1)).join(',');
+  const ring=v=>`<polygon class="rg" points="${[...Array(n)].map((_,i)=>f(pt(i,v))).join(' ')}"/>`;
+  const vals=galaxies.map((g,i)=>{const rows=Object.values(Q.ans).filter(a=>a.g===i);return rows.length?Math.max(.07,rows.reduce((s,a)=>s+a.level,0)/(rows.length*3)):null});
+  const exp=vals.map((v,i)=>v==null?null:i).filter(i=>i!=null);
+  const spokes=exp.map(i=>{const p=pt(i,vals[i]);return`<line class="sp" x1="${C[0]}" y1="${C[1]}" x2="${p[0].toFixed(1)}" y2="${p[1].toFixed(1)}"/>`}).join('');
+  const poly=exp.length>=3?`<polygon class="val" points="${exp.map(i=>f(pt(i,vals[i]))).join(' ')}"/>`:'';
+  const labels=SHORT.map((s,i)=>{const p=pt(i,1.2),a=p[0]<C[0]-8?'end':p[0]>C[0]+8?'start':'middle';return`<text x="${p[0].toFixed(1)}" y="${(p[1]+4).toFixed(1)}" text-anchor="${a}" class="${vals[i]==null?'dim':''}">${esc(s)}</text>`}).join('');
+  return`<svg viewBox="0 0 340 300" class="radar" role="img" aria-label="Carte des compétences par galaxie">${ring(.33)}${ring(.66)}${ring(1)}${[...Array(n)].map((_,i)=>`<line class="ax" x1="${C[0]}" y1="${C[1]}" x2="${f(pt(i,1)).split(',')[0]}" y2="${f(pt(i,1)).split(',')[1]}"/>`).join('')}${poly}${spokes}${vals.map((v,i)=>{const p=pt(i,v==null?0:v);return v==null?'':`<circle class="dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4.5"/>`}).join('')}${labels}</svg>`;
+}
+function buildPath(){
+  const list=Object.values(Q.ans).sort((a,b)=>a.level-b.level||b.ms-a.ms),seen=new Set(),path=[];
+  const tag=['Démarrer','Consolider','Approfondir','Aller plus loin'];
+  list.forEach(a=>{
+    const role=galaxies[a.g].d.roles[a.r],cs=role.courses;
+    const idx=a.level<=1?[0,1]:a.level===2?[0]:[cs.length-1];
+    idx.forEach(ci=>{const c=cs[ci];if(!c||seen.has(c[0]))return;seen.add(c[0]);path.push({g:a.g,r:a.r,ci,c,level:a.level,tag:tag[a.level],role:role.name})});
+  });
+  return path.slice(0,8);
+}
+function showFinal(fromSaved){
+  setStage('final');goUniverse();
+  const answers=Object.values(Q.ans),done=Object.keys(Q.stars).length,prios=[...answers].sort((a,b)=>a.level-b.level||b.ms-a.ms).slice(0,3),path=buildPath();
+  const total=path.reduce((s,p)=>s+hoursOf(p.c[2]),0),rk=rankOf(Q.xp);
+  const starsN=Object.values(Q.stars),visited=galaxies.filter(g=>g.visited).length;
+  const badges=[
+    [answers.length>=1,'Premier contact','Un premier défi relevé'],
+    [Q.speed>=3,'Éclair','Trois réponses en moins de 10 s'],
+    [Q.best>=3,'Série de feu','Trois bonnes réponses d’affilée'],
+    [visited>=3,'Explorateur·rice','Trois galaxies traversées'],
+    [visited===7,'Cartographe','Les sept galaxies traversées'],
+    [starsN.some(s=>s===3),'Constellation','Une galaxie à trois étoiles'],
+    [answers.some(a=>a.level===0),'Curieux·se','Un terrain neuf affronté sans reculer']
+  ].filter(b=>b[0]);
+  const why=a=>QUIZ[order[a.g]][a.r][5];
+  $('qfinal').innerHTML=answers.length?`
+    <div class="qf-head"><div><p class="kicker">Mission accomplie</p><h2>Votre carte des compétences</h2><p class="q-lede">${answers.length} défi${answers.length>1?'s':''} relevé${answers.length>1?'s':''} dans ${visited} galaxie${visited>1?'s':''}. Voici où vous brillez déjà et où le parcours vous fera le plus progresser.</p></div>
+      <div class="qf-rank"><b>${rk+1}</b><span>${esc(RANKS[rk][0])}</span><em>${Q.xp} XP</em></div></div>
+    <div class="qf-grid">
+      <div class="qf-radar">${radarSVG()}
+        <ul class="qf-gl">${Q.order.map(i=>`<li><span>${esc(gTitle(i))}</span><span class="mini">${[1,2,3].map(n=>`<s class="${n<=(Q.stars[i]||0)?'on':''}"></s>`).join('')}</span></li>`).join('')}</ul></div>
+      <div class="qf-col">
+        <h3>Vos priorités</h3>
+        <div class="qf-prios">${prios.map((a,k)=>`<article class="prio l${a.level}"><span class="rk">${k+1}</span><div><b>${esc(galaxies[a.g].d.roles[a.r].name)}</b><small>${esc(gTitle(a.g))} · <i style="color:${LVL[a.level].c}">${LVL[a.level].k}</i></small><p>${esc(why(a))}</p></div></article>`).join('')}</div>
+        <h3>Votre parcours conseillé <span class="tot">≈ ${fmtHours(total)}</span></h3>
+        <ol class="qf-path">${path.map(p=>`<li><button data-g="${p.g}" data-r="${p.r}" data-c="${p.ci}"><span class="tg l${p.level}">${p.tag}</span><span class="tt">${esc(p.c[1])}</span><span class="du">${esc(fmtDur(p.c[2]))}</span></button></li>`).join('')}</ol>
+      </div></div>
+    ${badges.length?`<div class="qf-badges"><span>Badges</span>${badges.map(b=>`<i title="${esc(b[2])}">${ico.spark}${esc(b[1])}</i>`).join('')}</div>`:''}
+    <div class="q-actions"><button class="btn solid" id="qfCopy">Copier mon parcours</button><button class="btn" id="qfExplore">Explorer ma priorité n°1</button><button class="btn ghost" id="qfAgain">Rejouer</button><button class="btn ghost" id="qfClose">Fermer</button></div>`
+  :`<p class="kicker">Mission terminée</p><h2>Aucune planète explorée</h2><p class="q-lede">Vous avez passé toutes les galaxies. Relancez le diagnostic et choisissez quelques planètes pour obtenir votre carte.</p><div class="q-actions"><button class="btn solid" id="qfAgain">Rejouer</button><button class="btn ghost" id="qfClose">Fermer</button></div>`;
+  const $$=s=>$('qfinal').querySelector(s);
+  $$('#qfAgain').onclick=()=>{sfx('click');resetQuiz();Q.on=true;document.body.dataset.mode='quiz';setStage('brief');renderBrief();renderHud(false);renderRail()};
+  $$('#qfClose').onclick=()=>quitQuiz(true);
+  if(answers.length){
+    $$('#qfCopy').onclick=()=>copyPlan(prios,path,total,rk);
+    $$('#qfExplore').onclick=()=>{const a=prios[0];quitQuiz(false);goRole(a.g,a.r)};
+    $('qfinal').querySelectorAll('.qf-path button').forEach(b=>b.onclick=()=>{const g=+b.dataset.g,r=+b.dataset.r,c=+b.dataset.c;quitQuiz(false);goRole(g,r);setTimeout(()=>selectCourse(c),flight?1700:300)});
+  }
+  galaxies.forEach(g=>{if(!g.visited)g.qGlow=0});
+  if(!fromSaved&&answers.length){sfx('end');burst(W*.3,H*.3,70,700);burst(W*.7,H*.3,70,700);try{localStorage.setItem('ldc-quiz-last',JSON.stringify({order:Q.order,ans:Q.ans,stars:Q.stars,xp:Q.xp,best:Q.best,speed:Q.speed,glow:galaxies.map(g=>g.qGlow)}))}catch(_){}}
+  renderRail();
+}
+function copyPlan(prios,path,total,rk){
+  const txt=['Mon diagnostic · Univers Techno Numérique 2027',`Niveau : ${RANKS[rk][0]} (${Q.xp} XP)`,'','Mes priorités :',...prios.map((a,k)=>`${k+1}. ${galaxies[a.g].d.roles[a.r].name} (${gTitle(a.g)}) : ${LVL[a.level].k}`),'',`Parcours conseillé (≈ ${fmtHours(total)}) :`,...path.map(p=>`- ${p.c[1]} · réf. ${p.c[0]} · ${fmtDur(p.c[2])}`),'',`Catalogue : ${CATALOG_URL}`].join('\n');
+  const ok=()=>{toast('Parcours copié dans le presse-papiers');sfx('pick')};
+  const fb=()=>{const t=document.createElement('textarea');t.value=txt;t.style.cssText='position:fixed;opacity:0';document.body.appendChild(t);t.select();try{document.execCommand('copy')?ok():toast('Copie impossible : sélectionnez le texte à la main')}catch(_){toast('Copie impossible : sélectionnez le texte à la main')}t.remove()};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(ok,fb);else fb();
+}
+
+/* ---------- Sortie, clavier ---------- */
+function quitQuiz(toUniverse){
+  Q.on=false;delete document.body.dataset.mode;delete document.body.dataset.qs;Q.stage='';
+  planets.flat().forEach(pl=>{pl.picked=false;pl.lvl=-1});galaxies.forEach(g=>{g.qGlow=0});
+  $('qConfirm').hidden=true;mTags=clearEls(mTags);conf.length=0;
+  if(toUniverse)goUniverse();syncUI();
+}
+function toggleQuit(){
+  if(Q.stage==='brief'||Q.stage==='final'){quitQuiz(true);return}
+  $('qConfirm').hidden=!$('qConfirm').hidden;
+}
+function quizKey(e){
+  if(e.target.closest&&e.target.closest('button')&&(e.key==='Enter'||e.key===' '))return;
+  if(Q.stage==='ask'){
+    if(!Q.done&&/^[1-4]$/.test(e.key))answer(+e.key-1);
+    else if(Q.done&&(e.key==='Enter'||e.key===' ')){e.preventDefault();nextQ()}
+  }else if(Q.stage==='pick'){
+    if(/^[1-6]$/.test(e.key))togglePick(+e.key-1);else if(e.key==='Enter')validatePicks();
+  }else if(Q.stage==='recap'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();sfx('click');nextGalaxy()}
+  else if(Q.stage==='brief'&&e.key==='Enter'&&Q.sel.size)beginMission();
+}
+$('startQuiz').onclick=startQuiz;$('quizBtn').onclick=startQuiz;
+$('qSfx').onclick=()=>{Q.sfx=!Q.sfx;try{localStorage.setItem('ldc-sfx',Q.sfx?'1':'0')}catch(_){}renderHud(false);sfx('pick')};
+$('qQuit').onclick=toggleQuit;$('qStay').onclick=()=>{$('qConfirm').hidden=true};$('qLeave').onclick=()=>quitQuiz(true);
 
 /* =====================================================================
    Boucle de rendu et qualité adaptative

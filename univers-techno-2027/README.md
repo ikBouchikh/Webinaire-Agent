@@ -12,6 +12,20 @@ Deux façons de l’ouvrir, sans installation ni serveur : `univers-techno-numer
 | Planète | un métier : ses modules (lunes) et ses compétences | clic sur une planète |
 | Lune | un module : durée, référence, compétences travaillées, lien catalogue | clic sur une lune ou sur une carte |
 
+## Mission diagnostic
+
+Bouton « Lancer le diagnostic » (accueil) ou « Diagnostic » (barre du haut). Un quiz en jeu qui fait traverser les galaxies une à une :
+
+1. **Briefing** : choix des galaxies à traverser (les 7 par défaut, environ 5 min).
+2. **Choix des planètes** : dans chaque galaxie, 3 planètes au plus parmi les métiers, en cliquant sur la scène ou sur la liste (touches `1` à `6`).
+3. **Défi en situation** : une mise en situation professionnelle par planète, quatre réponses (touches `1` à `4`), puis le bon réflexe expliqué.
+4. **Bilan de galaxie** : étoiles, niveau par planète, point fort et zone à explorer.
+5. **Carte des compétences** : radar par galaxie, 3 priorités, parcours de modules conseillé avec durée totale, badges. Le parcours se copie en texte, et chaque module ouvre sa fiche.
+
+Il n'y a pas de note éliminatoire : chaque réponse est un niveau (Terrain neuf, À consolider, Bon début, Réflexe expert), avec des XP, des séries et des rangs pour le côté jeu. Les sons sont discrets et se coupent d’un clic.
+
+Les 42 situations (une par métier, dans l’ordre des planètes) sont dans l’objet `QUIZ` du script. Format : `[situation, niveau 3, niveau 2, niveau 1, niveau 0, à retenir]`. Le dernier bilan est mémorisé dans le navigateur.
+
 ## Commandes
 
 - Clic : entrer. `Échap`, fil d’Ariane ou molette arrière : remonter.
