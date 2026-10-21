@@ -1,48 +1,40 @@
-# La Bibliothèque des Compétences : explorer tout le catalogue en 3D
+# Bibliothèque des compétences · Lefebvre Dalloz Compétences
 
-Expérience immersive **100 % locale** (aucune installation, aucun réseau, aucune clé) : une bibliothèque ancienne façon *Poudlard*, bougies flottantes, livres volants, rayonnages à perte de vue, aux couleurs **Skilia par Lefebvre Dalloz Compétences** (bordeaux, framboise, crème, lueurs pêche et or).
+Exploration 3D du catalogue de formation : une grande bibliothèque française ancienne (rotonde à galerie, marbre, acajou, reliures cuir et or), claire et nette. **100 % locale** : double-cliquez sur `index.html` (Chrome, Edge ou Firefox récents). Three.js est embarqué dans `vendor/`, aucun réseau n'est nécessaire.
 
-## Lancer
-Double-cliquez sur `index.html` (Chrome, Edge ou Firefox récents, accélération matérielle activée). Plein écran (F11) avant de partager l'écran. Three.js est embarqué dans `vendor/` : tout fonctionne hors ligne.
-
-## Le parcours
-| Niveau du catalogue | Dans la bibliothèque |
+## Parcours
+| Catalogue | Dans la bibliothèque |
 |---|---|
-| **Domaine** (6) | une **porte** de la Grande Nef, une **salle-rayon** derrière |
+| **Domaine** (6) | une **porte** de la Grande salle ; elle s'ouvre, on entre dans le rayon |
 | **Thématique** (5 par domaine) | une **travée** (vitrine, plaque dorée) |
-| **Produit de formation** (4 par travée) | un **grand livre** exposé : on l'ouvre, il vient devant vous, s'ouvre dans la lumière |
-| **France compétences** | bouton « Relier à France compétences » : pont animé entre les compétences du livre et le bloc de compétences visé, jauge de couverture, suggestions pour compléter le bloc |
+| **Produit de formation** (4 par travée) | un **grand livre** : on l'ouvre, il s'ouvre dans la lumière et sa fiche s'affiche |
+| **France compétences** | onglet du même nom dans la fiche : certification visée, bloc de compétences, % couvert, livres à ajouter pour compléter le bloc |
 
-On referme le livre, il retourne sur son présentoir ; on sort par la porte du fond ou la touche `Échap`.
+## Navigation (volontairement simple)
+Pas de marche libre : la caméra suit des rails.
+- **Glisser** (souris ou doigt), **flèches ‹ ›** à l'écran, **← →** au clavier ou **molette** : passer d'une porte à l'autre, d'une travée à l'autre.
+- **Clic** sur une porte ou un livre : on le centre d'abord, un second clic l'ouvre. Aucun zoom brutal.
+- **Échap** ou le bouton « ← Grande salle » : on revient en arrière.
+- **Mes rayons** (en haut) : rouvrir le filtre à tout moment. **Mon parcours** : formations retenues, durée totale, couverture des blocs France compétences, copie du parcours.
 
-### Filtrer dès le départ (le « Bibliothécaire »)
-Trois façons, qui se combinent, avec aperçu en direct (les portes des rayons fermés se couvrent d'une grille) :
-1. **Qui êtes-vous ?** 7 profils (dirigeant, DAF, juriste, DRH, QSE, agent public, manager) ouvrent les bons rayons.
-2. **Un besoin précis ?** saisie libre (« paie », « bail », « IA »…) : ouvre les rayons pertinents et **repère les livres** par une étoile ★ (touche `N` : livre recommandé suivant).
-3. **Vos rayons** : ouvrir ou fermer chaque domaine à la main.
-Le filtre se rouvre à tout moment (touche `F`, ou clic sur le grand livre du lutrin). La barre de recherche en bas téléporte jusqu'au livre voulu.
+## Filtrer dès l'entrée
+1. **Votre métier** : 10 profils (liste à valider, voir plus bas) qui ouvrent les bons rayons.
+2. **Un besoin précis** : saisie libre (« paie », « bail », « IA »…) ; les rayons utiles s'ouvrent, les livres repérés portent une étoile.
+3. **Vos rayons** : ouvrir ou fermer chaque domaine ; les portes se referment ou s'entrouvrent en direct.
 
-### Gamification
-Grades (de *Lecteur curieux* à *Grand Maître des savoirs*), 7 quêtes, **un livre doré caché par rayon**, et un **parcours** à composer (durée totale, couverture des blocs France compétences, copie ou impression).
-La progression est enregistrée dans le navigateur (`localStorage`), nulle part ailleurs.
-
-## Commandes
-Regarder : glisser. Marcher : `Z Q S D` ou flèches, `Maj` pour courir, molette pour avancer. Cliquer une porte, une travée ou un livre pour s'y rendre. `F` rayons · `P` parcours · `J` carnet · `N` livre recommandé · `M` son · `H` aide · `Échap` fermer ou sortir. Sur tactile : joystick à l'écran. Le mini-plan (en bas à gauche) est cliquable.
-
-## Brancher le vrai catalogue 2027
-Tout part de **`data.js`** : domaines → thématiques → produits. Chaque thématique porte sa cible France compétences :
+## Brancher le vrai catalogue
+Tout part de **`data.js`** : domaines → thématiques → produits, avec la cible France compétences de chaque thématique. Rayons, travées, livres et « match » se reconstruisent seuls. Le contenu actuel (6 domaines, 30 thématiques, 120 produits) est **illustratif**, et les rattachements RNCP / RS sont **indicatifs** (pas de numéros de fiche).
 
 ```js
-T('Paie',
-  ['Établir un bulletin de paie', 'Traiter absences et congés', …],              // compétences de la thématique
+T('Paie', ['Établir un bulletin de paie', …],                                   // compétences de la thématique
   FC('RNCP', 'Gestionnaire de paie', 5, 'Réaliser la paie et les déclarations sociales',
-     [['Établir les bulletins de paie', [0, 1]], …]),                              // bloc : compétences ↔ indices ci-dessus
-  [['Paie : les fondamentaux', 'FO', '3 jours', 'Fondamental', [0, 3]], …])        // produits : titre, format, durée, niveau, compétences
+     [['Établir les bulletins de paie', [0, 1]], …]),                           // bloc : compétence ↔ indices ci-dessus
+  [['Paie : les fondamentaux', 'FO', '3 jours', 'Fondamental', [0, 3]], …])     // produits : titre, format, durée, niveau, compétences
 ```
-Le score de « match » est **calculé** (part des compétences du bloc couvertes par le produit). Le contenu actuel est **illustratif** (120 produits, 30 thématiques) et les rattachements RNCP / RS sont **indicatifs** : renseignez les vrais intitulés et numéros de fiche, ou branchez l'API France compétences.
+Les **métiers** de départ sont dans `L.PERSONAS` (même fichier) : ils reprennent les grands segments du catalogue public (directions financières et fiscales, directions juridiques, banque et assurance, immobilier, RH et social, QSE, secteur public, management). À remplacer par vos cibles réelles.
 
 ## Charte
-Variables en tête de `style.css` (`--framboise`, `--bordeaux`, `--cream`, `--peach`…) et `BRAND` en tête de `textures.js` ; couleurs des domaines dans `data.js`. Les couvertures de livres, plaques et bannières sont dessinées en canvas : rien à exporter.
+Variables en tête de `style.css` (sable, bordeaux, framboise, pêche) et de `textures.js` (`C`), couleurs des domaines dans `data.js`. Les valeurs sont relevées sur les visuels de charte transmis ; pour les figer, remplacez-les par les codes exacts. Couvertures, plaques et marbres sont dessinés en canvas : aucun fichier image.
 
 ## Fichiers
-`index.html` · `style.css` (interface) · `data.js` (catalogue) · `textures.js` (matières et couvertures) · `book.js` (le livre magique) · `world.js` (Grande Nef, rayons) · `ui.js` (filtre, fiche, parcours, quêtes) · `main.js` (moteur, déplacement, transitions, son) · `vendor/three.min.js` (Three.js r149, licence MIT).
+`index.html` · `style.css` · `data.js` (catalogue) · `textures.js` (matières, couvertures) · `book.js` (le livre) · `scene.js` (Grande salle, rayons) · `app.js` (navigation, filtre, fiche, parcours) · `vendor/three.min.js` (Three.js r149, MIT).

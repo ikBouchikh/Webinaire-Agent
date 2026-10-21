@@ -2,7 +2,7 @@
    feuillets qui tournent, page de titre à droite, ex-libris à gauche. */
 
 (function () {
-  const L = window.LDC, T = L.tex, B = L.BRAND;
+  const L = window.LDC, T = L.tex, B = L.C;
   const ease = (t) => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const clamp01 = (v) => Math.max(0, Math.min(1, v));
   L.ease = ease; L.clamp01 = clamp01;
@@ -22,9 +22,9 @@
     const root = new THREE.Group(), inner = new THREE.Group(); root.add(inner);
     const leather = new THREE.MeshStandardMaterial({ color: o.color || '#5a1420', roughness: .55, metalness: .06 });
     const coverMat = new THREE.MeshStandardMaterial({ map: o.cover, roughness: .5, metalness: .1 });
-    const endMat = new THREE.MeshStandardMaterial({ map: o.endpaper, roughness: .85 });
+    const endMat = new THREE.MeshStandardMaterial({ map: o.endpaper, roughness: .85, color: '#E6DDD0' });
     const edgeMat = new THREE.MeshStandardMaterial({ map: pageEdge(), roughness: 1 });
-    const faceMat = new THREE.MeshStandardMaterial({ map: o.page, roughness: .95, emissive: new THREE.Color(0x000000) });
+    const faceMat = new THREE.MeshStandardMaterial({ map: o.page, roughness: .95, color: '#E6DDD0' });
     const plainMat = new THREE.MeshStandardMaterial({ color: '#efe4c8', roughness: 1 });
 
     const back = new THREE.Mesh(new THREE.BoxGeometry(w, h, .012), leather); back.position.set(0, 0, -t / 2 + .006);
@@ -32,7 +32,7 @@
     const pages = new THREE.Mesh(new THREE.BoxGeometry(w - .045, h - .03, t - .026), [edgeMat, edgeMat, edgeMat, edgeMat, faceMat, plainMat]);
     pages.position.set(.006, 0, 0);
     // bandes dorées sur le dos
-    const bandMat = new THREE.MeshStandardMaterial({ color: B.goldL, metalness: .85, roughness: .35 });
+    const bandMat = new THREE.MeshStandardMaterial({ color: B.orL, metalness: .85, roughness: .35 });
     [-.36, -.28, .28, .36].forEach((f) => { const b = new THREE.Mesh(new THREE.BoxGeometry(.038, .012, t + .004), bandMat); b.position.set(-w / 2 + .017, f * h, 0); inner.add(b); });
 
     const coverPivot = new THREE.Group(); coverPivot.position.set(-w / 2, 0, t / 2 - .006);
@@ -48,10 +48,11 @@
       pv.add(s); inner.add(pv); sheets.push({ pv, m });
     }
     // marque-page
-    const rib = new THREE.Mesh(new THREE.PlaneGeometry(.035, h * .34), new THREE.MeshStandardMaterial({ color: B.redD, roughness: .7, side: THREE.DoubleSide }));
+    const rib = new THREE.Mesh(new THREE.PlaneGeometry(.035, h * .34), new THREE.MeshStandardMaterial({ color: B.framboise, roughness: .7, side: THREE.DoubleSide }));
     rib.position.set(.04, -h / 2 - h * .12, -t / 2 + .02);
 
     inner.add(back, spine, pages, coverPivot, rib);
+    root.traverse((m) => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } });
     const state = { p: 0 };
     const api = {
       root, inner, w, h, t, state, faceMat, leather, coverMat, endMat, pages,

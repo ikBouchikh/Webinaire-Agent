@@ -1,441 +1,271 @@
-/* Textures dessinées en canvas : aucun fichier image, tout fonctionne hors ligne.
-   Charte : crème, rouge, bordeaux, pêche, serif (reprise de la démo du webinaire). */
+/* Matières et couvertures dessinées en canvas (haute définition, aucun fichier image).
+   Tout reste dans la charte : sable, bordeaux, framboise, pêche, or. */
 
 (function () {
   const L = window.LDC;
-  const BRAND = L.BRAND = {
-    cream: '#f7eee8', red: '#d6175f', redD: '#b50f4e', ink: '#4a0a22', peach: '#f6b68a', peachL: '#fbe0cd', bordeaux: '#680d2d',
-    gold: '#d9a441', goldL: '#f3d27a', goldD: '#8a6420',
+  const C = L.C = {
+    sable: '#F4ECE4', creme: '#FBF7F2', encre: '#4A0A22', bordeaux: '#680D2D', framboise: '#D6175F', framboiseD: '#B50F4E',
+    peche: '#F2B48C', rose: '#F3DDE3', bleu: '#2F5DA8', pierre: '#E6D7C3', pierreD: '#C9B293',
+    acajou: '#4A1B26', acajouL: '#6A2A38', or: '#D9A441', orL: '#F3D27A', orD: '#8A6420',
   };
-  const SANS = L.SANS = "'Calibri','Segoe UI','Helvetica Neue',Arial,sans-serif";
-  const SERIF = L.SERIF = "'Source Serif 4','Source Serif Pro','Noto Serif',Georgia,'Times New Roman',serif";
+  const SERIF = L.SERIF = "Georgia,'Times New Roman',serif";
+  const SANS = L.SANS = "'Calibri','Carlito','Segoe UI','Helvetica Neue',Arial,sans-serif";
   const T = L.tex = {};
-  const cache = {};
-  const owned = []; // textures à libérer avec le rayon courant
+  const cache = {}, owned = [];
 
-  const mulberry = (a) => () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-  T.rng = mulberry;
+  const rng = T.rng = (a) => () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return [c, c.getContext('2d')]; };
   const tex = (c, o = {}) => {
-    const t = new THREE.CanvasTexture(c);
-    t.encoding = o.linear ? THREE.LinearEncoding : THREE.sRGBEncoding;
-    t.anisotropy = T.aniso || 4;
-    if (o.repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(o.repeat[0], o.repeat[1]); }
+    const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = T.aniso || 8;
+    if (o.repeat) t.wrapS = t.wrapT = THREE.RepeatWrapping;
     if (o.own) owned.push(t);
     return t;
   };
-  const memo = (key, fn) => (cache[key] || (cache[key] = fn()));
+  const memo = (k, fn) => (cache[k] || (cache[k] = fn()));
   T.disposeOwned = () => { owned.splice(0).forEach((t) => t.dispose()); };
 
-  const rr = (ctx, x, y, w, h, r) => {
-    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
-  };
-  const wrap = (ctx, text, maxW) => {
-    const words = text.split(' '); const lines = []; let cur = '';
-    words.forEach((w) => { const t = cur ? cur + ' ' + w : w; if (ctx.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; });
-    if (cur) lines.push(cur); return lines;
-  };
-  const goldGrad = (ctx, x0, y0, x1, y1) => {
-    const g = ctx.createLinearGradient(x0, y0, x1, y1);
-    g.addColorStop(0, BRAND.goldD); g.addColorStop(.35, BRAND.goldL); g.addColorStop(.6, BRAND.gold); g.addColorStop(1, BRAND.goldD); return g;
-  };
-  const spaced = (ctx, s, px) => { try { ctx.letterSpacing = px + 'px'; } catch (e) { /* ignoré */ } return s; };
-  const noise = (ctx, w, h, n, rnd, alpha = .08) => {
-    for (let i = 0; i < n; i++) { ctx.fillStyle = rnd() > .5 ? `rgba(255,255,255,${alpha * rnd()})` : `rgba(0,0,0,${alpha * 1.6 * rnd()})`; ctx.fillRect(rnd() * w, rnd() * h, 1 + rnd() * 2, 1 + rnd() * 2); }
+  const rr = (g, x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+  const wrap = (g, text, maxW) => { const words = text.split(' '), lines = []; let cur = ''; words.forEach((w) => { const t = cur ? cur + ' ' + w : w; if (g.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }); if (cur) lines.push(cur); return lines; };
+  const goldGrad = (g, x0, y0, x1, y1) => { const q = g.createLinearGradient(x0, y0, x1, y1); q.addColorStop(0, C.orD); q.addColorStop(.35, C.orL); q.addColorStop(.62, C.or); q.addColorStop(1, C.orD); return q; };
+  const spaced = (g, px) => { try { g.letterSpacing = px + 'px'; } catch (e) { /* ignoré */ } };
+  const noise = (g, w, h, n, r, a = .06) => { for (let i = 0; i < n; i++) { g.fillStyle = r() > .5 ? `rgba(255,255,255,${a * r()})` : `rgba(0,0,0,${a * 1.5 * r()})`; g.fillRect(r() * w, r() * h, 1 + r() * 2, 1 + r() * 2); } };
+  const shade = T.shade = (hex, amt) => { const n = parseInt(hex.slice(1), 16), f = (v) => Math.max(0, Math.min(255, Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt))); return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`; };
+  const hexA = T.hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+  T.wordmark = (g, x, y, size, color) => {
+    g.save(); g.fillStyle = color; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `700 ${Math.round(size * .5)}px ${SERIF}`; spaced(g, size * .07); g.fillText('LEFEBVRE DALLOZ', x, y - size * .12);
+    g.font = `600 ${Math.round(size * .24)}px ${SANS}`; spaced(g, size * .09); g.fillText('COMPÉTENCES', x, y + size * .3); spaced(g, 0); g.restore();
   };
 
-  /* Marque Lefebvre Dalloz : carré d'angle arrondi, trait vertical et trait horizontal (comme sur les slides). */
-  T.drawMark = (ctx, x, y, s, color) => {
-    ctx.save(); ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.font = `700 ${Math.round(s * .78)}px ${SANS}`; ctx.fillText('Skilia', x, y); ctx.restore();
-  };
+  /* ---------- architecture ---------- */
 
-  /* ---------- Matériaux d'architecture ---------- */
-
-  T.floor = () => memo('floor', () => {
-    const [c, g] = mk(1024, 1024); const r = mulberry(7);
-    g.fillStyle = '#2a170a'; g.fillRect(0, 0, 1024, 1024);
-    const pw = 64, pl = 256;
-    for (let row = 0; row < 1024 / pw; row++) {
-      const off = r() * pl;
-      for (let x = -pl; x < 1024 + pl; x += pl) {
-        const lum = 30 + r() * 16, hue = 22 + r() * 8;
-        g.fillStyle = `hsl(${hue},48%,${lum}%)`; g.fillRect(x + off + 2, row * pw + 2, pl - 4, pw - 4);
-        for (let k = 0; k < 14; k++) { g.strokeStyle = `rgba(20,8,0,${.06 + r() * .1})`; g.lineWidth = 1; g.beginPath(); const yy = row * pw + 4 + r() * (pw - 8); g.moveTo(x + off + 2, yy); g.bezierCurveTo(x + off + 80, yy + r() * 6 - 3, x + off + 170, yy + r() * 6 - 3, x + off + pl - 2, yy + r() * 4 - 2); g.stroke(); }
-      }
+  T.marble = () => memo('marble', () => {
+    const [c, g] = mk(1024, 1024), r = rng(7);
+    for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
+      const dark = (i + j) % 2, x = i * 256, y = j * 256;
+      g.fillStyle = dark ? '#6A1230' : '#E8DAC7'; g.fillRect(x, y, 256, 256);
+      for (let k = 0; k < 7; k++) { g.strokeStyle = dark ? `rgba(255,220,225,${.05 + r() * .09})` : `rgba(120,80,60,${.05 + r() * .08})`; g.lineWidth = .8 + r() * 2; g.beginPath(); g.moveTo(x + r() * 256, y); g.bezierCurveTo(x + r() * 256, y + 90, x + r() * 256, y + 170, x + r() * 256, y + 256); g.stroke(); }
+      g.strokeStyle = dark ? 'rgba(20,0,8,.5)' : 'rgba(110,80,50,.4)'; g.lineWidth = 3; g.strokeRect(x + 1.5, y + 1.5, 253, 253);
     }
-    noise(g, 1024, 1024, 5000, r, .07);
-    return tex(c, { repeat: [5, 5] });
+    noise(g, 1024, 1024, 9000, r, .05);
+    return tex(c, { repeat: true });
   });
 
-  T.wood = (key = 'wood', base = '#4a2814', seed = 3) => memo('wood:' + key, () => {
-    const [c, g] = mk(512, 512); const r = mulberry(seed);
-    g.fillStyle = base; g.fillRect(0, 0, 512, 512);
-    for (let i = 0; i < 90; i++) {
-      const x = r() * 512; g.strokeStyle = r() > .5 ? `rgba(0,0,0,${.05 + r() * .12})` : `rgba(255,220,170,${.03 + r() * .06})`;
-      g.lineWidth = .6 + r() * 2.2; g.beginPath(); g.moveTo(x, 0);
-      g.bezierCurveTo(x + r() * 30 - 15, 170, x + r() * 30 - 15, 340, x + r() * 20 - 10, 512); g.stroke();
-    }
-    noise(g, 512, 512, 2500, r, .06);
-    return tex(c, { repeat: [1, 1] });
+  T.parquet = () => memo('parquet', () => {
+    const [c, g] = mk(1024, 1024), r = rng(11);
+    g.fillStyle = '#2A0F14'; g.fillRect(0, 0, 1024, 1024);
+    const pw = 64, pl = 341;
+    for (let row = 0; row < 16; row++) { const off = r() * pl; for (let x = -pl; x < 1024 + pl; x += pl) { const l = 22 + r() * 9; g.fillStyle = `hsl(${352 + r() * 8},${38 + r() * 10}%,${l}%)`; g.fillRect(x + off + 1.5, row * pw + 1.5, pl - 3, pw - 3); for (let k = 0; k < 10; k++) { g.strokeStyle = `rgba(20,0,6,${.06 + r() * .1})`; g.lineWidth = 1; g.beginPath(); const yy = row * pw + 5 + r() * (pw - 10); g.moveTo(x + off + 2, yy); g.bezierCurveTo(x + off + 100, yy + r() * 5 - 2.5, x + off + 230, yy + r() * 5 - 2.5, x + off + pl - 2, yy + r() * 3 - 1.5); g.stroke(); } } }
+    noise(g, 1024, 1024, 5000, r, .05);
+    return tex(c, { repeat: true });
   });
 
   T.stone = () => memo('stone', () => {
-    const [c, g] = mk(512, 512); const r = mulberry(11);
-    g.fillStyle = '#6d6256'; g.fillRect(0, 0, 512, 512);
-    for (let y = 0; y < 512; y += 64) { const off = (y / 64 % 2) * 64; for (let x = -64; x < 512; x += 128) { const l = 38 + r() * 8; g.fillStyle = `hsl(30,10%,${l}%)`; g.fillRect(x + off + 2, y + 2, 124, 60); } }
-    noise(g, 512, 512, 6000, r, .1);
-    return tex(c, { repeat: [2, 2] });
+    const [c, g] = mk(1024, 1024), r = rng(13);
+    g.fillStyle = '#C9B293'; g.fillRect(0, 0, 1024, 1024);
+    for (let y = 0; y < 1024; y += 128) { const off = (y / 128) % 2 ? 128 : 0; for (let x = -256; x < 1024; x += 256) { const l = 78 + r() * 6; g.fillStyle = `hsl(33,${28 + r() * 8}%,${l}%)`; g.fillRect(x + off + 3, y + 3, 250, 122); } }
+    noise(g, 1024, 1024, 14000, r, .07);
+    return tex(c, { repeat: true });
   });
 
-  /* Rayonnages peints : des centaines de dos de livres, répétables. */
-  T.bookwall = (seed = 1, bias = null) => memo(`bw:${seed}:${bias}`, () => {
-    const [c, g] = mk(1024, 1024); const r = mulberry(seed * 97 + 5);
-    const pal = ['#5a1420', '#3b0a0a', '#6e2a14', '#2c3e2d', '#1f2f4a', '#7a5a1e', '#4a2f6b', '#8a1f2b', '#2a2220', '#5b3a21', '#8c6a3a', '#d8cdb0'];
-    if (bias) { pal.push(bias, bias, bias, bias); }
-    const shelves = 4, sh = 1024 / shelves;
-    for (let s = 0; s < shelves; s++) {
-      const y0 = s * sh;
-      const bg = g.createLinearGradient(0, y0, 0, y0 + sh); bg.addColorStop(0, '#0e0705'); bg.addColorStop(1, '#241209');
-      g.fillStyle = bg; g.fillRect(0, y0, 1024, sh);
+  T.wood = (key, base, seed) => memo('wood:' + key, () => {
+    const [c, g] = mk(512, 512), r = rng(seed || 3);
+    g.fillStyle = base; g.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 80; i++) { const x = r() * 512; g.strokeStyle = r() > .5 ? `rgba(0,0,0,${.05 + r() * .1})` : `rgba(255,210,200,${.03 + r() * .05})`; g.lineWidth = .6 + r() * 2; g.beginPath(); g.moveTo(x, 0); g.bezierCurveTo(x + r() * 26 - 13, 170, x + r() * 26 - 13, 340, x + r() * 18 - 9, 512); g.stroke(); }
+    noise(g, 512, 512, 2200, r, .05);
+    return tex(c, { repeat: true });
+  });
+
+  /* Rayonnages peints (fond lointain) : 8 étagères de dos de livres aux couleurs de la charte. */
+  T.bookwall = (seed = 1) => memo('bw:' + seed, () => {
+    const [c, g] = mk(2048, 2048), r = rng(seed * 97 + 5);
+    const pal = ['#680D2D', '#7A1233', '#4A0A22', '#8B0F3E', '#5A2230', '#6A1230', '#E6D7C3', '#F3DDE3', '#B58A4A', '#2F5DA8', '#3A2A2E', '#9A4A2B', '#680D2D', '#5A0B27'];
+    const rows = 8, sh = 2048 / rows;
+    for (let s = 0; s < rows; s++) {
+      const y0 = s * sh; const bg = g.createLinearGradient(0, y0, 0, y0 + sh); bg.addColorStop(0, '#1A070C'); bg.addColorStop(1, '#2E0E16'); g.fillStyle = bg; g.fillRect(0, y0, 2048, sh);
       let x = 0;
-      while (x < 1024) {
-        const w = 12 + r() * 24, h = 140 + r() * 80, col = pal[(r() * pal.length) | 0];
-        if (r() < .06) { x += 20 + r() * 40; continue; }
-        const top = y0 + sh - 20 - h;
-        const gr = g.createLinearGradient(x, 0, x + w, 0); gr.addColorStop(0, 'rgba(255,255,255,.18)'); gr.addColorStop(.25, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(0,0,0,.5)');
+      while (x < 2048) {
+        const w = 20 + r() * 34, h = 150 + r() * 70, col = pal[(r() * pal.length) | 0]; if (r() < .05) { x += 30 + r() * 50; continue; }
+        const top = y0 + sh - 22 - h, gr = g.createLinearGradient(x, 0, x + w, 0); gr.addColorStop(0, 'rgba(255,255,255,.2)'); gr.addColorStop(.3, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(0,0,0,.45)');
         g.fillStyle = col; g.fillRect(x, top, w, h); g.fillStyle = gr; g.fillRect(x, top, w, h);
-        g.fillStyle = r() > .4 ? BRAND.goldD : BRAND.goldL;
-        g.fillRect(x, top + 10 + r() * 6, w, 2); g.fillRect(x, top + h - 22 - r() * 6, w, 2);
-        if (r() > .55) { g.fillStyle = 'rgba(243,210,122,.55)'; g.fillRect(x + w * .25, top + h * .3, w * .5, h * .22); }
-        x += w + .5;
+        g.fillStyle = r() > .4 ? C.orD : C.orL; g.fillRect(x, top + 12 + r() * 8, w, 3); g.fillRect(x, top + h - 26 - r() * 8, w, 3);
+        if (r() > .45) { g.fillStyle = 'rgba(243,210,122,.6)'; g.fillRect(x + w * .22, top + h * .32, w * .56, h * .2); }
+        x += w + 1;
       }
-      const wd = g.createLinearGradient(0, y0 + sh - 20, 0, y0 + sh); wd.addColorStop(0, '#5a3418'); wd.addColorStop(.2, '#7a4a24'); wd.addColorStop(1, '#2a1608');
-      g.fillStyle = wd; g.fillRect(0, y0 + sh - 20, 1024, 20);
-      g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(0, y0 + sh - 38, 1024, 18);
+      const wd = g.createLinearGradient(0, y0 + sh - 22, 0, y0 + sh); wd.addColorStop(0, '#6A2A3A'); wd.addColorStop(.25, '#8A3A4C'); wd.addColorStop(1, '#3A1219'); g.fillStyle = wd; g.fillRect(0, y0 + sh - 22, 2048, 22);
+      g.fillStyle = 'rgba(0,0,0,.4)'; g.fillRect(0, y0 + sh - 44, 2048, 22);
     }
-    return tex(c, { repeat: [1, 1] });
+    return tex(c, { repeat: true });
   });
 
   T.coffer = () => memo('coffer', () => {
-    const [c, g] = mk(512, 512); const r = mulberry(23);
-    g.fillStyle = '#1d0f08'; g.fillRect(0, 0, 512, 512);
+    const [c, g] = mk(1024, 1024), r = rng(23);
+    g.fillStyle = '#E4D3BE'; g.fillRect(0, 0, 1024, 1024);
     for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) {
-      const x = i * 256, y = j * 256;
-      g.fillStyle = '#2c180c'; g.fillRect(x + 14, y + 14, 228, 228);
-      g.strokeStyle = BRAND.goldD; g.lineWidth = 3; g.strokeRect(x + 26, y + 26, 204, 204);
-      g.strokeStyle = 'rgba(217,164,65,.5)'; g.lineWidth = 1; g.strokeRect(x + 40, y + 40, 176, 176);
-      g.fillStyle = BRAND.goldD; g.beginPath(); g.arc(x + 128, y + 128, 10, 0, 7); g.fill();
+      const x = i * 512, y = j * 512;
+      g.fillStyle = '#D9C5AB'; g.fillRect(x + 36, y + 36, 440, 440);
+      const gr = g.createLinearGradient(x, y, x + 512, y + 512); gr.addColorStop(0, 'rgba(255,255,255,.3)'); gr.addColorStop(1, 'rgba(0,0,0,.14)'); g.fillStyle = gr; g.fillRect(x + 36, y + 36, 440, 440);
+      g.strokeStyle = goldGrad(g, x, y, x + 512, y + 512); g.lineWidth = 7; g.strokeRect(x + 56, y + 56, 400, 400); g.lineWidth = 2; g.strokeRect(x + 76, y + 76, 360, 360);
+      g.fillStyle = C.bordeaux; g.beginPath(); g.arc(x + 256, y + 256, 26, 0, 7); g.fill(); g.strokeStyle = C.or; g.lineWidth = 4; g.stroke();
     }
-    noise(g, 512, 512, 3000, r, .05);
-    return tex(c, { repeat: [6, 6] });
+    noise(g, 1024, 1024, 5000, r, .04);
+    return tex(c, { repeat: true });
   });
 
   T.dome = () => memo('dome', () => {
-    const [c, g] = mk(2048, 512); const r = mulberry(31);
-    const bg = g.createLinearGradient(0, 0, 0, 512); bg.addColorStop(0, '#0a0506'); bg.addColorStop(1, '#2a140c');
-    g.fillStyle = bg; g.fillRect(0, 0, 2048, 512);
-    for (let i = 0; i < 36; i++) { const x = i * 2048 / 36; g.fillStyle = i % 2 ? 'rgba(80,40,18,.35)' : 'rgba(20,8,4,.35)'; g.fillRect(x, 0, 2048 / 36, 512); }
-    for (let i = 0; i < 12; i++) { const x = i * 2048 / 12; g.fillStyle = '#3a1d0e'; g.fillRect(x - 9, 0, 18, 512); g.fillStyle = BRAND.goldD; g.fillRect(x - 2, 0, 4, 512); }
-    for (let k = 1; k < 5; k++) { g.fillStyle = '#3a1d0e'; g.fillRect(0, k * 100, 2048, 12); g.fillStyle = 'rgba(217,164,65,.6)'; g.fillRect(0, k * 100 + 4, 2048, 3); }
-    for (let i = 0; i < 160; i++) { g.fillStyle = `rgba(243,210,122,${.2 + r() * .5})`; g.beginPath(); g.arc(r() * 2048, r() * 480, .8 + r() * 1.8, 0, 7); g.fill(); }
+    const [c, g] = mk(2048, 512);
+    const bg = g.createLinearGradient(0, 0, 0, 512); bg.addColorStop(0, '#FBF7F2'); bg.addColorStop(1, '#DCC8AC'); g.fillStyle = bg; g.fillRect(0, 0, 2048, 512);
+    for (let i = 0; i < 24; i++) { const x = i * 2048 / 24; g.fillStyle = i % 2 ? 'rgba(120,70,50,.07)' : 'rgba(255,255,255,.12)'; g.fillRect(x, 0, 2048 / 24, 512); }
+    for (let i = 0; i < 12; i++) { const x = i * 2048 / 12; g.fillStyle = C.bordeaux; g.fillRect(x - 10, 0, 20, 512); g.fillStyle = goldGrad(g, 0, 0, 0, 512); g.fillRect(x - 3, 0, 6, 512); }
+    for (let k = 1; k < 5; k++) { g.fillStyle = C.bordeaux; g.fillRect(0, k * 96, 2048, 12); g.fillStyle = C.or; g.fillRect(0, k * 96 + 4, 2048, 4); }
     return tex(c);
   });
 
   T.balustrade = () => memo('bal', () => {
-    const [c, g] = mk(256, 128); g.clearRect(0, 0, 256, 128);
-    g.fillStyle = '#4a2814'; g.fillRect(0, 0, 256, 16); g.fillStyle = '#7a4a24'; g.fillRect(0, 2, 256, 4);
-    g.fillStyle = '#3a1d0e'; g.fillRect(0, 112, 256, 16);
-    for (let x = 8; x < 256; x += 32) { const gr = g.createLinearGradient(x - 8, 0, x + 8, 0); gr.addColorStop(0, '#2a1608'); gr.addColorStop(.4, '#7a4a24'); gr.addColorStop(1, '#2a1608'); g.fillStyle = gr; g.beginPath(); g.moveTo(x - 4, 16); g.quadraticCurveTo(x - 9, 64, x - 4, 112); g.lineTo(x + 4, 112); g.quadraticCurveTo(x + 9, 64, x + 4, 16); g.fill(); }
-    return tex(c, { repeat: [24, 1] });
+    const [c, g] = mk(512, 256); g.clearRect(0, 0, 512, 256);
+    for (let x = 16; x < 512; x += 64) { const q = g.createLinearGradient(x - 14, 0, x + 14, 0); q.addColorStop(0, '#3A1219'); q.addColorStop(.4, '#9A5A52'); q.addColorStop(1, '#3A1219'); g.fillStyle = q; g.beginPath(); g.moveTo(x - 7, 12); g.quadraticCurveTo(x - 17, 128, x - 7, 244); g.lineTo(x + 7, 244); g.quadraticCurveTo(x + 17, 128, x + 7, 12); g.fill(); g.fillStyle = q; g.beginPath(); g.arc(x, 128, 14, 0, 7); g.fill(); }
+    return tex(c, { repeat: true });
   });
 
-  T.windowNight = () => memo('win', () => {
+  T.windowGlass = () => memo('win', () => {
+    const [c, g] = mk(512, 1024);
+    const sky = g.createLinearGradient(0, 0, 0, 1024); sky.addColorStop(0, '#FFF8EC'); sky.addColorStop(1, '#F1DDC2'); g.fillStyle = sky; g.fillRect(0, 0, 512, 1024);
+    const gl = g.createRadialGradient(256, 300, 10, 256, 300, 420); gl.addColorStop(0, 'rgba(255,255,255,.9)'); gl.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.fillRect(0, 0, 512, 1024);
+    g.strokeStyle = '#7A5A4A'; g.lineWidth = 12; g.beginPath(); g.moveTo(256, 0); g.lineTo(256, 1024); g.stroke();
+    for (const y of [300, 560, 800]) { g.beginPath(); g.moveTo(0, y); g.lineTo(512, y); g.stroke(); }
+    return tex(c);
+  });
+
+  /* ---------- portes ---------- */
+
+  T.doorLeaf = () => memo('leaf', () => {
+    const [c, g] = mk(512, 1024), r = rng(41);
+    g.fillStyle = C.acajou; g.fillRect(0, 0, 512, 1024);
+    for (let i = 0; i < 40; i++) { const x = r() * 512; g.strokeStyle = r() > .5 ? 'rgba(0,0,0,.14)' : 'rgba(255,210,200,.07)'; g.lineWidth = 1 + r() * 2; g.beginPath(); g.moveTo(x, 0); g.bezierCurveTo(x + 12, 300, x - 12, 700, x, 1024); g.stroke(); }
+    const panel = (x, y, w, h) => { g.fillStyle = 'rgba(0,0,0,.28)'; g.fillRect(x - 6, y - 6, w + 12, h + 12); g.fillStyle = C.acajouL; g.fillRect(x, y, w, h); const q = g.createLinearGradient(x, y, x + w, y + h); q.addColorStop(0, 'rgba(255,255,255,.18)'); q.addColorStop(1, 'rgba(0,0,0,.28)'); g.fillStyle = q; g.fillRect(x, y, w, h); g.strokeStyle = 'rgba(243,210,122,.7)'; g.lineWidth = 3; g.strokeRect(x + 14, y + 14, w - 28, h - 28); };
+    panel(46, 50, 420, 400); panel(46, 500, 420, 470);
+    g.fillStyle = C.orL; for (const [x, y] of [[26, 26], [486, 26], [26, 998], [486, 998], [26, 480], [486, 480]]) { g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill(); }
+    noise(g, 512, 1024, 3000, r, .05);
+    return tex(c);
+  });
+
+  T.transom = (dom) => memo('transom:' + dom.id, () => {
+    const [c, g] = mk(512, 256); g.clearRect(0, 0, 512, 256);
+    g.save(); g.beginPath(); g.moveTo(0, 256); g.lineTo(0, 256); g.arc(256, 256, 256, Math.PI, 0); g.closePath(); g.clip();
+    const q = g.createRadialGradient(256, 256, 10, 256, 256, 260); q.addColorStop(0, '#FFF6E4'); q.addColorStop(.55, dom.lueur); q.addColorStop(1, dom.couleur); g.fillStyle = q; g.fillRect(0, 0, 512, 256);
+    g.strokeStyle = 'rgba(58,18,25,.8)'; g.lineWidth = 6; for (let i = 0; i <= 12; i++) { const a = Math.PI + i * Math.PI / 12; g.beginPath(); g.moveTo(256, 256); g.lineTo(256 + Math.cos(a) * 260, 256 + Math.sin(a) * 260); g.stroke(); }
+    for (const rad of [90, 170]) { g.beginPath(); g.arc(256, 256, rad, Math.PI, 0); g.stroke(); }
+    g.fillStyle = '#FFF6E4'; g.beginPath(); g.arc(256, 256, 62, Math.PI, 0); g.fill(); g.strokeStyle = 'rgba(58,18,25,.8)'; g.stroke();
+    g.fillStyle = dom.couleur; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.font = `700 ${dom.glyph.length > 2 ? 30 : dom.glyph.length > 1 ? 40 : 56}px ${SERIF}`; g.fillText(dom.glyph, 256, 244);
+    g.restore(); return tex(c);
+  });
+
+  T.vestibule = (dom) => memo('vest:' + dom.id, () => {
     const [c, g] = mk(256, 512);
-    const sky = g.createLinearGradient(0, 0, 0, 512); sky.addColorStop(0, '#0f1b3a'); sky.addColorStop(1, '#3a5a8a');
-    g.fillStyle = sky; g.fillRect(0, 0, 256, 512);
-    const r = mulberry(5); for (let i = 0; i < 40; i++) { g.fillStyle = `rgba(255,255,255,${.3 + r() * .6})`; g.fillRect(r() * 256, r() * 300, 1.5, 1.5); }
-    const mg = g.createRadialGradient(170, 110, 0, 170, 110, 80); mg.addColorStop(0, 'rgba(255,248,220,1)'); mg.addColorStop(.25, 'rgba(255,240,200,.9)'); mg.addColorStop(1, 'rgba(255,240,200,0)');
-    g.fillStyle = mg; g.fillRect(0, 0, 256, 300);
-    g.strokeStyle = '#120a06'; g.lineWidth = 7;
-    g.beginPath(); g.moveTo(128, 0); g.lineTo(128, 512); g.stroke();
-    for (const y of [150, 280, 400]) { g.beginPath(); g.moveTo(0, y); g.lineTo(256, y); g.stroke(); }
-    g.lineWidth = 14; g.strokeRect(0, 0, 256, 512);
+    const q = g.createRadialGradient(128, 260, 10, 128, 260, 300); q.addColorStop(0, '#FFF6E4'); q.addColorStop(.45, hexA(dom.lueur, 1)); q.addColorStop(1, shade(dom.couleur, -.35)); g.fillStyle = q; g.fillRect(0, 0, 256, 512);
+    g.strokeStyle = 'rgba(255,246,228,.35)'; g.lineWidth = 2; for (let i = -5; i <= 5; i++) { g.beginPath(); g.moveTo(128 + i * 8, 250); g.lineTo(128 + i * 40, 512); g.stroke(); }
     return tex(c);
   });
 
-  /* ---------- Rideaux, enseignes, plaques ---------- */
+  /* ---------- enseignes ---------- */
 
-  T.banner = (dom) => memo('banner:' + dom.id, () => {
-    const [c, g] = mk(256, 640);
-    const gr = g.createLinearGradient(0, 0, 0, 640); gr.addColorStop(0, dom.couleur); gr.addColorStop(1, shade(dom.couleur, -.35));
-    g.fillStyle = gr; g.beginPath(); g.moveTo(0, 0); g.lineTo(256, 0); g.lineTo(256, 600); g.lineTo(128, 640); g.lineTo(0, 600); g.closePath(); g.fill();
-    g.strokeStyle = goldGrad(g, 0, 0, 256, 640); g.lineWidth = 8; g.strokeRect(14, 14, 228, 540);
-    g.lineWidth = 2; g.strokeRect(26, 26, 204, 516);
-    T.drawMark(g, 128, 90, 56, BRAND.goldL, 5);
-    g.fillStyle = goldGrad(g, 0, 160, 256, 420); g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.font = `700 ${dom.glyph.length > 2 ? 78 : dom.glyph.length > 1 ? 104 : 150}px ${SERIF}`; g.fillText(dom.glyph, 128, 275);
-    g.font = `600 22px ${SERIF}`; g.fillStyle = BRAND.cream; spaced(g, '', 3);
-    wrap(g, dom.court.toUpperCase(), 190).forEach((l, i) => g.fillText(l, 128, 420 + i * 28));
-    return tex(c);
-  });
-
-  T.sign = (dom) => memo('sign:' + dom.id, () => {
-    const [c, g] = mk(1024, 280);
-    const wd = g.createLinearGradient(0, 0, 0, 280); wd.addColorStop(0, '#3a1d0e'); wd.addColorStop(.5, '#2a1408'); wd.addColorStop(1, '#1a0b05');
-    g.fillStyle = wd; rr(g, 4, 4, 1016, 272, 18); g.fill();
-    g.strokeStyle = goldGrad(g, 0, 0, 1024, 280); g.lineWidth = 6; rr(g, 14, 14, 996, 252, 12); g.stroke();
-    g.lineWidth = 1.5; rr(g, 26, 26, 972, 228, 8); g.stroke();
+  const plate = (w, h, kicker, title, tcol) => {
+    const [c, g] = mk(w, h);
+    const q = g.createLinearGradient(0, 0, 0, h); q.addColorStop(0, '#F1E6D4'); q.addColorStop(1, '#DCC8AC'); g.fillStyle = q; rr(g, 6, 6, w - 12, h - 12, h * .1); g.fill();
+    g.strokeStyle = goldGrad(g, 0, 0, w, h); g.lineWidth = h * .035; rr(g, h * .08, h * .08, w - h * .16, h - h * .16, h * .06); g.stroke();
     g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillStyle = BRAND.peach; g.font = `italic 600 32px ${SERIF}`; spaced(g, '', 4);
-    g.fillText(dom.court.toUpperCase(), 512, 66);
-    g.fillStyle = goldGrad(g, 0, 90, 0, 220); g.font = `700 ${dom.nom.length > 28 ? 50 : 64}px ${SERIF}`; spaced(g, '', 1);
-    const lines = wrap(g, dom.nom, 900);
-    lines.forEach((l, i) => g.fillText(l, 512, (lines.length > 1 ? 144 : 168) + i * 58));
-    return tex(c);
-  });
-
-  /* Plaque de travée : titre de la thématique + nombre de formations. */
-  T.valance = (theme, n, total, dom) => {
-    const [c, g] = mk(1024, 170);
-    const wd = g.createLinearGradient(0, 0, 0, 170); wd.addColorStop(0, '#4a2814'); wd.addColorStop(.5, '#341b0c'); wd.addColorStop(1, '#22110a');
-    g.fillStyle = wd; g.fillRect(0, 0, 1024, 170);
-    g.strokeStyle = goldGrad(g, 0, 0, 1024, 170); g.lineWidth = 5; g.strokeRect(10, 10, 1004, 150); g.lineWidth = 1.5; g.strokeRect(22, 22, 980, 126);
-    g.fillStyle = dom.lueur; g.beginPath(); g.arc(88, 85, 40, 0, 7); g.fill();
-    g.fillStyle = '#1a0b05'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `700 ${dom.glyph.length > 2 ? 22 : dom.glyph.length > 1 ? 30 : 44}px ${SERIF}`; g.fillText(dom.glyph, 88, 88);
-    g.textAlign = 'left'; g.fillStyle = BRAND.peach; g.font = `italic 600 24px ${SERIF}`; spaced(g, '', 3);
-    g.fillText(`TRAVÉE ${n} / ${total}`, 150, 52);
-    g.fillStyle = goldGrad(g, 150, 60, 900, 140); g.font = `700 ${theme.length > 30 ? 44 : 54}px ${SERIF}`; spaced(g, '', 0);
-    g.fillText(theme, 150, 106);
+    if (kicker) { g.fillStyle = C.framboiseD; g.font = `700 ${h * .17}px ${SANS}`; spaced(g, h * .02); g.fillText(kicker, w / 2, h * .3); spaced(g, 0); }
+    g.fillStyle = tcol || C.bordeaux; g.font = `700 ${h * (kicker ? .3 : .42)}px ${SERIF}`; g.fillText(title, w / 2, h * (kicker ? .64 : .52), w * .88);
     return tex(c, { own: true });
   };
+  T.plaque = (dom) => memo('plq:' + dom.id, () => plate(1024, 200, 'RAYON', dom.court, C.bordeaux));
+  T.valance = (theme, n, total) => plate(2048, 282, `TRAVÉE ${n} SUR ${total}`, theme, C.bordeaux);
 
-  T.gate = () => memo('gate', () => {
-    const [c, g] = mk(512, 768); g.clearRect(0, 0, 512, 768);
-    g.fillStyle = '#17110f';
-    for (let x = 20; x < 512; x += 34) g.fillRect(x, 0, 8, 768);
-    for (const y of [60, 380, 700]) g.fillRect(0, y, 512, 16);
-    g.fillStyle = '#2b201c'; for (let x = 20; x < 512; x += 34) { g.beginPath(); g.moveTo(x - 4, 0); g.lineTo(x + 4, -16); g.lineTo(x + 12, 0); g.fill(); }
-    g.fillStyle = goldGrad(g, 196, 330, 316, 470); rr(g, 196, 330, 120, 140, 14); g.fill();
-    g.fillStyle = '#17110f'; g.beginPath(); g.arc(256, 385, 14, 0, 7); g.fill(); g.fillRect(250, 390, 12, 40);
-    g.strokeStyle = goldGrad(g, 196, 250, 316, 330); g.lineWidth = 12; g.beginPath(); g.arc(256, 330, 44, Math.PI, 0); g.stroke();
-    return tex(c);
-  });
-
-  T.portalGlow = (dom) => memo('pg:' + dom.id, () => {
-    const [c, g] = mk(512, 768);
-    const bg = g.createLinearGradient(0, 0, 0, 768); bg.addColorStop(0, '#1a0c08'); bg.addColorStop(1, '#3a2010');
-    g.fillStyle = bg; g.fillRect(0, 0, 512, 768);
-    // perspective de rayonnages
-    g.strokeStyle = 'rgba(243,210,122,.18)'; g.lineWidth = 2;
-    for (let i = -6; i <= 6; i++) { g.beginPath(); g.moveTo(256 + i * 18, 330); g.lineTo(256 + i * 70, 768); g.stroke(); }
-    for (let k = 0; k < 8; k++) { const y = 330 + k * k * 8; g.beginPath(); g.moveTo(256 - (y - 300) * .5, y); g.lineTo(256 + (y - 300) * .5, y); g.stroke(); }
-    const rg = g.createRadialGradient(256, 420, 10, 256, 420, 360); rg.addColorStop(0, 'rgba(255,236,190,.95)'); rg.addColorStop(.35, hexA(dom.lueur, .55)); rg.addColorStop(1, 'rgba(0,0,0,0)');
-    g.fillStyle = rg; g.fillRect(0, 0, 512, 768);
-    g.fillStyle = 'rgba(255,255,255,.9)'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `700 ${dom.glyph.length > 2 ? 100 : dom.glyph.length > 1 ? 130 : 200}px ${SERIF}`;
-    g.globalAlpha = .75; g.fillText(dom.glyph, 256, 430); g.globalAlpha = 1;
-    return tex(c);
-  });
-
-  /* ---------- Tapis ---------- */
-
-  T.rug = () => memo('rug', () => {
-    const [c, g] = mk(1024, 1024); const cx = 512, cy = 512;
-    g.clearRect(0, 0, 1024, 1024);
+  T.rosace = () => memo('rosace', () => {
+    const [c, g] = mk(1024, 1024), cx = 512, cy = 512; g.clearRect(0, 0, 1024, 1024);
     const ring = (r0, r1, col) => { g.fillStyle = col; g.beginPath(); g.arc(cx, cy, r1, 0, 7); g.arc(cx, cy, r0, 0, 7, true); g.fill(); };
-    g.fillStyle = '#5a0c26'; g.beginPath(); g.arc(cx, cy, 506, 0, 7); g.fill();
-    ring(488, 506, BRAND.goldD); ring(470, 480, BRAND.gold); ring(330, 440, '#3a0818'); ring(322, 330, BRAND.gold);
-    // étoile à 12 branches
-    g.fillStyle = '#86123a'; g.strokeStyle = BRAND.gold; g.lineWidth = 3;
-    g.beginPath(); for (let i = 0; i < 24; i++) { const a = i * Math.PI / 12 - Math.PI / 2, rad = i % 2 ? 160 : 310; g.lineTo(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad); } g.closePath(); g.fill(); g.stroke();
-    g.fillStyle = '#3a0818'; g.beginPath(); g.arc(cx, cy, 120, 0, 7); g.fill(); g.strokeStyle = BRAND.goldL; g.lineWidth = 4; g.stroke();
-    T.drawMark(g, cx, cy, 120, BRAND.goldL);
-    // texte circulaire
-    g.fillStyle = BRAND.goldL; g.font = `600 40px ${SERIF}`; g.textAlign = 'center'; g.textBaseline = 'middle';
-    const txt = 'SKILIA PAR LEFEBVRE DALLOZ COMPÉTENCES  ✦  CATALOGUE 2027  ✦  ', n = txt.length;
+    g.fillStyle = C.bordeaux; g.beginPath(); g.arc(cx, cy, 508, 0, 7); g.fill(); ring(484, 508, C.or); ring(470, 478, C.orL);
+    ring(330, 440, '#4A0A22'); ring(322, 330, C.orL);
+    g.fillStyle = C.framboise; g.strokeStyle = C.orL; g.lineWidth = 4; g.beginPath(); for (let i = 0; i < 24; i++) { const a = i * Math.PI / 12 - Math.PI / 2, rad = i % 2 ? 150 : 300; g.lineTo(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad); } g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = C.bordeaux; g.beginPath(); g.arc(cx, cy, 120, 0, 7); g.fill(); g.lineWidth = 5; g.stroke(); g.fillStyle = C.orL; g.font = `700 104px ${SERIF}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('LD', cx, cy + 4);
+    g.fillStyle = C.orL; g.font = `600 42px ${SERIF}`; g.textAlign = 'center'; g.textBaseline = 'middle'; spaced(g, 4);
+    const txt = 'LEFEBVRE DALLOZ COMPÉTENCES  ·  CATALOGUE 2027  ·  ', n = txt.length;
     for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2 - Math.PI / 2; g.save(); g.translate(cx + Math.cos(a) * 395, cy + Math.sin(a) * 395); g.rotate(a + Math.PI / 2); g.fillText(txt[i], 0, 0); g.restore(); }
-    L.DOMAINES.forEach((d, i) => {
-      const a = (i / 6) * Math.PI * 2 - Math.PI / 2, x = cx + Math.cos(a) * 262, y = cy + Math.sin(a) * 262;
-      g.fillStyle = d.couleur; g.beginPath(); g.arc(x, y, 34, 0, 7); g.fill(); g.strokeStyle = BRAND.goldL; g.lineWidth = 4; g.stroke();
-      g.fillStyle = BRAND.goldL; g.font = `700 ${d.glyph.length > 2 ? 20 : d.glyph.length > 1 ? 26 : 36}px ${SERIF}`; g.fillText(d.glyph, x, y + 2);
-    });
     return tex(c);
   });
 
   T.runner = (dom) => memo('runner:' + dom.id, () => {
-    const [c, g] = mk(256, 1024);
-    g.fillStyle = shade(dom.couleur, -.45); g.fillRect(0, 0, 256, 1024);
-    g.strokeStyle = BRAND.goldD; g.lineWidth = 10; g.strokeRect(10, 10, 236, 1004);
-    g.strokeStyle = 'rgba(243,210,122,.7)'; g.lineWidth = 2; g.strokeRect(28, 28, 200, 968);
-    for (let i = 0; i < 4; i++) {
-      const y = 140 + i * 250; g.fillStyle = shade(dom.couleur, -.15); g.beginPath(); g.moveTo(128, y - 100); g.lineTo(220, y); g.lineTo(128, y + 100); g.lineTo(36, y); g.closePath(); g.fill();
-      g.strokeStyle = BRAND.gold; g.lineWidth = 3; g.stroke();
-      g.fillStyle = BRAND.goldL; g.beginPath(); g.arc(128, y, 22, 0, 7); g.fill();
-    }
-    return tex(c, { repeat: [1, 1] });
+    const [c, g] = mk(1024, 256);
+    g.fillStyle = shade(dom.cuir, -.15); g.fillRect(0, 0, 1024, 256);
+    g.strokeStyle = C.or; g.lineWidth = 12; g.strokeRect(0, 12, 1024, 232); g.strokeStyle = 'rgba(243,210,122,.7)'; g.lineWidth = 3; g.strokeRect(-4, 34, 1032, 188);
+    for (let i = 0; i < 2; i++) { const x = 256 + i * 512; g.fillStyle = shade(dom.cuir, .12); g.beginPath(); g.moveTo(x, 40); g.lineTo(x + 170, 128); g.lineTo(x, 216); g.lineTo(x - 170, 128); g.closePath(); g.fill(); g.strokeStyle = C.or; g.lineWidth = 5; g.stroke(); g.fillStyle = C.orL; g.beginPath(); g.arc(x, 128, 22, 0, 7); g.fill(); }
+    return tex(c, { repeat: true });
   });
 
-  /* ---------- Reliures et pages ---------- */
+  /* ---------- reliures ---------- */
 
-  const shade = (hex, amt) => {
-    const n = parseInt(hex.slice(1), 16); let r = n >> 16, gg = (n >> 8) & 255, b = n & 255;
-    const f = (v) => Math.max(0, Math.min(255, Math.round(amt < 0 ? v * (1 + amt) : v + (255 - v) * amt)));
-    return `rgb(${f(r)},${f(gg)},${f(b)})`;
-  };
-  const hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
-  T.shade = shade; T.hexA = hexA;
-
-  T.leather = (color, seed = 1) => {
-    const [c, g] = mk(512, 720); const r = mulberry(seed);
-    g.fillStyle = color; g.fillRect(0, 0, 512, 720);
-    for (let i = 0; i < 4200; i++) { g.fillStyle = r() > .5 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.08)'; g.beginPath(); g.arc(r() * 512, r() * 720, 1 + r() * 2.4, 0, 7); g.fill(); }
-    const v = g.createRadialGradient(256, 330, 120, 256, 360, 480); v.addColorStop(0, 'rgba(255,255,255,.07)'); v.addColorStop(1, 'rgba(0,0,0,.5)');
-    g.fillStyle = v; g.fillRect(0, 0, 512, 720);
+  const leather = (color, seed, w, h) => {
+    const [c, g] = mk(w, h), r = rng(seed); g.fillStyle = color; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 9000; i++) { g.fillStyle = r() > .5 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.08)'; g.beginPath(); g.arc(r() * w, r() * h, 1.2 + r() * 3, 0, 7); g.fill(); }
+    const v = g.createRadialGradient(w / 2, h * .45, w * .2, w / 2, h * .5, h * .75); v.addColorStop(0, 'rgba(255,255,255,.06)'); v.addColorStop(1, 'rgba(0,0,0,.42)'); g.fillStyle = v; g.fillRect(0, 0, w, h);
     return [c, g];
   };
 
   T.cover = (livre) => {
-    const dom = livre.dom, fm = L.FORMATS[livre.fmt];
-    const [c, g] = T.leather(shade(dom.couleur, -.3), livre.titre.length * 13 + livre.slot);
-    const gold = goldGrad(g, 0, 0, 512, 720);
-    g.strokeStyle = gold; g.lineWidth = 6; g.strokeRect(24, 24, 464, 672); g.lineWidth = 1.6; g.strokeRect(38, 38, 436, 644);
-    [[38, 38, 1, 1], [474, 38, -1, 1], [38, 682, 1, -1], [474, 682, -1, -1]].forEach(([x, y, sx, sy]) => {
-      g.save(); g.translate(x, y); g.scale(sx, sy); g.beginPath(); g.moveTo(0, 36); g.quadraticCurveTo(0, 0, 36, 0); g.moveTo(0, 22); g.quadraticCurveTo(0, 0, 22, 0); g.lineWidth = 3; g.stroke(); g.restore();
-    });
-    T.drawMark(g, 256, 92, 60, BRAND.goldL);
-    g.fillStyle = BRAND.goldL; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `600 15px ${SERIF}`; spaced(g, '', 2);
-    g.fillText('PAR LEFEBVRE DALLOZ COMPÉTENCES', 256, 138); spaced(g, '', 0);
-    // médaillon
-    g.strokeStyle = gold; g.lineWidth = 4; g.beginPath(); g.arc(256, 250, 70, 0, 7); g.stroke();
-    g.lineWidth = 1.5; g.beginPath(); g.arc(256, 250, 80, 0, 7); g.stroke();
-    g.fillStyle = hexA(dom.lueur, .18); g.beginPath(); g.arc(256, 250, 66, 0, 7); g.fill();
-    g.fillStyle = gold; g.font = `700 ${dom.glyph.length > 2 ? 42 : dom.glyph.length > 1 ? 56 : 84}px ${SERIF}`; g.fillText(dom.glyph, 256, 256);
-    // titre
-    g.fillStyle = BRAND.cream; let fs = 44; g.font = `700 ${fs}px ${SERIF}`;
-    let lines = wrap(g, livre.titre, 380); while (lines.length > 5 && fs > 28) { fs -= 3; g.font = `700 ${fs}px ${SERIF}`; lines = wrap(g, livre.titre, 380); }
-    const lh = fs * 1.2, y0 = 372 + (5 - Math.min(5, lines.length)) * lh * .35;
-    lines.forEach((l, i) => g.fillText(l, 256, y0 + i * lh));
-    // pied
-    g.strokeStyle = gold; g.lineWidth = 2; g.beginPath(); g.moveTo(130, 590); g.lineTo(382, 590); g.stroke();
-    g.fillStyle = BRAND.peach; g.font = `italic 600 22px ${SERIF}`; g.fillText(livre.theme.nom, 256, 618, 400);
-    g.fillStyle = BRAND.cream; g.font = `600 19px ${SERIF}`; spaced(g, '', 2); g.fillText(`${fm.nom.toUpperCase()}  ·  ${livre.duree.toUpperCase()}`, 256, 654); spaced(g, '', 0);
-    // marque-page au format
-    g.fillStyle = fm.col; g.beginPath(); g.moveTo(404, 0); g.lineTo(450, 0); g.lineTo(450, 128); g.lineTo(427, 104); g.lineTo(404, 128); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(404, 0, 5, 128);
+    const dom = livre.dom, fm = L.FORMATS[livre.fmt], W = 1024, H = 1440;
+    const [c, g] = leather(dom.cuir, livre.titre.length * 13 + livre.slot, W, H), gold = goldGrad(g, 0, 0, W, H);
+    g.strokeStyle = gold; g.lineWidth = 12; g.strokeRect(48, 48, W - 96, H - 96); g.lineWidth = 3.5; g.strokeRect(76, 76, W - 152, H - 152);
+    [[76, 76, 1, 1], [W - 76, 76, -1, 1], [76, H - 76, 1, -1], [W - 76, H - 76, -1, -1]].forEach(([x, y, sx, sy]) => { g.save(); g.translate(x, y); g.scale(sx, sy); g.lineWidth = 6; g.beginPath(); g.moveTo(0, 74); g.quadraticCurveTo(0, 0, 74, 0); g.moveTo(0, 46); g.quadraticCurveTo(0, 0, 46, 0); g.stroke(); g.restore(); });
+    T.wordmark(g, W / 2, 215, 118, C.orL); g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.strokeStyle = gold; g.lineWidth = 8; g.beginPath(); g.arc(W / 2, 520, 140, 0, 7); g.stroke(); g.lineWidth = 3; g.beginPath(); g.arc(W / 2, 520, 160, 0, 7); g.stroke();
+    g.fillStyle = hexA(dom.lueur, .16); g.beginPath(); g.arc(W / 2, 520, 134, 0, 7); g.fill();
+    g.fillStyle = gold; g.font = `700 ${dom.glyph.length > 2 ? 84 : dom.glyph.length > 1 ? 112 : 168}px ${SERIF}`; g.fillText(dom.glyph, W / 2, 532);
+    g.fillStyle = C.creme; let fs = 88; g.font = `700 ${fs}px ${SERIF}`; let lines = wrap(g, livre.titre, 760);
+    while (lines.length > 5 && fs > 56) { fs -= 5; g.font = `700 ${fs}px ${SERIF}`; lines = wrap(g, livre.titre, 760); }
+    const lh = fs * 1.2; lines.forEach((l, i) => g.fillText(l, W / 2, 780 + i * lh + (5 - lines.length) * lh * .3));
+    g.strokeStyle = gold; g.lineWidth = 4; g.beginPath(); g.moveTo(260, 1180); g.lineTo(W - 260, 1180); g.stroke();
+    g.fillStyle = C.peche; g.font = `italic 600 44px ${SERIF}`; g.fillText(livre.theme.nom, W / 2, 1236, 800);
+    g.fillStyle = C.creme; g.font = `700 38px ${SANS}`; spaced(g, 4); g.fillText(`${fm.nom.toUpperCase()}  ·  ${livre.duree.toUpperCase()}`, W / 2, 1310); spaced(g, 0);
+    g.fillStyle = fm.col; g.beginPath(); g.moveTo(780, 0); g.lineTo(880, 0); g.lineTo(880, 262); g.lineTo(830, 214); g.lineTo(780, 262); g.closePath(); g.fill(); g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(780, 0, 10, 262);
     return tex(c, { own: true });
   };
 
   T.titlePage = (livre) => {
-    const [c, g] = mk(512, 720); const r = mulberry(4);
-    g.fillStyle = '#f1e7d0'; g.fillRect(0, 0, 512, 720);
-    const v = g.createRadialGradient(256, 360, 160, 256, 360, 480); v.addColorStop(0, 'rgba(255,250,235,.0)'); v.addColorStop(1, 'rgba(140,100,40,.28)'); g.fillStyle = v; g.fillRect(0, 0, 512, 720);
-    noise(g, 512, 720, 3500, r, .05);
-    g.strokeStyle = 'rgba(59,10,10,.45)'; g.lineWidth = 2; g.strokeRect(30, 30, 452, 660);
-    g.textAlign = 'center'; g.textBaseline = 'middle';
-    T.drawMark(g, 256, 84, 52, BRAND.red);
-    g.fillStyle = BRAND.ink; g.font = `700 32px ${SERIF}`; const lines = wrap(g, livre.titre, 390);
-    lines.forEach((l, i) => g.fillText(l, 256, 170 + i * 40));
-    const y1 = 170 + lines.length * 40 + 14;
-    g.fillStyle = BRAND.redD; g.fillRect(226, y1, 60, 3);
-    g.fillStyle = '#6a4a3a'; g.font = `italic 600 20px ${SERIF}`; g.fillText(livre.theme.nom, 256, y1 + 32, 400);
-    g.textAlign = 'left'; g.fillStyle = BRAND.redD; g.font = `700 17px ${SERIF}`; spaced(g, '', 2); g.fillText('COMPÉTENCES VISÉES', 62, y1 + 92); spaced(g, '', 0);
-    g.fillStyle = BRAND.ink; g.font = `600 20px ${SERIF}`;
-    let yy = y1 + 132;
-    livre.comps.slice(0, 4).forEach((cp) => { g.fillStyle = BRAND.redD; g.beginPath(); g.arc(70, yy - 6, 4, 0, 7); g.fill(); g.fillStyle = BRAND.ink; wrap(g, cp, 370).forEach((l, i) => g.fillText(l, 88, yy + i * 25)); yy += 28 + (wrap(g, cp, 370).length - 1) * 25 + 14; });
-    g.textAlign = 'center'; g.fillStyle = 'rgba(59,10,10,.55)'; g.font = `italic 17px ${SERIF}`; g.fillText('Skilia par Lefebvre Dalloz Compétences · Catalogue 2027', 256, 662);
+    const W = 1024, H = 1440, [c, g] = mk(W, H), r = rng(4);
+    g.fillStyle = '#F6EEE0'; g.fillRect(0, 0, W, H); const v = g.createRadialGradient(W / 2, H / 2, 300, W / 2, H / 2, 900); v.addColorStop(0, 'rgba(255,250,240,0)'); v.addColorStop(1, 'rgba(150,100,60,.22)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
+    noise(g, W, H, 6000, r, .04); g.strokeStyle = 'rgba(104,13,45,.5)'; g.lineWidth = 3; g.strokeRect(64, 64, W - 128, H - 128);
+    T.wordmark(g, W / 2, 200, 96, C.framboise);
+    g.fillStyle = C.encre; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `700 68px ${SERIF}`; const lines = wrap(g, livre.titre, 780); lines.forEach((l, i) => g.fillText(l, W / 2, 400 + i * 82));
+    const y1 = 400 + lines.length * 82 + 20; g.fillStyle = C.framboise; g.fillRect(W / 2 - 60, y1, 120, 6);
+    g.fillStyle = '#6A4A52'; g.font = `italic 600 42px ${SERIF}`; g.fillText(livre.theme.nom, W / 2, y1 + 66, 800);
+    g.textAlign = 'left'; g.fillStyle = C.framboiseD; g.font = `700 32px ${SANS}`; spaced(g, 4); g.fillText('COMPÉTENCES VISÉES', 130, y1 + 190); spaced(g, 0); g.font = `600 40px ${SERIF}`; let yy = y1 + 260;
+    livre.comps.slice(0, 4).forEach((cp) => { g.fillStyle = C.framboise; g.beginPath(); g.arc(146, yy - 12, 8, 0, 7); g.fill(); g.fillStyle = C.encre; const ls = wrap(g, cp, 720); ls.forEach((l, i) => g.fillText(l, 176, yy + i * 50)); yy += 56 + (ls.length - 1) * 50 + 22; });
+    g.textAlign = 'center'; g.fillStyle = 'rgba(74,10,34,.55)'; g.font = `italic 32px ${SERIF}`; g.fillText('Lefebvre Dalloz Compétences · Catalogue 2027', W / 2, H - 110);
     return tex(c, { own: true });
   };
 
   T.endpaper = (dom) => memo('endp:' + dom.id, () => {
-    const [c, g] = mk(512, 720); const r = mulberry(dom.index * 5 + 2);
-    g.fillStyle = shade(dom.couleur, -.25); g.fillRect(0, 0, 512, 720);
-    for (let i = 0; i < 40; i++) { g.strokeStyle = r() > .5 ? 'rgba(243,210,122,.12)' : 'rgba(255,255,255,.07)'; g.lineWidth = 2 + r() * 6; g.beginPath(); const y = r() * 720; g.moveTo(0, y); g.bezierCurveTo(130, y + r() * 140 - 70, 380, y + r() * 140 - 70, 512, y + r() * 60 - 30); g.stroke(); }
-    const gr = g.createRadialGradient(256, 340, 20, 256, 340, 220); gr.addColorStop(0, hexA(dom.lueur, .55)); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 512, 720);
-    g.strokeStyle = goldGrad(g, 0, 0, 512, 720); g.lineWidth = 5; g.strokeRect(26, 26, 460, 668);
-    g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = goldGrad(g, 100, 250, 400, 450);
-    g.font = `700 ${dom.glyph.length > 2 ? 90 : dom.glyph.length > 1 ? 120 : 190}px ${SERIF}`; g.fillText(dom.glyph, 256, 340);
-    g.fillStyle = BRAND.cream; g.font = `italic 600 26px ${SERIF}`; g.fillText('Ex-libris', 256, 520);
-    g.font = `600 20px ${SERIF}`; spaced(g, '', 3); g.fillText(dom.court.toUpperCase(), 256, 560); spaced(g, '', 0);
+    const W = 1024, H = 1440, [c, g] = mk(W, H), r = rng(dom.index * 5 + 2);
+    g.fillStyle = '#F4ECE4'; g.fillRect(0, 0, W, H);
+    for (let i = 0; i < 46; i++) { g.strokeStyle = r() > .5 ? hexA(dom.couleur, .1) : 'rgba(104,13,45,.07)'; g.lineWidth = 4 + r() * 14; g.beginPath(); const y = r() * H; g.moveTo(0, y); g.bezierCurveTo(260, y + r() * 280 - 140, 760, y + r() * 280 - 140, W, y + r() * 120 - 60); g.stroke(); }
+    g.strokeStyle = goldGrad(g, 0, 0, W, H); g.lineWidth = 8; g.strokeRect(60, 60, W - 120, H - 120);
+    g.fillStyle = C.bordeaux; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `700 ${dom.glyph.length > 2 ? 150 : dom.glyph.length > 1 ? 210 : 340}px ${SERIF}`; g.fillText(dom.glyph, W / 2, 660);
+    g.fillStyle = C.encre; g.font = `italic 600 52px ${SERIF}`; g.fillText('Ex-libris', W / 2, 1030); g.font = `700 36px ${SANS}`; spaced(g, 5); g.fillText(dom.court.toUpperCase(), W / 2, 1100); spaced(g, 0);
     return tex(c);
   });
 
-  /* Livre-catalogue géant du hall. */
-  T.catalogueCover = () => memo('catcov', () => {
-    const [c, g] = T.leather('#6e1020', 77); const gold = goldGrad(g, 0, 0, 512, 720);
-    g.strokeStyle = gold; g.lineWidth = 8; g.strokeRect(22, 22, 468, 676); g.lineWidth = 2; g.strokeRect(40, 40, 432, 640);
-    T.drawMark(g, 256, 150, 120, BRAND.goldL);
-    g.fillStyle = gold; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `700 54px ${SERIF}`; g.fillText('CATALOGUE', 256, 300); g.fillText('2027', 256, 366);
-    g.fillStyle = BRAND.cream; g.font = `italic 600 26px ${SERIF}`; g.fillText('par Lefebvre Dalloz Compétences', 256, 460);
-    g.strokeStyle = gold; g.lineWidth = 2; g.beginPath(); g.moveTo(150, 500); g.lineTo(362, 500); g.stroke();
-    L.DOMAINES.forEach((d, i) => { g.fillStyle = d.lueur; g.beginPath(); g.arc(112 + i * 58, 560, 16, 0, 7); g.fill(); });
-    return tex(c);
-  });
-  T.cataloguePage = () => memo('catpage', () => {
-    const [c, g] = mk(512, 720); g.fillStyle = '#f1e7d0'; g.fillRect(0, 0, 512, 720);
-    const v = g.createRadialGradient(256, 360, 160, 256, 360, 480); v.addColorStop(0, 'rgba(255,250,235,0)'); v.addColorStop(1, 'rgba(140,100,40,.3)'); g.fillStyle = v; g.fillRect(0, 0, 512, 720);
-    g.textAlign = 'center'; g.textBaseline = 'middle'; T.drawMark(g, 256, 90, 58, BRAND.red);
-    g.fillStyle = BRAND.ink; g.font = `700 30px ${SERIF}`; g.fillText('Sommaire', 256, 160);
-    L.DOMAINES.forEach((d, i) => { const y = 225 + i * 74; g.fillStyle = d.couleur; g.beginPath(); g.arc(70, y, 22, 0, 7); g.fill(); g.fillStyle = '#fff'; g.font = `700 ${d.glyph.length > 2 ? 13 : d.glyph.length > 1 ? 17 : 24}px ${SERIF}`; g.fillText(d.glyph, 70, y + 1);
-      g.textAlign = 'left'; g.fillStyle = BRAND.ink; g.font = `600 21px ${SERIF}`; g.fillText(d.court, 110, y - 8); g.font = `italic 15px ${SERIF}`; g.fillStyle = '#6a4a3a'; g.fillText(`${d.themes.length} travées · ${d.nbLivres} formations`, 110, y + 15); g.textAlign = 'center'; });
-    return tex(c);
-  });
-
-  /* Dos de livre générique (niveaux de gris, teinté par instance) : bandes dorées et relief. */
   T.spine = () => memo('spine', () => {
-    const [c, g] = mk(64, 256);
-    const gr = g.createLinearGradient(0, 0, 64, 0); gr.addColorStop(0, '#9a9a9a'); gr.addColorStop(.3, '#ffffff'); gr.addColorStop(.7, '#cfcfcf'); gr.addColorStop(1, '#6a6a6a');
-    g.fillStyle = gr; g.fillRect(0, 0, 64, 256);
-    g.fillStyle = '#f6e3a0'; g.fillRect(0, 22, 64, 4); g.fillRect(0, 30, 64, 2); g.fillRect(0, 226, 64, 4); g.fillRect(0, 218, 64, 2);
-    g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(8, 70, 48, 90);
-    g.fillStyle = '#f6e3a0'; g.fillRect(14, 80, 36, 3); g.fillRect(14, 148, 36, 3);
+    const [c, g] = mk(64, 256); const gr = g.createLinearGradient(0, 0, 64, 0); gr.addColorStop(0, '#A0A0A0'); gr.addColorStop(.3, '#fff'); gr.addColorStop(.7, '#D0D0D0'); gr.addColorStop(1, '#707070'); g.fillStyle = gr; g.fillRect(0, 0, 64, 256);
+    g.fillStyle = '#F6E3A0'; g.fillRect(0, 22, 64, 4); g.fillRect(0, 31, 64, 2); g.fillRect(0, 226, 64, 4); g.fillRect(0, 217, 64, 2); g.fillStyle = 'rgba(0,0,0,.16)'; g.fillRect(8, 70, 48, 90); g.fillStyle = '#F6E3A0'; g.fillRect(14, 80, 36, 3); g.fillRect(14, 148, 36, 3);
     return tex(c);
   });
 
-  /* ---------- Effets lumineux ---------- */
-
-  const radial = (stops, size = 128) => { const [c, g] = mk(size, size); const gr = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2); stops.forEach(([o, col]) => gr.addColorStop(o, col)); g.fillStyle = gr; g.fillRect(0, 0, size, size); return tex(c, { linear: false }); };
-  T.glow = () => memo('glow', () => radial([[0, 'rgba(255,255,255,1)'], [.25, 'rgba(255,255,255,.55)'], [.6, 'rgba(255,255,255,.12)'], [1, 'rgba(255,255,255,0)']]));
-  T.flame = () => memo('flame', () => {
-    const [c, g] = mk(64, 128);
-    const gr = g.createRadialGradient(32, 84, 2, 32, 76, 52); gr.addColorStop(0, 'rgba(255,255,230,1)'); gr.addColorStop(.25, 'rgba(255,214,120,.95)'); gr.addColorStop(.6, 'rgba(255,140,40,.4)'); gr.addColorStop(1, 'rgba(255,100,20,0)');
-    g.fillStyle = gr; g.beginPath(); g.moveTo(32, 4); g.bezierCurveTo(60, 50, 58, 100, 32, 122); g.bezierCurveTo(6, 100, 4, 50, 32, 4); g.fill();
-    return tex(c);
-  });
-  T.spark = () => memo('spark', () => { const [c, g] = mk(64, 64); const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.2, 'rgba(255,236,170,.8)'); gr.addColorStop(1, 'rgba(255,200,80,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(32, 4); g.lineTo(32, 60); g.moveTo(4, 32); g.lineTo(60, 32); g.stroke(); return tex(c); });
+  /* ---------- lueurs ---------- */
+  T.glow = () => memo('glow', () => { const [c, g] = mk(128, 128), q = g.createRadialGradient(64, 64, 0, 64, 64, 64); q.addColorStop(0, 'rgba(255,255,255,1)'); q.addColorStop(.3, 'rgba(255,255,255,.45)'); q.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = q; g.fillRect(0, 0, 128, 128); return tex(c); });
+  T.flame = () => memo('flame', () => { const [c, g] = mk(64, 128), q = g.createRadialGradient(32, 84, 2, 32, 76, 52); q.addColorStop(0, 'rgba(255,255,235,1)'); q.addColorStop(.3, 'rgba(255,222,150,.95)'); q.addColorStop(.7, 'rgba(255,170,90,.35)'); q.addColorStop(1, 'rgba(255,130,60,0)'); g.fillStyle = q; g.beginPath(); g.moveTo(32, 4); g.bezierCurveTo(60, 50, 58, 100, 32, 122); g.bezierCurveTo(6, 100, 4, 50, 32, 4); g.fill(); return tex(c); });
+  T.spark = () => memo('spark', () => { const [c, g] = mk(64, 64), q = g.createRadialGradient(32, 32, 0, 32, 32, 32); q.addColorStop(0, 'rgba(255,255,255,1)'); q.addColorStop(.25, 'rgba(255,236,170,.8)'); q.addColorStop(1, 'rgba(255,200,80,0)'); g.fillStyle = q; g.fillRect(0, 0, 64, 64); return tex(c); });
   T.beam = () => memo('beam', () => {
-    const [c, g] = mk(128, 256);
-    const v = g.createLinearGradient(0, 0, 0, 256); v.addColorStop(0, 'rgba(255,255,255,0)'); v.addColorStop(.3, 'rgba(255,255,255,.16)'); v.addColorStop(.6, 'rgba(255,255,255,.34)'); v.addColorStop(.85, 'rgba(255,255,255,.1)'); v.addColorStop(1, 'rgba(255,255,255,0)');
-    g.fillStyle = v; g.fillRect(0, 0, 128, 256);
-    g.globalCompositeOperation = 'destination-in'; const h = g.createLinearGradient(0, 0, 128, 0); h.addColorStop(0, 'rgba(0,0,0,0)'); h.addColorStop(.5, 'rgba(0,0,0,1)'); h.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = h; g.fillRect(0, 0, 128, 256);
-    return tex(c);
-  });
-  T.shaft = () => memo('shaft', () => {
-    const [c, g] = mk(128, 512);
-    const v = g.createLinearGradient(0, 0, 0, 512); v.addColorStop(0, 'rgba(190,215,255,.55)'); v.addColorStop(1, 'rgba(190,215,255,0)');
-    g.fillStyle = v; g.fillRect(0, 0, 128, 512);
-    g.globalCompositeOperation = 'destination-in'; const h = g.createLinearGradient(0, 0, 128, 0); h.addColorStop(0, 'rgba(0,0,0,0)'); h.addColorStop(.35, 'rgba(0,0,0,.9)'); h.addColorStop(.65, 'rgba(0,0,0,.9)'); h.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = h; g.fillRect(0, 0, 128, 512);
-    return tex(c);
-  });
-
-  /* Rune : texte flottant (compétence) sur halo. */
-  T.rune = (text, color = '#fde3cf', big = false, keep = false) => {
-    const [c0, g0] = mk(8, 8); g0.font = `600 ${big ? 30 : 26}px ${SERIF}`;
-    const w = Math.min(560, Math.ceil(g0.measureText(text).width) + 70), h = 80;
-    const [c, g] = mk(w, h);
-    const bg = g.createLinearGradient(0, 0, w, 0); bg.addColorStop(0, 'rgba(20,6,6,0)'); bg.addColorStop(.12, 'rgba(30,8,8,.78)'); bg.addColorStop(.88, 'rgba(30,8,8,.78)'); bg.addColorStop(1, 'rgba(20,6,6,0)');
-    g.fillStyle = bg; rr(g, 4, 14, w - 8, h - 28, 26); g.fill();
-    g.strokeStyle = color; g.globalAlpha = .7; g.lineWidth = 2; rr(g, 4, 14, w - 8, h - 28, 26); g.stroke(); g.globalAlpha = 1;
-    g.fillStyle = color; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `600 ${big ? 30 : 26}px ${SERIF}`; g.fillText(text, w / 2, h / 2 + 1, w - 50);
-    const t = tex(c, { own: !keep }); t.userData = { aspect: w / h }; return t;
-  };
-
-  /* Étoile « recommandé ». */
-  T.star = () => memo('star', () => {
-    const [c, g] = mk(128, 128); g.translate(64, 64);
-    const gl = g.createRadialGradient(0, 0, 0, 0, 0, 64); gl.addColorStop(0, 'rgba(255,225,140,.9)'); gl.addColorStop(1, 'rgba(255,200,80,0)'); g.fillStyle = gl; g.fillRect(-64, -64, 128, 128);
-    g.fillStyle = BRAND.goldL; g.strokeStyle = BRAND.goldD; g.lineWidth = 3; g.beginPath();
-    for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2, rad = i % 2 ? 14 : 34; g.lineTo(Math.cos(a) * rad, Math.sin(a) * rad); } g.closePath(); g.fill(); g.stroke();
-    return tex(c);
+    const [c, g] = mk(128, 256), v = g.createLinearGradient(0, 0, 0, 256); v.addColorStop(0, 'rgba(255,255,255,0)'); v.addColorStop(.4, 'rgba(255,255,255,.18)'); v.addColorStop(.85, 'rgba(255,255,255,.34)'); v.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = v; g.fillRect(0, 0, 128, 256);
+    g.globalCompositeOperation = 'destination-in'; const h = g.createLinearGradient(0, 0, 128, 0); h.addColorStop(0, 'rgba(0,0,0,0)'); h.addColorStop(.5, 'rgba(0,0,0,1)'); h.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = h; g.fillRect(0, 0, 128, 256); return tex(c);
   });
 })();

@@ -14,11 +14,11 @@ window.LDC = window.LDC || {};
   const L = window.LDC;
 
   L.FORMATS = {
-    IL: { nom: 'Instant Learning', col: '#f6b68a', desc: 'Format court et percutant pour faire le point sur un sujet précis.' },
-    WS: { nom: 'Workshop', col: '#ffd36a', desc: 'Un atelier pratique : vous travaillez sur vos propres cas et repartez avec des outils.' },
-    MC: { nom: 'Masterclass', col: '#c59bff', desc: 'Un expert décrypte les points sensibles et partage ses retours d\'expérience.' },
-    FO: { nom: 'Formation', col: '#ff7a9e', desc: 'Une formation complète : apports, cas pratiques et mises en situation.' },
-    CE: { nom: 'Certificat', col: '#7be0a0', desc: 'Un parcours certifiant : modules progressifs, évaluation finale, reconnaissance.' },
+    IL: { nom: 'Instant Learning', col: '#F2B48C', desc: 'Format court et percutant pour faire le point sur un sujet précis.' },
+    WS: { nom: 'Workshop', col: '#E6C48A', desc: 'Un atelier pratique : vous travaillez sur vos propres cas et repartez avec des outils.' },
+    MC: { nom: 'Masterclass', col: '#E29AB6', desc: 'Un expert décrypte les points sensibles et partage ses retours d\'expérience.' },
+    FO: { nom: 'Formation', col: '#D6175F', desc: 'Une formation complète : apports, cas pratiques et mises en situation.' },
+    CE: { nom: 'Certificat', col: '#7FA3DD', desc: 'Un parcours certifiant : modules progressifs, évaluation finale, reconnaissance.' },
   };
 
   const T = (nom, comps, fc, livres) => ({ nom, comps, fc, livres });
@@ -27,7 +27,7 @@ window.LDC = window.LDC || {};
   L.DOMAINES = [
     {
       id: 'chiffre', nom: 'Comptabilité, Finance & Fiscalité', court: 'Du Chiffre', glyph: '€',
-      couleur: '#8f1238', lueur: '#ff6b8e', public: 'Comptables, DAF, contrôleurs de gestion, fiscalistes, banque et assurance',
+      couleur: '#D6175F', lueur: '#F06C9B', cuir: '#8B0F3E', public: 'Comptables, DAF, contrôleurs de gestion, fiscalistes, banque et assurance',
       accroche: 'Chiffres, normes et fiscalité : maîtriser ce qui compte.',
       themes: [
         T('Fiscalité des entreprises',
@@ -74,7 +74,7 @@ window.LDC = window.LDC || {};
     },
     {
       id: 'droit', nom: 'Droit & Immobilier', court: 'Du Droit', glyph: '§',
-      couleur: '#26376e', lueur: '#7fa2ff', public: 'Juristes, avocats, notaires, directions juridiques, professionnels de l\'immobilier',
+      couleur: '#680D2D', lueur: '#B54368', cuir: '#5A0B27', public: 'Juristes, avocats, notaires, directions juridiques, professionnels de l\'immobilier',
       accroche: 'Sécuriser, rédiger, conseiller : le droit au service de vos décisions.',
       themes: [
         T('Droit des sociétés',
@@ -121,7 +121,7 @@ window.LDC = window.LDC || {};
     },
     {
       id: 'rh', nom: 'RH, Paie & Social', court: 'Des Équipes', glyph: 'RH',
-      couleur: '#d6175f', lueur: '#ff8fb8', public: 'DRH, gestionnaires de paie, responsables formation, élus du CSE',
+      couleur: '#E3875A', lueur: '#F2B48C', cuir: '#7E3326', public: 'DRH, gestionnaires de paie, responsables formation, élus du CSE',
       accroche: 'Paie, droit social, dialogue : faire grandir les équipes.',
       themes: [
         T('Paie',
@@ -168,7 +168,7 @@ window.LDC = window.LDC || {};
     },
     {
       id: 'qse', nom: 'Qualité, Santé, Sécurité, Environnement', court: 'De la Prévention', glyph: 'QSE',
-      couleur: '#2f6247', lueur: '#7fe0aa', public: 'Responsables QSE, préventeurs, HSE, dirigeants, référents sécurité',
+      couleur: '#2F5DA8', lueur: '#7FA3DD', cuir: '#1F427A', public: 'Responsables QSE, préventeurs, HSE, dirigeants, référents sécurité',
       accroche: 'Prévenir, certifier, durer : la performance responsable.',
       themes: [
         T('Santé et sécurité au travail',
@@ -215,7 +215,7 @@ window.LDC = window.LDC || {};
     },
     {
       id: 'public', nom: 'Secteur public', court: 'Du Service Public', glyph: '★',
-      couleur: '#5a2a78', lueur: '#cf9bff', public: 'Agents des collectivités, acheteurs publics, DGS, établissements publics',
+      couleur: '#A8416B', lueur: '#E29AB6', cuir: '#7D2B52', public: 'Agents des collectivités, acheteurs publics, DGS, établissements publics',
       accroche: 'Commande publique, finances locales, aménagement : servir l\'intérêt général.',
       themes: [
         T('Marchés publics',
@@ -262,7 +262,7 @@ window.LDC = window.LDC || {};
     },
     {
       id: 'mgmt', nom: 'Management, Soft skills & Numérique', court: 'De l\'Humain', glyph: '✦',
-      couleur: '#b3822a', lueur: '#ffd37a', public: 'Managers, chefs de projet, assistants, toutes fonctions',
+      couleur: '#B58A4A', lueur: '#E6C48A', cuir: '#8A6224', public: 'Managers, chefs de projet, assistants, toutes fonctions',
       accroche: 'Manager, convaincre, s\'organiser, adopter l\'IA : les compétences qui servent partout.',
       themes: [
         T('Management d\'équipe',
@@ -309,15 +309,21 @@ window.LDC = window.LDC || {};
     },
   ];
 
-  /* Profils de départ : ils pré-sélectionnent des rayons et orientent la recommandation. */
+  /* Métiers : pré-sélectionnent des rayons et orientent la recommandation.
+     Liste de départ calquée sur les grands segments du catalogue public (directions financières et fiscales,
+     directions juridiques, banque et assurance, immobilier, RH et social, QSE, secteur public, management).
+     À valider ou remplacer par vos cibles réelles. */
   L.PERSONAS = [
-    { id: 'dirigeant', nom: 'Dirigeant·e', icone: '♛', domaines: ['chiffre', 'droit', 'rh', 'mgmt'], q: 'dirigeant transmission pacte budget management' },
-    { id: 'daf', nom: 'DAF · Comptable', icone: '€', domaines: ['chiffre', 'droit'], q: 'fiscalité clôture comptes trésorerie budget' },
-    { id: 'juriste', nom: 'Juriste · Avocat·e', icone: '§', domaines: ['droit', 'chiffre'], q: 'contrat sociétés conformité rgpd contentieux' },
-    { id: 'drh', nom: 'DRH · Paie', icone: '✚', domaines: ['rh', 'droit', 'mgmt'], q: 'paie cse licenciement recrutement formation' },
-    { id: 'qse', nom: 'Responsable QSE', icone: '⚑', domaines: ['qse', 'droit'], q: 'document unique iso risques carbone csrd' },
-    { id: 'public', nom: 'Agent public', icone: '★', domaines: ['public', 'droit'], q: 'marchés publics budget urbanisme statut' },
-    { id: 'manager', nom: 'Manager', icone: '✦', domaines: ['mgmt', 'rh'], q: 'manager déléguer équipe ia prise de parole' },
+    { id: 'daf', nom: 'Direction financière · DAF', domaines: ['chiffre', 'droit'], q: 'fiscalité trésorerie budget clôture comptes' },
+    { id: 'compta', nom: 'Comptable · Expert-comptable', domaines: ['chiffre'], q: 'comptabilité clôture comptes tva consolidation' },
+    { id: 'juriste', nom: 'Juriste · Direction juridique', domaines: ['droit'], q: 'contrat sociétés conformité contentieux rgpd' },
+    { id: 'avocat', nom: 'Avocat · Notaire', domaines: ['droit', 'chiffre'], q: 'successions patrimoine sociétés cession' },
+    { id: 'rh', nom: 'RH · Paie · Social', domaines: ['rh', 'droit'], q: 'paie cse licenciement recrutement formation' },
+    { id: 'qse', nom: 'QSE · HSE', domaines: ['qse'], q: 'document unique iso risques carbone csrd' },
+    { id: 'banque', nom: 'Banque · Assurance', domaines: ['chiffre', 'droit'], q: 'banque assurance crédit lcb prudentielle' },
+    { id: 'immo', nom: 'Immobilier · Construction', domaines: ['droit', 'chiffre'], q: 'bail copropriété construction urbanisme' },
+    { id: 'public', nom: 'Secteur public', domaines: ['public', 'droit'], q: 'marchés publics budget collectivités urbanisme' },
+    { id: 'manager', nom: 'Manager · Toutes fonctions', domaines: ['mgmt', 'rh'], q: 'manager déléguer équipe ia prise de parole' },
   ];
 
   /* Synonymes : un mot cherché peut en appeler d'autres. */
