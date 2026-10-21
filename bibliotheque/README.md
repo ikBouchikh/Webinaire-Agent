@@ -2,6 +2,9 @@
 
 Exploration 3D du catalogue de formation : une grande bibliothèque française ancienne (rotonde à galerie, marbre, acajou, reliures cuir et or), claire et nette. **100 % locale** : double-cliquez sur `index.html` (Chrome, Edge ou Firefox récents). Three.js est embarqué dans `vendor/`, aucun réseau n'est nécessaire.
 
+## Le premier Code civil au centre de la Grande salle
+Au cœur de la rotonde, un pupitre sur son estrade porte le **premier Code civil (1804)**, ouvert sur sa page de titre (« Code civil des Français, édition originale et seule officielle, à Paris, de l'imprimerie de la République, an XII ») : c'est la vue d'accueil de la bibliothèque, et on le retrouve de côté quand on passe de porte en porte. Un clic ouvre une fiche (promulgation du 21 mars 1804, 2 281 articles, rédaction par quatre juristes, rebaptisé « Code Napoléon » en 1807, exemplaire récemment entré dans les collections du groupe) avec un bouton vers les formations en droit. Les textes de présentation sont dans `app.js` (fonction `showCode`) et les pages dans `textures.js` (`codeTitle`, `codePage`, `codeCover`) : à valider avec l'éditorial et à compléter avec les photos de l'exemplaire.
+
 ## Parcours
 | Catalogue | Dans la bibliothèque |
 |---|---|
@@ -12,7 +15,7 @@ Exploration 3D du catalogue de formation : une grande bibliothèque française a
 
 ## Navigation (volontairement simple)
 Pas de marche libre : la caméra suit des rails.
-- **Glisser** (souris ou doigt), **flèches ‹ ›** à l'écran, **← →** au clavier ou **molette** : passer d'une porte à l'autre, d'une travée à l'autre.
+- **Glisser** (souris ou doigt), **flèches ‹ ›** à l'écran, **← →** au clavier ou **molette** : passer du Code civil aux six portes, puis d'une porte à l'autre, d'une travée à l'autre.
 - **Clic** sur une porte ou un livre : on le centre d'abord, un second clic l'ouvre. Aucun zoom brutal.
 - **Échap** ou le bouton « ← Grande salle » : on revient en arrière.
 - **Mes rayons** (en haut) : rouvrir le filtre à tout moment. **Mon parcours** : formations retenues, durée totale, couverture des blocs France compétences, copie du parcours.

@@ -260,6 +260,47 @@
     return tex(c);
   });
 
+
+  /* ---------- le premier Code civil (1804) ---------- */
+  const aged = (w, h, seed) => {
+    const [c, g] = mk(w, h), r = rng(seed); g.fillStyle = '#EFE2C6'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 90; i++) { const x = r() * w, y = r() * h, rad = 6 + r() * 34, q = g.createRadialGradient(x, y, 0, x, y, rad); q.addColorStop(0, `rgba(150,100,50,${.04 + r() * .08})`); q.addColorStop(1, 'rgba(150,100,50,0)'); g.fillStyle = q; g.fillRect(x - rad, y - rad, rad * 2, rad * 2); }
+    const v = g.createRadialGradient(w / 2, h / 2, w * .3, w / 2, h / 2, h * .75); v.addColorStop(0, 'rgba(255,250,235,0)'); v.addColorStop(1, 'rgba(120,80,40,.3)'); g.fillStyle = v; g.fillRect(0, 0, w, h);
+    noise(g, w, h, 9000, r, .05); return [c, g];
+  };
+  const INK = '#3A2418';
+  const rule = (g, y, w) => { g.strokeStyle = INK; g.lineWidth = 3; g.beginPath(); g.moveTo(w / 2 - 230, y); g.lineTo(w / 2 + 230, y); g.stroke(); g.lineWidth = 1.5; g.beginPath(); g.moveTo(w / 2 - 230, y + 9); g.lineTo(w / 2 + 230, y + 9); g.stroke(); };
+  T.codeTitle = () => memo('codeTitle', () => {
+    const W = 1024, H = 1440, [c, g] = aged(W, H, 9); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = INK;
+    g.strokeStyle = 'rgba(58,36,24,.55)'; g.lineWidth = 3; g.strokeRect(70, 70, W - 140, H - 140);
+    g.font = `700 112px ${SERIF}`; spaced(g, 6); g.fillText('CODE CIVIL', W / 2, 360); g.font = `700 78px ${SERIF}`; g.fillText('DES FRANÇAIS', W / 2, 480); spaced(g, 0);
+    rule(g, 570, W);
+    g.font = `600 42px ${SERIF}`; spaced(g, 4); g.fillText('ÉDITION ORIGINALE', W / 2, 700); g.font = `italic 600 40px ${SERIF}`; spaced(g, 0); g.fillText('et seule officielle', W / 2, 770);
+    rule(g, 850, W);
+    g.font = `600 44px ${SERIF}`; spaced(g, 3); g.fillText('À PARIS,', W / 2, 980); g.font = `600 36px ${SERIF}`; g.fillText('DE L\'IMPRIMERIE DE LA RÉPUBLIQUE.', W / 2, 1050, 800); spaced(g, 0);
+    g.font = `700 52px ${SERIF}`; spaced(g, 4); g.fillText('AN XII — 1804.', W / 2, 1190); spaced(g, 0);
+    return tex(c);
+  });
+  T.codePage = () => memo('codePage', () => {
+    const W = 1024, H = 1440, [c, g] = aged(W, H, 21), r = rng(5); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = INK;
+    const bars = (y0, n) => { for (let i = 0; i < n; i++) { const y = y0 + i * 40, w = (i % 6 === 5) ? 340 : 700; g.fillStyle = `rgba(58,36,24,${.5 + r() * .15})`; g.fillRect(150, y, w, 6); } };
+    g.font = `700 40px ${SERIF}`; spaced(g, 8); g.fillText('TITRE PRÉLIMINAIRE', W / 2, 190); spaced(g, 0);
+    g.font = `italic 600 34px ${SERIF}`; g.fillText('De la publication, des effets et de l\'application', W / 2, 262, 760); g.fillText('des lois en général.', W / 2, 308);
+    rule(g, 360, W); bars(430, 14);
+    g.fillStyle = INK; g.font = `700 36px ${SERIF}`; spaced(g, 8); g.fillText('LIVRE PREMIER', W / 2, 1060); spaced(g, 0); g.font = `italic 600 38px ${SERIF}`; g.fillText('Des personnes', W / 2, 1115);
+    bars(1170, 5); g.fillStyle = INK; g.font = `600 30px ${SERIF}`; g.fillText('1', W / 2, H - 100);
+    return tex(c);
+  });
+  T.codeCover = () => memo('codeCover', () => {
+    const W = 1024, H = 1440, [c, g] = leather('#5A0B27', 404, W, H), gold = goldGrad(g, 0, 0, W, H);
+    g.strokeStyle = gold; g.lineWidth = 12; g.strokeRect(48, 48, W - 96, H - 96); g.lineWidth = 3.5; g.strokeRect(76, 76, W - 152, H - 152);
+    g.fillStyle = 'rgba(30,0,12,.55)'; rr(g, 180, 330, W - 360, 520, 18); g.fill(); g.strokeStyle = gold; g.lineWidth = 6; rr(g, 180, 330, W - 360, 520, 18); g.stroke();
+    g.fillStyle = gold; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `700 92px ${SERIF}`; spaced(g, 6); g.fillText('CODE', W / 2, 480); g.fillText('CIVIL', W / 2, 590); g.font = `700 52px ${SERIF}`; g.fillText('DES FRANÇAIS', W / 2, 720); spaced(g, 0);
+    g.font = `italic 600 44px ${SERIF}`; g.fillText('Édition originale', W / 2, 1010); g.font = `700 64px ${SERIF}`; spaced(g, 8); g.fillText('1804', W / 2, 1130); spaced(g, 0);
+    for (let s = -1; s <= 1; s += 2) for (let i = 0; i < 9; i++) { const a = -Math.PI / 2 + s * (.35 + i * .2); g.save(); g.translate(W / 2 + Math.sin(a) * 250, 1130 + 50 - Math.cos(a) * 140 + 140); g.rotate(a * .8); g.fillStyle = gold; g.beginPath(); g.ellipse(0, 0, 8, 22, 0, 0, 7); g.fill(); g.restore(); }
+    return tex(c);
+  });
+
   /* ---------- lueurs ---------- */
   T.glow = () => memo('glow', () => { const [c, g] = mk(128, 128), q = g.createRadialGradient(64, 64, 0, 64, 64, 64); q.addColorStop(0, 'rgba(255,255,255,1)'); q.addColorStop(.3, 'rgba(255,255,255,.45)'); q.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = q; g.fillRect(0, 0, 128, 128); return tex(c); });
   T.flame = () => memo('flame', () => { const [c, g] = mk(64, 128), q = g.createRadialGradient(32, 84, 2, 32, 76, 52); q.addColorStop(0, 'rgba(255,255,235,1)'); q.addColorStop(.3, 'rgba(255,222,150,.95)'); q.addColorStop(.7, 'rgba(255,170,90,.35)'); q.addColorStop(1, 'rgba(255,130,60,0)'); g.fillStyle = q; g.beginPath(); g.moveTo(32, 4); g.bezierCurveTo(60, 50, 58, 100, 32, 122); g.bezierCurveTo(6, 100, 4, 50, 32, 4); g.fill(); return tex(c); });

@@ -46,6 +46,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .hall-card{width:min(460px,calc(100vw - 32px));padding:1rem 1.4rem 1.2rem;text-align:center}
 .dots{display:flex;justify-content:center;gap:.5rem;margin-bottom:.7rem}
 .dots button{width:.8rem;height:.8rem;border-radius:50%;border:0;padding:0;background:var(--c,#999);opacity:.4;transition:.2s}.dots button.on{opacity:1;transform:scale(1.4)}
+.hc-actions{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap}
+.dots button.home{background:#C9962E;border-radius:2px;transform:rotate(45deg)}.dots button.home.on{transform:rotate(45deg) scale(1.4)}
 .kicker{margin:0;font-size:.74rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--framboise)}
 .hall-card h2{margin:.15rem 0 .1rem;font-size:1.55rem;line-height:1.15;color:var(--bordeaux)}
 .meta{margin:0 0 .8rem;color:var(--muted);font-size:.9rem}

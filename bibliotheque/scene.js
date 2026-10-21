@@ -146,8 +146,26 @@
     // quelques bougies flottantes
     for (let i = 0; i < 12; i++) { const c = candle(1.0), a = i / 12 * PI * 2 + .3, rr = 6.2 + (i % 3) * 1.2, y = 6.6 + (i % 4) * .6; c.position.set(Math.cos(a) * rr, y, Math.sin(a) * rr); c.userData.base = y; g.add(c); R.candles.push(c); }
 
+    // pupitre central : le premier Code civil (1804)
+    const pk = { kind: 'code' };
+    const st1 = mesh(new THREE.CylinderGeometry(1.6, 1.75, .24, 48), m.stone, true); st1.position.y = .12;
+    const st2 = mesh(new THREE.CylinderGeometry(1.2, 1.3, .22, 48), m.acajou, true); st2.position.y = .35;
+    const rim = mesh(new THREE.TorusGeometry(1.2, .035, 8, 64), m.brass); rim.rotation.x = PI / 2; rim.position.y = .47;
+    const col = mesh(new THREE.CylinderGeometry(.17, .27, 1.0, 16), m.acajou, true); col.position.y = 1.0;
+    const plate = box(1.2, .07, .88, m.acajouL, true); plate.position.y = 1.56; plate.rotation.x = -.32;
+    [st1, st2, col, plate].forEach((o) => { o.userData.pick = pk; g.add(o); R.pickables.push(o); }); g.add(rim);
+    const hub = new THREE.Group(); hub.position.y = 2.3; g.add(hub);
+    const hb = L.makeBook({ w: .62, h: .86, t: .09, color: '#5A0B27', cover: T.codeCover(), page: T.codePage(), endpaper: T.codeTitle(), open: 1 });
+    hb.root.rotation.x = -.5; hb.root.scale.setScalar(1.7); hub.add(hb.root);
+    hb.root.traverse((o) => { if (o.isMesh) { o.userData.pick = pk; R.pickables.push(o); } });
+    [0, PI / 2].forEach((ry) => { const gm = new THREE.PlaneGeometry(1.9, 3.4); gm.translate(0, 1.7, 0); const bm = new THREE.Mesh(gm, new THREE.MeshBasicMaterial({ map: T.beam(), color: '#FFE2B0', transparent: true, opacity: .3, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide })); bm.position.y = 3.2; bm.rotation.y = ry; g.add(bm); });
+    const hubGlow = glowSprite('#FFD9A0', 3.4, .28); hubGlow.position.set(0, .1, -.9); hub.add(hubGlow);
+    const hubLight = new THREE.PointLight('#FFE2B8', .9, 9, 1.3); hubLight.position.set(0, 3.1, .4); g.add(hubLight);
+    R.hub = hub; R.hubCenter = new THREE.Vector3(0, 2.3, 0); R.camPos = new THREE.Vector3(0, 2, 6);
+
     R.setSelection = (sel, instant) => R.doors.forEach((d) => { const open = sel.has(d.dom.id); d.setLocked(!open); d.target = open ? .16 : 0; if (instant) { d.state = d.target; d.apply(); } });
     R.update = (dt, t) => {
+      hub.position.y = 2.3 + Math.sin(t * .9) * .05; hub.rotation.y = Math.atan2(R.camPos.x, R.camPos.z) + Math.sin(t * .35) * .3; hubGlow.material.opacity = .26 + .05 * Math.sin(t * 1.6);
       R.doors.forEach((d) => { if (Math.abs(d.target - d.state) > .0005) { d.state += (d.target - d.state) * Math.min(1, dt * 3.2); d.apply(); } });
       R.candles.forEach((c, i) => { c.position.y = c.userData.base + Math.sin(t * .7 + i) * .1; flicker(c, t); });
     };

@@ -41,11 +41,18 @@
   const dimPlane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: '#2A0A14', transparent: true, opacity: 0, depthWrite: false })); dimPlane.position.z = -4.5; dimPlane.visible = false; camera.add(dimPlane);
 
   let hall = S.buildHall(), rayon = null, cur = hall; scene.add(hall.group);
-  let view = 'gate', busy = false, time = 0, camOverride = null, curDom = 0;
+  let view = 'gate', busy = false, time = 0, camOverride = null, curDom = 0, hallMode = 'home', lastPose = { x: 0, y: 2.4, z: 6.8, yaw: 0, pitch: 0 }, codeOpen = false, codeRet = null;
   const H = { a: 0, tgt: 0, vel: 0 }, X = { x: S.BAY_X[0], tgt: S.BAY_X[0], vel: 0 }, par = { x: 0, y: 0, tx: 0, ty: 0 };
   const hallIdx = () => mod(Math.round(-H.tgt / STEP), 6);
   const angFor = (k) => { const b = -k * STEP; return b + Math.round((H.tgt - b) / (PI * 2)) * PI * 2; };
+  const angDiff = (a, b) => ((b - a + PI * 3) % (PI * 2)) - PI;
   const bayOf = (x) => { let b = 0; S.BAY_X.forEach((bx, i) => { if (Math.abs(bx - x) < Math.abs(S.BAY_X[b] - x)) b = i; }); return b; };
+
+  /* ---------- poses de caméra de la Grande salle ---------- */
+  const HOME = { x: 0, y: 2.3, z: 7.0, yaw: 0, pitch: -.04 };
+  const orbitPose = (t) => { const a = t * .1 + 2.2; return { x: 6.8 * Math.sin(a), y: 2.4, z: 6.8 * Math.cos(a), yaw: a, pitch: -.03 }; };
+  const doorPose = (a) => { const ang = a + .6, x = -6.5 * Math.sin(ang), z = -6.5 * Math.cos(ang), y = 2.4, dx = S.HR * Math.sin(a) - x, dz = S.HR * Math.cos(a) - z; return { x, y, z, yaw: Math.atan2(-dx, -dz), pitch: Math.atan2(2.3 - y, Math.hypot(dx, dz)) }; };
+  const lerpPose = (a, b, e) => ({ x: lerp(a.x, b.x, e), y: lerp(a.y, b.y, e), z: lerp(a.z, b.z, e), yaw: a.yaw + angDiff(a.yaw, b.yaw) * e, pitch: lerp(a.pitch, b.pitch, e) });
 
   /* ---------- tweens ---------- */
   const tw = [];
@@ -67,29 +74,78 @@
   };
   const crumbs = () => {
     const el = $('#crumbs'), parts = [];
-    if (cur.kind === 'hall') parts.push({ t: 'Grande salle', cur: true });
+    if (cur.kind === 'hall') { if (hallMode === 'doors') parts.push({ t: 'Grande salle', fn: () => hallTo('home') }, { t: L.DOMAINES[hallIdx()].nom, cur: true }); else parts.push({ t: 'Grande salle', cur: true }); }
     else { const d = rayon.dom, b = bayOf(X.tgt); parts.push({ t: 'Grande salle', fn: leaveRayon }, { t: d.nom, cur: view === 'rayon' && false }, { t: `Travée ${b + 1} · ${d.themes[b].nom}`, cur: true }); }
     el.innerHTML = ''; parts.forEach((p, i) => { if (i) { const s = document.createElement('span'); s.className = 'sep'; s.textContent = '›'; el.appendChild(s); } const b = document.createElement(p.fn ? 'button' : 'span'); b.className = 'crumb' + (p.cur ? ' cur' : '') + (p.fn ? ' link-c' : ''); b.textContent = p.t; if (p.fn) b.addEventListener('click', p.fn); el.appendChild(b); });
   };
 
   /* ---------- carte de la Grande salle ---------- */
   const dotsEl = $('#hallDots');
+  { const b = document.createElement('button'); b.className = 'home'; b.setAttribute('aria-label', 'Le premier Code civil'); b.addEventListener('click', () => hallTo('home')); dotsEl.appendChild(b); }
   L.DOMAINES.forEach((d, k) => { const b = document.createElement('button'); b.style.setProperty('--c', d.couleur); b.setAttribute('aria-label', d.nom); b.addEventListener('click', () => goHall(k)); dotsEl.appendChild(b); });
-  let lastIdx = -1;
+  let lastKey = '';
   const hallCard = () => {
-    const k = hallIdx(), d = L.DOMAINES[k], open = st.sel.has(d.id), nReco = [...st.reco].filter((id) => L.byId[id].dom === d).length;
-    $$('button', dotsEl).forEach((b, i) => b.classList.toggle('on', i === k));
-    $('#hcKicker').textContent = d.court; $('#hcTitle').textContent = d.nom;
-    $('#hcMeta').innerHTML = open ? `${d.themes.length} thématiques · ${d.nbLivres} formations` + (nReco ? ` · <b style="color:var(--framboise)">★ ${nReco} pour vous</b>` : '') : 'Ce rayon est fermé : vous l\'avez filtré.';
-    const b = $('#hcEnter'); b.textContent = open ? 'Entrer dans le rayon' : 'Rouvrir ce rayon'; b.className = 'btn ' + (open ? 'btn-primary' : 'btn-soft'); lastIdx = k;
+    const doors = hallMode === 'doors', k = hallIdx(), d = L.DOMAINES[k], open = st.sel.has(d.id), nReco = [...st.reco].filter((id) => L.byId[id].dom === d).length, enter = $('#hcEnter'), alt = $('#hcAlt');
+    $$('button', dotsEl).forEach((b, i) => b.classList.toggle('on', doors ? i === k + 1 : i === 0));
+    if (!doors) {
+      $('#hcKicker').textContent = 'À la une'; $('#hcTitle').textContent = 'Le premier Code civil'; $('#hcMeta').textContent = 'Édition originale de 1804, récemment entrée dans les collections du groupe Lefebvre Dalloz.';
+      enter.textContent = 'Découvrir l\'ouvrage'; enter.className = 'btn btn-primary'; alt.hidden = false;
+    } else {
+      $('#hcKicker').textContent = d.court; $('#hcTitle').textContent = d.nom;
+      $('#hcMeta').innerHTML = open ? `${d.themes.length} thématiques · ${d.nbLivres} formations` + (nReco ? ` · <b style="color:var(--framboise)">★ ${nReco} pour vous</b>` : '') : 'Ce rayon est fermé : vous l\'avez filtré.';
+      enter.textContent = open ? 'Entrer dans le rayon' : 'Rouvrir ce rayon'; enter.className = 'btn ' + (open ? 'btn-primary' : 'btn-soft'); alt.hidden = true;
+    }
+    lastKey = hallMode + k; if (cur.kind === 'hall') crumbs();
   };
-  const goHall = (k) => { if (busy || view !== 'hall') return; H.tgt = angFor(mod(k, 6)); };
-  const stepHall = (dir) => goHall(hallIdx() + dir);
-  $('#hcEnter').addEventListener('click', () => activateDoor(hallIdx()));
+  /* de la vue d'ensemble (le Code civil) aux portes, et retour */
+  const hallTo = (mode, k, force, cb) => {
+    if (!force && (busy || view !== 'hall')) return;
+    const from = { ...lastPose }; let to;
+    if (mode === 'home') to = HOME; else { H.tgt = angFor(k); to = doorPose(H.tgt); }
+    busy = true; hallMode = mode; hallCard();
+    tween(1400, (t) => { camOverride = lerpPose(from, to, ease(t)); }, () => { camOverride = null; if (mode === 'doors') H.a = H.tgt; busy = false; hallCard(); cb && cb(); });
+  };
+  const goHall = (k) => { if (busy || view !== 'hall') return; if (hallMode === 'home') hallTo('doors', mod(k, 6)); else H.tgt = angFor(mod(k, 6)); };
+  const stepHall = (dir) => { if (busy || view !== 'hall') return; if (hallMode === 'home') return hallTo('doors', dir > 0 ? 0 : 5); const k = hallIdx() + dir; if (k < 0 || k > 5) hallTo('home'); else H.tgt = angFor(k); };
+  $('#hcEnter').addEventListener('click', () => (hallMode === 'home' ? openCode() : activateDoor(hallIdx())));
+  $('#hcAlt').addEventListener('click', () => stepHall(1));
   const activateDoor = (k) => {
-    const d = L.DOMAINES[k]; if (busy || view !== 'hall') return;
+    const d = L.DOMAINES[k]; if (busy || view !== 'hall' || hallMode !== 'doors') return;
     if (!st.sel.has(d.id)) { st.sel.add(d.id); save(); hall.setSelection(st.sel); refreshGate(); hallCard(); toast('Rayon rouvert : ' + d.court); return; }
     enterRayon(k);
+  };
+
+  /* ---------- le premier Code civil (pupitre central) ---------- */
+  const codePose = () => {
+    const B = hall.hubCenter, cp = lastPose; let dx = cp.x - B.x, dz = cp.z - B.z; const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
+    const narrow = innerWidth < 900, P = { x: B.x + dx * 3.4, y: B.y - .1, z: B.z + dz * 3.4 }, sh = narrow ? 0 : 1.05;
+    const A = { x: B.x + dz * sh, y: B.y + (narrow ? -.95 : 0), z: B.z - dx * sh }, ddx = A.x - P.x, ddz = A.z - P.z;
+    return { x: P.x, y: P.y, z: P.z, yaw: Math.atan2(-ddx, -ddz), pitch: Math.atan2(A.y - P.y, Math.hypot(ddx, ddz)) };
+  };
+  const openCode = () => {
+    if (busy || view !== 'hall') return; hint(''); codeRet = { ...lastPose }; busy = true; view = 'code'; codeOpen = true; ui('none'); $('#top').hidden = false; dimPlane.visible = true;
+    const from = { ...lastPose }, to = codePose();
+    tween(1300, (t) => { camOverride = lerpPose(from, to, ease(t)); dimPlane.material.opacity = .4 * ease(t); }, () => { busy = false; showCode(); });
+  };
+  const closeCode = (cb) => {
+    if (view !== 'code' || busy) return; busy = true; hidePanel(); const from = { ...lastPose }, to = codeRet;
+    tween(1100, (t) => { camOverride = lerpPose(from, to, ease(t)); dimPlane.material.opacity = .4 * (1 - ease(t)); }, () => { camOverride = null; codeOpen = false; dimPlane.visible = false; view = 'hall'; busy = false; ui('hall'); hallCard(); cb && cb(); });
+  };
+  const showCode = () => {
+    panel.style.setProperty('--dom', '#5A0B27');
+    panel.innerHTML = `
+      <div class="p-head"><span class="fmt" style="--f:#C9962E">À la une</span><span class="p-meta">Collections du groupe</span><button class="p-x" data-a="code-close" aria-label="Fermer">✕</button></div>
+      <p class="p-path">Édition originale · 1804</p>
+      <h2>Le premier Code civil</h2>
+      <p class="p-pitch">Le « Code Napoléon », socle du droit civil français.</p>
+      <dl class="p-grid"><div><dt>Promulgué</dt><dd>21 mars 1804</dd></div><div><dt>Articles</dt><dd>2 281</dd></div><div><dt>Rédigé par</dt><dd>4 juristes</dd></div></dl>
+      <h3 class="p-h">Un monument du droit</h3>
+      <p>Promulgué sous le Consulat, le Code civil des Français réunit en un seul texte les règles de la famille, de la propriété et des contrats. Rebaptisé « Code Napoléon » en 1807, il demeure le socle du droit civil.</p>
+      <h3 class="p-h">Une pièce rare chez Lefebvre Dalloz</h3>
+      <p>Ce premier Code civil vient de rejoindre les collections du groupe Lefebvre Dalloz. Éditeur du droit, nous continuons de l'annoter, de l'enseigner et de le faire vivre, dans nos ouvrages comme dans nos formations.</p>
+      <div class="p-actions"><button class="btn btn-primary" data-a="code-droit">Découvrir les formations en droit</button><button class="btn btn-ghost" data-a="code-close">Retour à la salle</button></div>
+      <p class="p-note">Texte de présentation à valider avec l'éditorial.</p>`;
+    panel.hidden = false; panel.scrollTop = 0; requestAnimationFrame(() => panel.classList.add('show'));
   };
 
   /* ---------- étiquettes des livres et stepper des travées ---------- */
@@ -112,26 +168,26 @@
   /* ---------- caméra sur rails ---------- */
   const camDist = () => (camera.aspect < .9 ? 9.2 : 6.6), baseFov = () => (camera.aspect < .9 ? 66 : 48);
   const placeCamera = () => {
-    let x, y, z, yaw, pitch;
-    if (camOverride) ({ x, y, z, yaw, pitch } = camOverride);
-    else if (cur.kind === 'hall') { x = 1.5 * Math.sin(H.a); z = 1.5 * Math.cos(H.a); y = 1.75; yaw = H.a + PI; pitch = .06; }
-    else { x = X.x; z = S.RAY_Z + camDist(); y = 1.7; yaw = 0; pitch = .045; }
-    camera.position.set(x, y, z); camera.rotation.set(pitch - par.y * .02, yaw - par.x * .03, 0);
+    let p;
+    if (camOverride) p = camOverride;
+    else if (cur.kind === 'hall') p = view === 'gate' ? orbitPose(time) : hallMode === 'home' ? HOME : doorPose(H.a);
+    else p = { x: X.x, y: 1.7, z: S.RAY_Z + camDist(), yaw: 0, pitch: .045 };
+    lastPose = p; camera.position.set(p.x, p.y, p.z); camera.rotation.set(p.pitch - par.y * .02, p.yaw - par.x * .03, 0);
   };
 
   /* ---------- pointeur : glisser, cliquer ---------- */
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
-  const ptr = { down: false, moved: false, x: 0, y: 0, sx: 0, sy: 0, t: 0, v: 0 };
+  const ptr = { down: false, moved: false, x: 0, y: 0, sx: 0, sy: 0, t: 0, v: 0, tot: 0 };
   const pick = (x, y) => { ndc.set(x / innerWidth * 2 - 1, -(y / innerHeight) * 2 + 1); ray.setFromCamera(ndc, camera); const hits = ray.intersectObjects(cur.pickables, false); return hits.length ? hits[0].object.userData.pick : null; };
   const railOk = () => !busy && !SC.on && !camOverride && (view === 'hall' || view === 'rayon');
-  canvas.addEventListener('pointerdown', (e) => { ptr.down = true; ptr.moved = false; ptr.sx = ptr.x = e.clientX; ptr.sy = e.clientY; ptr.t = performance.now(); ptr.v = 0; try { canvas.setPointerCapture(e.pointerId); } catch (er) { /* ignoré */ } });
+  canvas.addEventListener('pointerdown', (e) => { ptr.down = true; ptr.moved = false; ptr.sx = ptr.x = e.clientX; ptr.sy = e.clientY; ptr.t = performance.now(); ptr.v = 0; ptr.tot = 0; try { canvas.setPointerCapture(e.pointerId); } catch (er) { /* ignoré */ } });
   canvas.addEventListener('pointermove', (e) => {
     par.tx = e.clientX / innerWidth * 2 - 1; par.ty = e.clientY / innerHeight * 2 - 1;
     if (ptr.down) {
-      const dx = e.clientX - ptr.x, now = performance.now(), dt = Math.max(8, now - ptr.t) / 1000; ptr.x = e.clientX; ptr.t = now;
+      const dx = e.clientX - ptr.x, now = performance.now(), dt = Math.max(8, now - ptr.t) / 1000; ptr.x = e.clientX; ptr.t = now; ptr.tot += dx;
       if (!ptr.moved && Math.hypot(e.clientX - ptr.sx, e.clientY - ptr.sy) > 6) { ptr.moved = true; canvas.classList.add('drag'); }
       if (ptr.moved && railOk()) {
-        if (view === 'hall') { const d = dx * .0017; H.tgt += d; ptr.v = .7 * ptr.v + .3 * d / dt; }
+        if (view === 'hall') { if (hallMode === 'doors') { const d = dx * .0017; H.tgt += d; ptr.v = .7 * ptr.v + .3 * d / dt; } }
         else { const d = -dx * (2 * camDist() * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect) / innerWidth; X.tgt = clamp(X.tgt + d, S.BAY_X[0] - 1.5, S.BAY_X[4] + 1.5); ptr.v = .7 * ptr.v + .3 * d / dt; }
       }
     } else updateHover(e.clientX, e.clientY);
@@ -139,7 +195,7 @@
   const release = () => {
     canvas.classList.remove('drag'); if (!ptr.down) return; ptr.down = false;
     if (!ptr.moved || !railOk()) return;
-    if (view === 'hall') { H.tgt = Math.round((H.tgt + clamp(ptr.v, -4, 4) * .22) / STEP) * STEP; }
+    if (view === 'hall') { if (hallMode === 'doors') H.tgt = Math.round((H.tgt + clamp(ptr.v, -4, 4) * .22) / STEP) * STEP; else if (Math.abs(ptr.tot) > 70) stepHall(ptr.tot < 0 ? 1 : -1); }
     else { X.tgt = S.BAY_X[bayOf(X.tgt + clamp(ptr.v, -30, 30) * .2)]; syncBay(); }
   };
   canvas.addEventListener('pointerup', (e) => { const click = ptr.down && !ptr.moved; release(); if (click) onClick(e.clientX, e.clientY); });
@@ -155,9 +211,11 @@
     canvas.classList.toggle('hot', !!p && (p.kind !== 'bay'));
   };
   const onClick = (x, y) => {
+    if (view === 'code') { if (!busy) closeCode(); return; }
     if (SC.on) { if (SC.phase === 'idle') { const p = pick(x, y); if (!(p && p.kind === 'book' && p.ref === SC.ref)) closeBook(); } return; }
     if (!railOk()) return; const p = pick(x, y); if (!p) return;
-    if (p.kind === 'door') { if (p.k === hallIdx()) activateDoor(p.k); else goHall(p.k); }
+    if (p.kind === 'door') { if (hallMode === 'doors' && p.k === hallIdx()) activateDoor(p.k); else goHall(p.k); }
+    else if (p.kind === 'code') openCode();
     else if (p.kind === 'bay') goBay(p.bay.ti);
     else if (p.kind === 'book') { if (p.ref.bay.ti === bayOf(X.tgt)) openBook(p.ref); else goBay(p.ref.bay.ti); }
   };
@@ -168,13 +226,15 @@
     if (e.key === 'Escape') return escape();
     if (e.key === 'ArrowLeft') { if (railOk()) (view === 'hall' ? stepHall(-1) : goBay(bayOf(X.tgt) - 1)); }
     else if (e.key === 'ArrowRight') { if (railOk()) (view === 'hall' ? stepHall(1) : goBay(bayOf(X.tgt) + 1)); }
-    else if (e.key === 'Enter' && view === 'hall' && railOk() && !gateOpen()) activateDoor(hallIdx());
+    else if (e.key === 'Enter' && view === 'hall' && railOk() && !gateOpen()) (hallMode === 'doors' ? activateDoor(hallIdx()) : openCode());
   });
   const escape = () => {
     if (gateOpen() && $('#gate').dataset.mode === 'filter') return closeGate();
     if (journeyOpen()) return drawer(false);
+    if (view === 'code') return closeCode();
     if (SC.on) return closeBook();
     if (view === 'rayon') leaveRayon();
+    else if (view === 'hall' && hallMode === 'doors') hallTo('home');
   };
 
   /* ====================================================================================== */
@@ -184,10 +244,10 @@
   const enterRayon = (k, after) => {
     if (busy) return; const dom = L.DOMAINES[k]; busy = true; view = 'trans'; curDom = k; ui('none'); $('#top').hidden = false; hint('');
     const door = hall.doors[k]; door.target = 1;
-    const x0 = camera.position.x, z0 = camera.position.z, x1 = (S.HR - 1.3) * Math.sin(door.phi), z1 = (S.HR - 1.3) * Math.cos(door.phi), yaw = camera.rotation.y; let veiled = false;
+    const from = { ...lastPose }, x1 = (S.HR - 1.3) * Math.sin(door.phi), z1 = (S.HR - 1.3) * Math.cos(door.phi), yawEnd = door.phi + PI; let veiled = false;
     setTimeout(() => { if (!rayon) { rayon = S.buildRayon(dom); rayon.group.visible = false; scene.add(rayon.group); buildStepper(); } }, 250);
     tween(2000, (t) => {
-      const e = ease(t); camOverride = { x: lerp(x0, x1, e), y: 1.75, z: lerp(z0, z1, e), yaw, pitch: .03 }; camera.fov = baseFov() + 8 * e; camera.updateProjectionMatrix();
+      const e = ease(t); camOverride = { x: lerp(from.x, x1, e), y: lerp(from.y, 1.75, e), z: lerp(from.z, z1, e), yaw: from.yaw + angDiff(from.yaw, yawEnd) * e, pitch: lerp(from.pitch, .03, e) }; camera.fov = baseFov() + 8 * e; camera.updateProjectionMatrix();
       if (t > .6 && !veiled) { veiled = true; veil(true); }
     }, () => {
       if (!rayon) { rayon = S.buildRayon(dom); scene.add(rayon.group); buildStepper(); }
@@ -202,7 +262,7 @@
     setTimeout(() => {
       scene.remove(rayon.group); S.disposeGroup(rayon.group); T.disposeOwned(); rayon = null;
       hall.group.visible = true; cur = hall; H.tgt = H.a = angFor(curDom); hall.doors[curDom].state = hall.doors[curDom].target = .16; hall.doors[curDom].apply(); hall.setSelection(st.sel, true);
-      view = 'hall'; ui('hall'); hallCard(); crumbs(); applyReco(); veil(false); setTimeout(() => { busy = false; }, 500);
+      view = 'hall'; hallMode = 'doors'; ui('hall'); hallCard(); applyReco(); veil(false); setTimeout(() => { busy = false; }, 500);
     }, 650);
   };
   const applyReco = () => { if (rayon) fillLabels(); if (view === 'hall') hallCard(); };
@@ -240,7 +300,7 @@
   const closeBook = () => { if (!SC.on || SC.phase !== 'idle') return; hidePanel(); SC.phase = 'close'; SC.t = 0; };
 
   const stepShowcase = (dt, t) => {
-    if (!SC.on) { dimPlane.visible = false; return; }
+    if (!SC.on) { if (!codeOpen) dimPlane.visible = false; return; }
     const ref = SC.ref, root = ref.bk.root, m = SC.magic; SC.t += dt;
     if (SC.phase === 'fly') {
       const k = clamp01(SC.t / .85), e = ease(k);
@@ -310,7 +370,10 @@
     }
   };
   panel.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-a],[data-tab]'); if (!b || !SC.ref) return;
+    const b = e.target.closest('[data-a],[data-tab]'); if (!b) return;
+    if (b.dataset.a === 'code-close') return closeCode();
+    if (b.dataset.a === 'code-droit') return closeCode(() => hallTo('doors', 1));
+    if (!SC.ref) return;
     if (b.dataset.tab) return renderTab(b.dataset.tab);
     const a = b.dataset.a, l = SC.ref.livre;
     if (a === 'close') closeBook(); else if (a === 'journey') { toggleJourney(l); b.textContent = inJourney(l) ? 'Retirer de mon parcours' : 'Ajouter à mon parcours'; }
@@ -391,16 +454,15 @@
   const startFromGate = (opts = {}) => {
     if (!st.sel.size) return;
     if (view === 'gate') {
-      gate.classList.remove('show'); busy = true;
-      const first = opts.goto ? opts.goto.dom.index : L.DOMAINES.findIndex((d) => st.sel.has(d.id));
-      const from = H.a; H.tgt = angFor(first); const to = H.tgt; H.a = from;
-      view = 'hall'; ui('hall'); hallCard(); crumbs(); setTimeout(() => { busy = false; hint('Glissez pour tourner la salle · ou utilisez ‹ › · cliquez une porte pour entrer', 'hall'); if (opts.goto) goTo(opts.goto); }, 1100);
+      gate.classList.remove('show'); view = 'hall'; hallMode = 'home'; ui('hall'); hallCard();
+      if (opts.goto) hallTo('doors', opts.goto.dom.index, true, () => goTo(opts.goto));
+      else hallTo('home', 0, true, () => hint('Cliquez le livre pour le découvrir · ‹ › pour explorer les rayons', 'hall'));
     } else { closeGate(); if (opts.goto) goTo(opts.goto); }
   };
   /* Aller droit à un livre repéré : ouvrir le rayon, centrer la travée, mettre le livre en évidence. */
   const goTo = (l) => {
     const go = () => { const ref = rayon.books.find((b) => b.id === l.id); X.tgt = S.BAY_X[l.theme.index]; syncBay(); ref.flash = 3; };
-    if (rayon && rayon.dom === l.dom) go(); else if (view === 'hall') { H.tgt = angFor(l.dom.index); enterRayon(l.dom.index, { bay: l.theme.index, ref: null }); } else if (view === 'rayon') { leaveRayon(); setTimeout(() => goTo(l), 1500); }
+    if (rayon && rayon.dom === l.dom) go(); else if (view === 'hall') { if (hallMode === 'home') hallTo('doors', l.dom.index, false, () => goTo(l)); else { H.tgt = angFor(l.dom.index); enterRayon(l.dom.index, { bay: l.theme.index, ref: null }); } } else if (view === 'rayon') { leaveRayon(); setTimeout(() => goTo(l), 1500); }
   };
 
   /* ====================================================================================== */
@@ -416,12 +478,11 @@
     requestAnimationFrame(frame);
     const dt = Math.min(.05, (now - last) / 1000) * (L.debug ? L.debug.fast : 1); last = now; time += dt;
     par.x += (par.tx - par.x) * Math.min(1, dt * 3); par.y += (par.ty - par.y) * Math.min(1, dt * 3);
-    if (view === 'gate') { H.tgt += dt * .1; H.a = H.tgt; }
-    else if (cur.kind === 'hall') H.a += (H.tgt - H.a) * (1 - Math.exp(-dt * 6.5));
+    if (cur.kind === 'hall') { if (hallMode === 'doors' && view !== 'gate') H.a += (H.tgt - H.a) * (1 - Math.exp(-dt * 6.5)); }
     else if (cur.kind === 'rayon') { X.x += (X.tgt - X.x) * (1 - Math.exp(-dt * 6.5)); cur.focus(X.x); }
     for (let i = tw.length - 1; i >= 0; i--) { const q = tw[i]; q.t += dt; const k = clamp01(q.t / q.d); q.fn(k); if (k >= 1) { tw.splice(i, 1); q.done && q.done(); } }
-    placeCamera(); cur.update(dt, time);
-    if (cur.kind === 'hall' && view === 'hall' && hallIdx() !== lastIdx) hallCard();
+    placeCamera(); if (cur.kind === 'hall') cur.camPos.copy(camera.position); cur.update(dt, time);
+    if (cur.kind === 'hall' && view === 'hall' && hallMode + hallIdx() !== lastKey) hallCard();
     if (cur.kind === 'rayon') {
       cur.books.forEach((b) => { if (SC.ref === b) return; const hv = hoverRef === b ? 1 : 0; b.hv += (hv - b.hv) * Math.min(1, dt * 10); b.bk.root.position.y = b.home.p.y + b.hv * .05; b.bk.root.scale.setScalar(1 + b.hv * .03); if (b.flash > 0) b.flash -= dt; });
       const bay = curBay(), settled = view === 'rayon' && !busy && Math.abs(X.x - bay.xc) < .5 && !ptr.moved;
@@ -435,5 +496,5 @@
 
   /* ---------- démarrage ---------- */
   hall.setSelection(st.sel, true); resize(); countJ(); showGate('intro'); requestAnimationFrame((t) => { last = t; frame(t); });
-  L.debug = { fast: 1, st, view: () => view, busy: () => busy, enterRayon, leaveRayon, openBook, closeBook, startFromGate, rayon: () => rayon, hall, X, H, camera, renderer, scene, goBay, goHall, SC };
+  L.debug = { fast: 1, st, view: () => view, busy: () => busy, enterRayon, leaveRayon, openBook, closeBook, startFromGate, rayon: () => rayon, hall, X, H, camera, renderer, scene, goBay, goHall, SC, hallTo, openCode, closeCode, hallMode: () => hallMode, lastPose: () => lastPose };
 })();
