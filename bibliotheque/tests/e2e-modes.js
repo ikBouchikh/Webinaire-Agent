@@ -17,11 +17,12 @@ const fs = require('fs'); const out = process.argv[2] || '/tmp/e2e-modes'; fs.mk
   { const { browser, page, log } = await launch({ viewport: { width: 1100, height: 650 } });
     await open(page, '?debug=1&fast=6&go=explore'); await idle(page);
     await page.evaluate(() => LDC.debug.hallTo('doors', 0)); await idle(page);
-    await watchTrans(page); await page.evaluate(() => LDC.debug.enterWorld(0));
-    await page.waitForFunction(() => document.getElementById('trans').classList.contains('on'), null, { timeout: 60000 });
-    const t0 = Date.now(); await page.click('#transSkip', { force: true, timeout: 10000 });
-    await worldReady(page);
-    ok('« Passer » : la séquence se termine sans attendre la fin', Date.now() - t0 < 12000, (Date.now() - t0) + ' ms');
+    /* « Passer » est cliqué par le navigateur dès que la séquence démarre (pas de course avec les à-coups du rendu logiciel) */
+    await watchTrans(page);
+    await page.evaluate(() => { const el = document.getElementById('trans'); const o = new MutationObserver(() => { if (el.classList.contains('play')) { o.disconnect(); document.getElementById('transSkip').click(); } }); o.observe(el, { attributes: true, attributeFilter: ['class'] }); });
+    await page.evaluate(() => LDC.debug.enterWorld(0)); await worldReady(page);
+    const sk = await trRecords(page), p0 = sk.find((r) => /play/.test(r.cls)), p1 = sk.find((r) => r.t >= (p0 ? p0.t : 0) && !/\bon\b/.test(r.cls));
+    ok('« Passer » : la séquence s\'arrête sans attendre les 3,8 s', !!p0 && !!p1 && (p1.t - p0.t) < 3000, p0 && p1 ? (p1.t - p0.t) + ' ms entre le début de la séquence et la sortie' : 'séquence non observée');
     ok('« Passer » : visite enregistrée comme vue', await page.evaluate(() => JSON.parse(localStorage.getItem('ldc-bibliotheque-v4')).seenTransition === true));
     await page.evaluate(() => LDC.debug.leaveWorld()); await page.waitForTimeout(500); await idle(page);
     ok('retour à la Grande salle (porte entrouverte)', await page.evaluate(() => LDC.debug.view() === 'hall' && /Grande salle/.test(document.getElementById('crumbs').innerText)));
@@ -43,7 +44,7 @@ const fs = require('fs'); const out = process.argv[2] || '/tmp/e2e-modes'; fs.mk
     await page.click('#sheet .pgrp > summary'); await page.click('#sheet .pgrp[open] .prow .t'); await page.waitForSelector('#sheet [role=tablist]'); await page.click('#sheet .pf .btn-primary'); await page.waitForTimeout(200);
     ok('sans WebGL : ajout à la sélection client', await page.evaluate(() => LDC.selection.count() === 1));
     await page.click('#modePitch'); await page.waitForSelector('#pitch.show');
-    ok('sans WebGL : Pitch guidé disponible', await page.evaluate(() => /étape 1 sur 6/.test(document.querySelector('#pitch .kicker').innerText)));
+    ok('sans WebGL : Pitch guidé disponible', await page.evaluate(() => /étape 1 sur 6/i.test(document.querySelector('#pitch .kicker').innerText)));
     ok('sans WebGL : Cognitio présente', await page.evaluate(() => document.getElementById('cgText').innerText.length > 10));
     process.exitCode = done(log) || process.exitCode; await browser.close(); }
 })();

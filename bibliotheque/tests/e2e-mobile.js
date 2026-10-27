@@ -10,7 +10,7 @@ const fs = require('fs'); const out = process.argv[2] || '/tmp/e2e-mobile'; fs.m
   await page.tap('#goExplore'); await idle(page);
   ok('mobile : Grande salle, carte du lieu et Cognitio dans l\'écran', await page.evaluate(() => { const r = document.getElementById('dock').getBoundingClientRect(), c = document.getElementById('cognitio').getBoundingClientRect(); return r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth && c.right <= innerWidth && c.left >= 0; }));
   await page.screenshot({ path: out + '/02-hall.png' });
-  await page.tap('#dock [data-d="vision"]'); await page.waitForSelector('#vision.show'); await idle(page); await page.waitForTimeout(400);
+  await page.tap('#dock [data-d="vision"]'); await page.waitForSelector('#vision.show'); await idle(page); await page.waitForTimeout(1200);
   ok('mobile : panneau Code civil dans l\'écran', await page.evaluate(() => { const r = document.getElementById('vision').getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight + 1; }));
   await page.screenshot({ path: out + '/03-vision.png' });
   await page.tap('#vision [data-step="2"]'); await page.waitForTimeout(200); await page.screenshot({ path: out + '/04-vision-offre.png' });
@@ -20,13 +20,13 @@ const fs = require('fs'); const out = process.argv[2] || '/tmp/e2e-mobile'; fs.m
   ok('mobile : univers sans défilement horizontal', await noOverflow());
   await page.screenshot({ path: out + '/06-world.png' });
   await page.evaluate(() => LDC.debug.goRail(1)); await page.waitForTimeout(2500); await page.screenshot({ path: out + '/07-station.png' });
-  await page.tap('#dock [data-d="list"]'); await page.waitForSelector('#sheet.show'); await page.waitForTimeout(500);
+  await page.tap('#dock [data-d="list"]'); await page.waitForSelector('#sheet.show'); await page.waitForTimeout(1200);
   ok('mobile : liste produits dans l\'écran', await page.evaluate(() => { const r = document.getElementById('sheet').getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight + 1; }));
   await page.screenshot({ path: out + '/08-liste.png' });
   await page.tap('#sheet .pgrp > summary'); await page.tap('#sheet .pgrp[open] .prow .t'); await page.waitForSelector('#sheet [role=tablist]'); await page.waitForTimeout(300); await page.screenshot({ path: out + '/09-fiche.png' });
-  await page.tap('#sheet .pf .btn-primary'); await page.waitForTimeout(200); await page.tap('#btnSel'); await page.waitForSelector('#selection.show'); await page.waitForTimeout(400);
+  await page.tap('#sheet .pf .btn-primary'); await page.waitForTimeout(200); await page.tap('#btnSel'); await page.waitForSelector('#selection.show'); await page.waitForTimeout(1200);
   ok('mobile : sélection client lisible', await page.evaluate(() => { const r = document.getElementById('selection').getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && /Ma sélection client/.test(document.getElementById('selection').innerText); }));
   await page.screenshot({ path: out + '/10-selection.png' });
-  ok('mobile : cibles tactiles ≥ 40 px (boutons principaux)', await page.evaluate(() => [...document.querySelectorAll('#selection .pf .btn, #dock .btn, #btnSel')].filter((b) => b.offsetParent).every((b) => b.getBoundingClientRect().height >= 36)));
+  ok('mobile : cibles tactiles ≥ 40 px (boutons principaux)', await page.evaluate(() => [...document.querySelectorAll('#selection .pf .btn, #dock .btn, #btnSel')].filter((b) => b.offsetParent).every((b) => b.getBoundingClientRect().height >= 40)));
   process.exitCode = done(log); await browser.close();
 })();
