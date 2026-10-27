@@ -80,7 +80,7 @@ const fs = require('fs'); const out = process.argv[2] || '/tmp/e2e'; fs.mkdirSyn
   /* ---- sélection client ---- */
   await page.click('#btnSel'); await page.waitForSelector('#selection.show');
   const sel = await page.evaluate(() => document.getElementById('selection').innerText);
-  ok('sélection client : produit, durée, formats, ROME « À VALIDER », argument principal', /Produits retenus/.test(sel) && /Durée cumulée/.test(sel) && /Formats/.test(sel) && /Argument principal/.test(sel) && /ROME 4/.test(sel));
+  ok('sélection client : produit, durée, formats, ROME « À VALIDER », argument principal', /Produits retenus/i.test(sel) && /Durée cumulée/i.test(sel) && /Formats/i.test(sel) && /Argument principal/i.test(sel) && /ROME 4/i.test(sel));
   await page.fill('#selArg', 'Test : sécuriser la clôture des comptes.');
   const txt = await page.evaluate(() => LDC.selection.toText());
   ok('synthèse texte : sections et argument saisi', /PROPOSITION CLIENT/.test(txt) && /PRODUITS RETENUS \(1\)/.test(txt) && /Test : sécuriser la clôture/.test(txt) && /COMPÉTENCES ROME 4 MOBILISÉES/.test(txt) && /À VALIDER/.test(txt));
