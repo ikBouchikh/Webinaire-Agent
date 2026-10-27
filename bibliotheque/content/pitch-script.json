@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "statut": "A_VALIDER",
+    "note": "Déroulé du mode Pitch guidé (3 à 5 minutes). Les durées sont indicatives. Les intitulés d'étapes sont ceux du brief."
+  },
+  "etapes": [
+    { "id": 1, "titre": "L'ADN et la vision", "court": "ADN", "consigne": "Raconter d'où nous venons, où nous allons et ce que nous proposons.", "duree": "≈ 30 s", "cognitio": "pitch.1" },
+    { "id": 2, "titre": "Le besoin du client", "court": "Besoin", "consigne": "Noter le contexte, le métier, les compétences visées et les contraintes.", "duree": "≈ 1 min", "cognitio": "pitch.2" },
+    { "id": 3, "titre": "Le domaine ou la situation", "court": "Domaine", "consigne": "Entrer dans l'univers qui correspond et repérer les stations utiles.", "duree": "≈ 45 s", "cognitio": "pitch.3" },
+    { "id": 4, "titre": "Les compétences mobilisées", "court": "Compétences", "consigne": "Relier le besoin aux compétences ROME 4.0 (rattachements validés uniquement).", "duree": "≈ 45 s", "cognitio": "pitch.4" },
+    { "id": 5, "titre": "La sélection de produits", "court": "Sélection", "consigne": "Composer la sélection à partir des correspondances expliquées.", "duree": "≈ 1 min", "cognitio": "pitch.5" },
+    { "id": 6, "titre": "La prochaine étape", "court": "Suite", "consigne": "Remettre la synthèse et convenir de la suite.", "duree": "≈ 30 s", "cognitio": "pitch.6" }
+  ],
+  "formatsDurees": [
+    { "id": "d05", "libelle": "≤ 1 jour", "jours": 1 },
+    { "id": "d2", "libelle": "≤ 2 jours", "jours": 2 },
+    { "id": "d3", "libelle": "≤ 3 jours", "jours": 3 },
+    { "id": "d5", "libelle": "≤ 5 jours", "jours": 5 }
+  ],
+  "prochainesEtapes": [
+    "Valider le périmètre avec le client",
+    "Planifier un échange avec un conseiller formation",
+    "Préparer une proposition détaillée"
+  ]
+}

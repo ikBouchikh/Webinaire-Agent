@@ -1,0 +1,15 @@
+{
+  "_meta": {
+    "statut": "A_VALIDER",
+    "note": "Aucun des six champs commerciaux n'existe dans la base produits fournie. Cette table est volontairement vide : renseignez-la (ou remplacez-la par l'export de la base enrichie), puis relancez python3 tools/build-data.py. Aucun argument n'est généré automatiquement.",
+    "champs": [
+      "probleme_client",
+      "savoir_faire_participant",
+      "arguments_vente",
+      "preuve_differenciateur",
+      "objection_reponse",
+      "produits_complementaires"
+    ]
+  },
+  "produits": {}
+}

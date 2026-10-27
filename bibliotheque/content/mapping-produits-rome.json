@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "statut": "A_VALIDER",
+    "note": "Aucun mapping validé produit → compétences ROME 4.0 n'a été fourni. Aucune compétence n'est déduite du titre d'un produit. Format attendu : voir exemple. Les identifiants et libellés sont contrôlés par tools/build-data.py contre le référentiel ROME 4.0.",
+    "exemple": {
+      "CODE_FORMEO": {
+        "competences": [
+          {
+            "id": 123456,
+            "libelle": "libellé exact ROME",
+            "importance": "coeur",
+            "explication": "phrase de justification validée"
+          }
+        ],
+        "momentsDeVie": [
+          "identifiant"
+        ],
+        "metiers": [
+          "code ROME"
+        ],
+        "statut": "VALIDE",
+        "validePar": "nom",
+        "date": "AAAA-MM-JJ"
+      }
+    },
+    "importances": [
+      "coeur",
+      "support"
+    ]
+  },
+  "produits": {}
+}

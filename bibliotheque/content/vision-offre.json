@@ -1,0 +1,88 @@
+{
+  "_meta": {
+    "statut": "A_VALIDER",
+    "note": "Aucun contenu éditorial validé n'a été fourni avec le dossier. Les textes ci-dessous sont soit tirés de la charte (source citée), soit issus du brief projet, soit générés à partir du catalogue. Chaque bloc porte son statut. À remplacer par les textes validés."
+  },
+  "titre": "De l'expertise éditoriale à l'action professionnelle",
+  "etapes": [
+    {
+      "id": "origine",
+      "kicker": "Notre origine",
+      "titre": "Le patrimoine éditorial et l'expertise humaine",
+      "corps": [
+        "Des contenus fiables, actualisés en temps réel et opérationnels au quotidien.",
+        "Nous informons nos clients des nouveautés législatives, réglementaires, jurisprudentielles ainsi que de leurs impacts et des évolutions à anticiper.",
+        "Papier puis numérique, l'offre éditoriale de Lefebvre Dalloz est aujourd'hui augmentée grâce à l'IA générative."
+      ],
+      "source": "LFVR_TERRITOIRE_ONBARDING.pdf, pages 8, 11 et 23 (texte de mise en page de la charte)",
+      "statut": "A_VALIDER"
+    },
+    {
+      "id": "vision",
+      "kicker": "Notre vision",
+      "titre": "Des savoirs fiables, activés en compétences",
+      "corps": [
+        "Transformer des savoirs fiables en capacités professionnelles activables.",
+        "Cognitio relie les savoirs humains, le patrimoine éditorial Lefebvre Dalloz, les compétences professionnelles et l'intelligence artificielle, pour transformer l'apprentissage en action."
+      ],
+      "source": "Brief projet (rédaction du client, 2026-10)",
+      "statut": "A_VALIDER"
+    },
+    {
+      "id": "offre",
+      "kicker": "Notre offre",
+      "titre": "Six univers, une offre de formation 2027",
+      "corps": [],
+      "dynamique": "catalogue",
+      "source": "Généré à partir de Base_produits_2027 (comptages et libellés du catalogue)",
+      "statut": "A_VALIDER"
+    }
+  ],
+  "cta": [
+    {
+      "id": "approche",
+      "libelle": "Découvrir notre approche",
+      "cible": "etape:vision"
+    },
+    {
+      "id": "domaines",
+      "libelle": "Explorer nos domaines",
+      "cible": "salle"
+    },
+    {
+      "id": "client",
+      "libelle": "Construire une réponse client",
+      "cible": "pitch"
+    },
+    {
+      "id": "droit",
+      "libelle": "Découvrir l'offre Droit",
+      "cible": "monde:droit"
+    }
+  ],
+  "codeCivil": {
+    "designation": "Le premier Code civil (« Code Napoléon »)",
+    "acquisition": "Exemplaire acquis récemment par le groupe Lefebvre Dalloz",
+    "sourceDesignation": "Brief client (message du 2026-10)",
+    "statut": "A_VALIDER",
+    "pageTitre": [
+      "CODE CIVIL",
+      "Le premier Code Napoléon"
+    ],
+    "pageBas": "Collections du groupe Lefebvre Dalloz",
+    "champsAValider": [
+      "date de promulgation",
+      "nombre d'articles",
+      "imprimeur et mention d'édition",
+      "provenance et date d'acquisition",
+      "photographies de l'exemplaire"
+    ]
+  },
+  "chiffre": {
+    "designation": "Le Grand Livre du Chiffre",
+    "sousTitre": "La table des décisions",
+    "legende": "La mesure, la performance, l'analyse et l'arbitrage.",
+    "statut": "A_VALIDER",
+    "note": "Installation symbolique contemporaine : aucun objet historique, aucun chiffre réel. Intitulé provisoire."
+  }
+}

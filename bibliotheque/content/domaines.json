@@ -1,0 +1,135 @@
+{
+  "_meta": {
+    "statut": "A_VALIDER",
+    "note": "Regroupement des 37 « domaines FORMEO » de la base produits en six univers d'exposition. Proposition de travail : à valider par l'offre. Les intitulés d'univers sont des directions artistiques et restent configurables.",
+    "source": "Base_produits_2027 (colonnes MARCHE FORMEO / DOMAINE FORMEO) et brief client"
+  },
+  "mondes": [
+    {
+      "id": "droit",
+      "ordre": 1,
+      "nom": "Droit",
+      "univers": "La chambre des sources",
+      "promesse": "Textes, références, raisonnements et chaînes de preuve.",
+      "accessoire": "droit",
+      "accent": "red",
+      "stationNiveau": "domaine",
+      "domaines": [
+        "DA - Droit des affaires",
+        "DC - Immobilier",
+        "DB - Construction - Urbanisme",
+        "DD - Conformité",
+        "DL - Droit des particuliers",
+        "DK - Contentieux - Procédure - Médiation",
+        "DO - Soft skills Droit"
+      ]
+    },
+    {
+      "id": "chiffre",
+      "ordre": 2,
+      "nom": "Chiffre",
+      "univers": "L'observatoire des décisions",
+      "promesse": "Budgets, flux, ratios, performance, simulations et arbitrages.",
+      "accessoire": "chiffre",
+      "accent": "blue",
+      "stationNiveau": "domaine",
+      "domaines": [
+        "CA - Comptabilité",
+        "CB - Gestion - Finance",
+        "CC - Consolidation - Normes IFRS",
+        "CD - Fiscalité",
+        "CE - Patrimoine",
+        "CF - Banque - Assurance",
+        "CG - Soft skills Chiffre"
+      ]
+    },
+    {
+      "id": "rh",
+      "ordre": 3,
+      "nom": "RH, Paie & Social",
+      "univers": "La constellation des talents",
+      "promesse": "Relations, trajectoires, situations humaines et compétences.",
+      "accessoire": "rh",
+      "accent": "ocre",
+      "stationNiveau": "domaine",
+      "domaines": [
+        "DF - GRH",
+        "DE - Droit social",
+        "DG - Paie",
+        "DH - IRP",
+        "DJ - Action sociale"
+      ]
+    },
+    {
+      "id": "qse",
+      "ordre": 4,
+      "nom": "QSE",
+      "univers": "La salle des risques et des impacts",
+      "promesse": "Prévention, qualité, sécurité, environnement et scénarios.",
+      "accessoire": "qse",
+      "accent": "blue",
+      "stationNiveau": "theme",
+      "domaines": [
+        "DI - QHSE"
+      ]
+    },
+    {
+      "id": "public",
+      "ordre": 5,
+      "nom": "Service public",
+      "univers": "La cartographie des missions",
+      "promesse": "Territoires, acteurs, responsabilités et service rendu.",
+      "accessoire": "neutre",
+      "accessoireStatut": "A_VALIDER (aucun accessoire Cognitio fourni pour ce domaine)",
+      "accent": "red",
+      "stationNiveau": "domaine",
+      "domaines": [
+        "DN - Secteur public",
+        "DM - Marchés publics"
+      ]
+    },
+    {
+      "id": "mgmt",
+      "ordre": 6,
+      "nom": "Management, Soft skills & Numérique",
+      "univers": "L'arène de situations",
+      "promesse": "Décisions, conversations, simulations et transformations liées à l'IA.",
+      "accessoire": "management",
+      "accent": "ocre",
+      "stationNiveau": "domaine",
+      "domaines": [
+        "SA - Management et leadership",
+        "SB - Gestion de projet",
+        "SC - Communication",
+        "SD - Développement personnel",
+        "SE - Efficacité professionnelle",
+        "SF - Learning",
+        "SG - Relation client et fournisseur",
+        "TNIA - IA",
+        "TNBU - Bureautique",
+        "TNMD - Marketing digital",
+        "TNIT - Informatique-IT",
+        "TNDA - Data",
+        "TNCY - Cyber",
+        "COACH_I - Coaching individuel",
+        "COACH_C - Coaching collectif"
+      ],
+      "accessoiresParDomaine": {
+        "TNIA - IA": "technologies",
+        "TNBU - Bureautique": "technologies",
+        "TNMD - Marketing digital": "technologies",
+        "TNIT - Informatique-IT": "technologies",
+        "TNDA - Data": "technologies",
+        "TNCY - Cyber": "technologies"
+      }
+    }
+  ],
+  "selection": {
+    "_note": "Produits exposés par station : d'abord ceux marqués BEST par le marketing, puis ordre du catalogue. Les autres restent accessibles par la liste complète.",
+    "nbVitrine": 4,
+    "exclureVenduSeul": [
+      "NON"
+    ],
+    "exclureMarques": []
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "statut": "A_VALIDER",
+    "note": "Séquence de passage de la Grande salle vers un univers. Si les fichiers vidéo ci-dessous existent au moment de `python3 tools/build-data.py`, ils sont utilisés ; sinon la séquence procédurale (HTML/CSS/SVG) joue à leur place. Aucun appel réseau dans les deux cas."
+  },
+  "video": {
+    "webm": "assets/transition/book-laptop-cognitio.webm",
+    "mp4": "assets/transition/book-laptop-cognitio.mp4",
+    "poster": "assets/transition/book-laptop-cognitio-poster.webp",
+    "dureeMaxSecondes": 6
+  },
+  "dureesMs": {
+    "premiereVisite": 3800,
+    "visiteSuivante": 1400,
+    "mouvementReduit": 900
+  },
+  "etapes": [
+    "Les pages du livre s'ouvrent",
+    "Un ordinateur en émerge",
+    "Une feuille sort de l'écran",
+    "Elle se plie : Cognitio apparaît",
+    "Cognitio invite dans l'univers choisi"
+  ]
+}

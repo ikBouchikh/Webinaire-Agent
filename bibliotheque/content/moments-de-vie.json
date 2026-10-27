@@ -1,0 +1,7 @@
+{
+  "_meta": {
+    "statut": "A_VALIDER",
+    "note": "La notion de « Moment de Vie » apparaît dans le brief mais aucune définition ni donnée n'a été fournie. Aucun moment n'est inventé. Format attendu : {id, libelle, description, competences:[ids ROME 4.0]}."
+  },
+  "moments": []
+}
