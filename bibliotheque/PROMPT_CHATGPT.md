@@ -1,98 +1,46 @@
-# Prompt à fournir à ChatGPT : vision exacte du livrable « Bibliothèque des compétences »
+# Prompt à fournir à ChatGPT : vision exacte du livrable « Bibliothèque des compétences » (version aide à la vente)
 
-Copiez tout ce qui suit dans ChatGPT. Complétez la dernière section (« Ta mission »).
+> Copiez tout ce qui suit dans ChatGPT. Les rubriques « À VALIDER » sont des manques réels : ne les comblez pas.
 
 ---
 
-Tu es un expert en produit digital, expérience 3D web et communication éditoriale. Je vais te décrire avec précision un livrable déjà réalisé. Lis tout avant de répondre, puis fais ce qui est demandé dans la section « Ta mission ». Ne rien inventer : si une information manque, pose la question.
+Tu vas m'aider à faire évoluer un livrable existant. Lis tout avant de répondre ; ne propose rien avant d'avoir confirmé en trois lignes ce que tu as compris.
 
 ## 1. Contexte
-
-- Client : **Lefebvre Dalloz Compétences** (organisme de formation du groupe Lefebvre Dalloz, éditeur juridique et fiscal). Site concerné : https://formation.lefebvre-dalloz.fr/ (catalogue de plus de 1 500 formations, 36 domaines d'expertise regroupés en 6 grands domaines). Ce n'est **pas** un projet Skilia.
-- Livrable : une **expérience web immersive en 3D** pour explorer tout le catalogue 2027, appelée **« Bibliothèque des compétences »**.
-- Idée directrice : une **bibliothèque française très ancienne et authentique**, qui fait hommage à la marque éditoriale (livres, reliures, Code civil) tout en restant **propre, nette, moderne et facile à naviguer**. Un esprit « Poudlard » discret (portes qui s'ouvrent, livres qui s'ouvrent dans la lumière, bougies flottantes), jamais kitsch ni « casino ».
-- Correspondance avec le catalogue : **domaine = porte et rayon**, **thématique = travée**, **produit de formation = grand livre**, avec un lien avec les blocs de compétences de **France compétences**.
+Lefebvre Dalloz Compétences (LDC) forme les professionnels (catalogue 2027 : 2 027 produits, 56 certifiants RS/RNCP, 215 lots) — site https://formation.lefebvre-dalloz.fr/ (ce n'est **pas** l'application Skilia). Le livrable est un **outil d'aide à la vente pour les commerciaux LDC** : raconter la vision du groupe, partir du besoin d'un client, explorer l'offre dans une expérience 3D, composer une **sélection client** exploitable. Ce n'est plus un parcours d'apprentissage.
 
 ## 2. Nature technique
+Dossier `bibliotheque/` : HTML + CSS + JavaScript sans framework, Three.js r149 inclus. S'ouvre par double-clic sur `index.html`, **hors ligne** (aucun CDN, aucun appel réseau, pas de `fetch` ni de modules ES). Les données sont générées par `tools/build-data.py` (Python + openpyxl) à partir de la base produits (xlsx) et du référentiel ROME 4.0 (xlsx) vers `data/catalogue.js`, `data/rome4-compact.js` et `content/content.bundle.js`. Sans WebGL : version statique simplifiée. Navigation clavier, mouvement réduit, mobile.
 
-- Page web autonome : HTML, CSS, JavaScript sans framework, rendu 3D avec Three.js r149 (fichier embarqué, aucun réseau requis). Elle s'ouvre par double-clic sur `index.html` et fonctionne hors ligne.
-- Aucune image : couvertures de livres, marbre, parquet, plaques, vitraux sont dessinés en canvas.
-- Fichiers : `index.html`, `style.css`, `data.js` (catalogue), `textures.js` (matières et couvertures), `book.js` (le livre qui s'ouvre), `scene.js` (Grande salle et rayons), `app.js` (navigation, filtre, fiches, parcours), `vendor/three.min.js`.
-- Lien de démonstration (privé, compte du propriétaire) : https://claude.ai/artifact/SP2CGpv5N3PpBhtZachDvt
-- Code : dépôt GitHub `ikBouchikh/Webinaire-Agent`, branche `claude/bibliotheque-3d-formations-1tvjsx`, dossier `bibliotheque/`.
+## 3. Identité visuelle (charte LFVR_TERRITOIRE_ONBARDING.pdf = source de vérité)
+- Rouge = couleur de marque (#D71635, #FF1E1E, #4B0000, #3B0000) ; clay (beiges #FAFAF5 #F2EEE1 #EBDCCD #E1C8B4 #CDB4A5) pour les fonds ; bleu (#1E87BE, #081F2C) et ocre (#FA914B, #CD5008) en touches seulement.
+- IBM Plex : **Serif** pour titres et claims (italique pour l'emphase), **Sans** pour CTA et interface, **Mono** pour catégories et repères techniques.
+- Forme graphique récurrente : rectangle arrondi à encoche haute droite (silhouette du symbole JL). Dégradés texturés réservés aux écrans et transitions. Matières tactiles, rapport humain / technologie.
+- Mascotte **Cognitio** (feuille crème pliée, pli bordeaux) : le dessin ne change jamais ; seuls un ou deux accessoires légers varient par domaine (sept images fournies).
+- **À VALIDER** : logo officiel et symbole JL en vectoriel (aujourd'hui : repère générique non officiel).
 
-## 3. Identité visuelle (obligatoire)
+## 4. Deux mondes
+- **Monde 1 — la Grande salle** : bibliothèque française ancienne (rotonde, galerie, six portes). Au centre, à égalité : *le premier Code civil* (Droit · Édition) et *Le Grand Livre du Chiffre* (« La table des décisions » : installation contemporaine symbolique, sans objet historique ni chiffre réel). En dix secondes, on comprend que LDC n'est pas seulement droit et éditorial.
+- **Monde 2 — les six univers**, contemporains, chauds, tactiles : Droit (la chambre des sources), Chiffre (l'observatoire des décisions), RH-Paie-Social (la constellation des talents), QSE (la salle des risques et des impacts), Service public (la cartographie des missions), Management-Soft skills-Numérique (l'arène de situations). Chaque univers : installation d'accueil, puis une station par domaine FORMEO (en-tête + vitrine de 4 produits, BEST d'abord), liste complète.
+- **Transition** porte → univers : séquence narrative (pages d'un livre → ordinateur → feuille → Cognitio → invitation). Vidéo locale si fournie (webm/mp4 + poster), sinon séquence procédurale ; version courte après la première visite ; bouton Passer ; image fixe en mouvement réduit.
 
-- Palette strictement limitée à la charte fournie par le client (valeurs relevées à l'œil sur ses visuels, à confirmer) : sable `#F4ECE4`, crème `#FBF7F2`, encre bordeaux foncé `#4A0A22`, bordeaux `#680D2D`, framboise `#D6175F`, pêche `#F2B48C`, rose `#F3DDE3`, bleu `#2F5DA8` (accent rare). Boiseries en acajou bordeaux, pierre sable, or pour les dorures.
-- Un accent par domaine, tous dans la charte : Chiffre = framboise `#D6175F` ; Droit = bordeaux `#680D2D` ; Équipes (RH) = pêche soutenu `#E3875A` ; Prévention (QSE) = bleu `#2F5DA8` ; Service public = mauve rosé `#A8416B` ; Humain (management) = or sable `#B58A4A`.
-- Typographie : interface en sans-serif humaniste type Calibri ; textes gravés dans la 3D (couvertures, plaques) en serif type Georgia.
-- Marque : mot-symbole textuel « LEFEBVRE DALLOZ / COMPÉTENCES » (serif capitales + sans espacée). Pas de logo Skilia.
-- Rendu : net et lumineux, sans brouillard ni halo excessif, sans tonemapping, ombres douces. Pas de musique, pas de points d'expérience, pas de quêtes, pas de mini-plan (tout cela a été retiré à la demande du client car « trop chargé »).
+## 5. Parcours
+1. Écran d'accueil : *Explorer librement* ou *Pitch guidé (3 à 5 min)*.
+2. Grande salle (carte du lieu en bas à droite, Cognitio en bas à gauche, fil d'Ariane, mode Exploration / Pitch en haut).
+3. Code civil → panneau « De l'expertise éditoriale à l'action professionnelle » en 3 étapes (Notre origine / Notre vision / Notre offre) ; CTA : Découvrir notre approche · Explorer nos domaines · Construire une réponse client · Découvrir l'offre Droit.
+4. Porte → transition → univers → stations → liste → **fiche produit à 4 onglets** : Pour quel besoin ? · Notre réponse · Compétences ROME 4 · Argumentaire commercial. Action principale : *Ajouter à la sélection client*.
+5. **Ma sélection client** : besoin, produits retenus, durée cumulée, formats, compétences ROME 4, argument principal (texte libre), produits complémentaires ; copier, imprimer, réinitialiser ; conservée dans le navigateur ; aucune donnée sensible.
+6. **Pitch guidé** : 1 ADN et vision → 2 besoin client (contexte, métier ROME, compétences ROME, univers, niveau, format, durée) → 3 domaine / situation → 4 compétences mobilisées → 5 sélection de produits classés par correspondance expliquée → 6 synthèse et prochaine étape.
 
-## 4. Parcours, écran par écran
+## 6. Règles de contenu (non négociables)
+- **Rien n'est inventé** : produits, durées, niveaux, formats, certifications viennent de la base ; compétences de ROME 4.0 (identifiants, libellés, types officiels). Aucune compétence déduite du titre d'un produit. France compétences (RS/RNCP) reste **séparé** de ROME 4.
+- Donnée absente → encart **« À VALIDER »** (jamais un texte plausible). Liste dans `docs/A_VALIDER.md` : six champs commerciaux par produit (problème client, savoir-faire, arguments, preuve, objection + réponse, produits complémentaires) ; mapping validé produit → ROME 4 ; définition des « moments de vie » ; lien métier → compétences ; fiche de l'ouvrage Code civil (date, articles, imprimeur, provenance) ; textes validés origine / vision / offre ; accessoire Cognitio pour « Service public » ; logo et symbole ; vidéo de transition.
+- Correspondance : déterministe, expliquée (pondérations dans `data/matching-config.js`) ; niveaux « forte / moyenne / partielle / cadre », jamais un score scientifique. Sans rattachement ROME validé, aucun produit n'est jamais « forte ».
+- Cognitio est un guide scénarisé (pas de LLM), jamais un expert omniscient ; fournisseur remplaçable pour une API future.
+- Interdits : musique, XP, quêtes, mini-carte, caméra libre, brouillard, zoom brutal, halos permanents, cyberpunk / néon violet / UI froide, tarifs et noms de collaborateurs dans le navigateur.
 
-**A. Écran d'entrée (aussi réutilisé comme filtre « Mes rayons »)**
-Carte sable à gauche, la Grande salle tourne lentement à droite. Trois blocs :
-1. « Votre métier » : 10 profils (Direction financière · DAF ; Comptable · Expert-comptable ; Juriste · Direction juridique ; Avocat · Notaire ; RH · Paie · Social ; QSE · HSE ; Banque · Assurance ; Immobilier · Construction ; Secteur public ; Manager · Toutes fonctions). Chaque profil ouvre les bons rayons. Cette liste est une proposition à valider avec le client.
-2. « Un besoin précis ? » : saisie libre (ex. paie, bail commercial, IA, document unique), recherche avec synonymes et sans accents ; ouvre les rayons pertinents et marque les livres repérés d'une étoile ★ ; cliquer un résultat emmène directement au livre.
-3. « Vos rayons » : 6 cartes (une par domaine) à ouvrir ou fermer, avec compteur de formations. L'aperçu est en direct : les portes des rayons ouverts s'entrouvrent, celles des rayons fermés se ferment avec un cadenas.
-Bouton « Entrer ».
+## 7. Historique des retours du client (à respecter)
+Trop chargé, brouillon, flou → épuré, net. On se perdait / zoom trop fort → navigation sur rails, jamais de caméra libre. Couleurs hors charte → charte PDF. « J'ai beaucoup aimé que les portes s'ouvrent » → conservé. Le premier Code civil Napoléon, acquis récemment par le groupe, au centre de la salle → conservé, sans fait historique non validé.
 
-**B. Grande salle, vue d'accueil**
-Rotonde française (11 m de rayon) : sol en damier de marbre sable et bordeaux avec rosace gravée « LEFEBVRE DALLOZ COMPÉTENCES · CATALOGUE 2027 », murs de bibliothèques sur deux niveaux, galerie à balustres et rambarde laiton, six hautes fenêtres cintrées, dôme à caissons crème et or avec oculus, douze bougies flottantes.
-**Au centre, un pupitre** (estrade en pierre et acajou, colonne, pupitre incliné) porte un grand livre ouvert qui flotte légèrement, avec un faisceau de lumière doux : **le premier Code civil de 1804** (voir section 7). La caméra le regarde en face, une porte de chaque côté. En bas, une carte « À LA UNE · Le premier Code civil » avec deux boutons : « Découvrir l'ouvrage » et « Explorer les rayons → ».
-
-**C. Grande salle, vue des portes**
-La caméra se place de côté : une porte au centre de l'écran, le pupitre visible sur un côté. Chaque porte : encadrement en pierre à arc, deux vantaux en acajou à panneaux, vitrail demi-cercle teinté de la couleur du domaine avec son symbole (€, §, RH, QSE, ★, ✦), plaque « RAYON · nom ». Carte en bas : nom du domaine, nombre de thématiques et de formations, ★ nombre de livres repérés, bouton « Entrer dans le rayon » (ou « Rouvrir ce rayon » si filtré). Sept points de repère : un losange doré (le Code civil) puis six points colorés.
-
-**D. Passage dans un rayon**
-Les vantaux s'ouvrent en grand, la caméra avance dans la lumière, un voile sable fait la transition.
-
-**E. Rayon (une longue galerie)**
-Un rayon par domaine, cinq travées côte à côte le long d'un mur de bibliothèques à deux niveaux (galerie en hauteur, échelles roulantes, plafond à caissons, fenêtres en face, tapis aux couleurs du domaine, parquet). Chaque travée : meuble bas, vitrine en velours, plaque dorée « TRAVÉE n SUR 5 · nom de la thématique », **quatre grands livres** exposés face visible (couverture cuir du domaine, cadres dorés, médaillon, titre, format, durée, signet coloré selon le format), des centaines de dos de livres au-dessus. Sous chaque livre, une **étiquette HTML nette** (titre sur deux lignes, pastille du format, durée, ★ si recommandé). Barre du bas : « ← Grande salle » et cinq onglets numérotés pour les travées.
-
-**F. Livre ouvert**
-Un clic sur un livre de la travée centrée : il quitte l'étagère, vient devant la caméra (taille modérée), la salle s'assombrit, la couverture s'ouvre (feuillets qui tournent, page de garde à gauche, page de titre à droite), halo doré et quelques étincelles. À droite, une fiche avec deux onglets :
-- **Fiche** : format (Instant Learning, Workshop, Masterclass, Formation, Certificat), durée, niveau, objectifs, public, bouton « Ajouter à mon parcours ».
-- **France compétences** : certification visée (RNCP niveau n ou répertoire spécifique), bloc de compétences, jauge de couverture en %, liste des compétences du bloc cochées ou « à compléter », et suggestions de livres de la même travée pour couvrir le reste du bloc.
-Fermer (✕, Échap ou clic dans le vide) : le livre retourne sur son présentoir.
-
-**G. Mon parcours** (tiroir à droite)
-Liste des formations retenues, durée totale estimée, couverture de chaque bloc France compétences en barres, boutons « Copier le parcours » et « Vider ». Mémorisé dans le navigateur (localStorage).
-
-## 5. Navigation (point crucial)
-
-- **Pas de marche libre** : la caméra suit des rails, pour ne jamais perdre l'utilisateur.
-- Glisser (souris ou doigt), flèches ‹ › à l'écran, touches ← →, molette : passer du Code civil aux six portes, puis d'une porte à l'autre ; dans un rayon, d'une travée à l'autre.
-- Un clic **centre** d'abord l'élément (porte, travée), un second clic l'ouvre : aucun zoom brutal.
-- Échap ou « ← Grande salle » : revenir en arrière. Fil d'Ariane cliquable en haut. Boutons du haut : « Mes rayons » (filtre) et « Mon parcours ».
-- Adapté aux téléphones : fiche en volet du bas, caméra plus reculée en portrait.
-
-## 6. Données et logique
-
-- 6 domaines : Comptabilité, Finance & Fiscalité (« Du Chiffre ») ; Droit & Immobilier (« Du Droit ») ; RH, Paie & Social (« Des Équipes ») ; Qualité, Santé, Sécurité, Environnement (« De la Prévention ») ; Secteur public (« Du Service Public ») ; Management, Soft skills & Numérique (« De l'Humain »).
-- Chaque domaine : 5 thématiques ; chaque thématique : 4 produits ; soit **30 thématiques et 120 produits**. Ces contenus sont **illustratifs** (écrits pour la démonstration), à remplacer par le catalogue 2027 dans `data.js`.
-- Chaque thématique porte : 5 compétences, une cible France compétences (type RNCP ou RS, intitulé, niveau, bloc, 4 compétences du bloc reliées aux compétences de la thématique). Chaque produit : titre, format, durée, niveau, compétences travaillées.
-- Le **score de correspondance est calculé** : part des compétences du bloc couvertes par le produit. Les rattachements RNCP / RS sont **indicatifs**, sans numéro de fiche.
-
-## 7. Le premier Code civil (pièce maîtresse)
-
-Au centre de la Grande salle, le livre ouvert représente **le premier Code civil (1804, dit « Code Napoléon »), récemment acquis par le groupe Lefebvre Dalloz** (information fournie par le client, à ne pas enrichir sans source). Page gauche : « CODE CIVIL DES FRANÇAIS · ÉDITION ORIGINALE et seule officielle · À PARIS, DE L'IMPRIMERIE DE LA RÉPUBLIQUE · AN XII — 1804 » (libellé de la page de titre, à vérifier sur l'exemplaire réel). Page droite : « TITRE PRÉLIMINAIRE » et « LIVRE PREMIER · Des personnes », avec un texte simulé par des lignes.
-Au clic, la caméra s'approche et une fiche s'ouvre : promulgué le 21 mars 1804 ; 2 281 articles ; rédigé par une commission de 4 juristes ; rebaptisé « Code Napoléon » en 1807 ; socle du droit civil ; pièce rare des collections du groupe ; bouton « Découvrir les formations en droit » qui mène à la porte Droit & Immobilier. Les textes de présentation sont à valider avec l'éditorial et peuvent être complétés par des photos de l'exemplaire. Rôle : mettre en valeur l'image éditoriale de Lefebvre Dalloz (effet « tribunal », côté avocat et éditeur).
-
-## 8. Historique des retours du client (à respecter)
-
-Une première version a été rejetée : « trop chargée, floue, pas professionnelle, on est perdu, on ne peut pas bouger, le clic zoome trop, couleurs hors charte ». D'où : navigation guidée sur rails, rendu net, palette stricte, suppression des effets superflus. Ce que le client a aimé et veut garder : les **portes qui s'ouvrent**, le **filtre à l'entrée** (métier, besoin précis, rayons), le **sol propre** de la nouvelle version, et surtout **la table centrale avec le grand livre** (désormais le Code civil de 1804).
-
-## 9. Limites et points à valider
-
-- Contenu du catalogue fictif ; correspondance France compétences indicative.
-- Liste des métiers ciblés à confirmer ; couleurs exactes de la charte à confirmer (codes hex officiels).
-- Informations sur le Code civil (acquisition, libellé de la page de titre) à valider.
-- Le site https://formation.lefebvre-dalloz.fr/ n'a pas pu être consulté pendant la conception : l'organisation des domaines vient d'informations publiques générales.
-
-## 10. Ta mission
-
-[À COMPLÉTER. Exemples : rédiger le cahier des charges fonctionnel ; écrire le texte de présentation destiné aux équipes marketing ; préparer un plan de branchement sur le vrai catalogue 2027 et l'API France compétences ; proposer des améliorations de l'expérience ; rédiger un brief pour un prestataire 3D ; préparer un script de démonstration de 3 minutes.]
-
-Règles de réponse : réponds en français, de façon structurée et concrète ; commence par reformuler en 5 lignes ta compréhension du livrable pour que je la valide ; distingue ce qui est fait, ce qui est illustratif et ce qui reste à décider ; n'invente aucun fait sur le Code civil, sur Lefebvre Dalloz ou sur France compétences ; signale toute incohérence ou information manquante avant de produire le livrable demandé.
+## 8. Ta mission
+Selon ce que je te demande ensuite : (a) relire le livrable avec un œil de commercial LDC et lister ce qui freine un rendez-vous client ; (b) rédiger les contenus « À VALIDER » **sous forme de propositions marquées comme telles**, jamais comme faits ; (c) proposer des scénarios de pitch par métier. Réponds en français, de façon concise, et signale toute hypothèse.

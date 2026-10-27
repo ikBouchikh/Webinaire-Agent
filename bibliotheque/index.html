@@ -4,70 +4,120 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Bibliothèque des compétences · Lefebvre Dalloz Compétences</title>
+<meta name="description" content="Outil d'aide à la vente : explorer l'offre de formation 2027 de Lefebvre Dalloz Compétences, composer une sélection client.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<canvas id="gl" aria-label="La bibliothèque en 3D"></canvas>
-<div id="labels" class="labels"></div>
+<a class="skip" href="#dock">Aller à la carte du lieu</a>
+<canvas id="gl" role="img" aria-label="Scène 3D : la Grande salle et les six univers de l'offre. Toutes les actions sont aussi disponibles au clavier."></canvas>
+<div id="hotspots" class="hotspots" aria-label="Éléments de la scène"></div>
 
 <header id="top" class="top" hidden>
-  <div class="brand"><span class="wordmark">Lefebvre Dalloz<small>Compétences</small></span></div>
+  <div class="brand">
+    <span id="brandMark" class="ico" aria-hidden="true"></span>
+    <span id="brandText" class="wordmark">Lefebvre Dalloz<small>Compétences</small></span>
+  </div>
   <nav id="crumbs" class="crumbs" aria-label="Où suis-je ?"></nav>
   <div class="top-actions">
-    <button id="btnFilter" class="pill">Mes rayons</button>
-    <button id="btnJourney" class="pill pill-main">Mon parcours <span id="jCount" class="count" hidden>0</span></button>
+    <div class="seg" role="group" aria-label="Mode d'utilisation">
+      <button id="modeExplore" type="button" aria-pressed="true">Exploration</button>
+      <button id="modePitch" type="button" aria-pressed="false">Pitch guidé</button>
+    </div>
+    <button id="btnSel" class="pill pill-main" type="button" aria-haspopup="dialog">Ma sélection client <span id="selCount" class="count" hidden>0</span></button>
   </div>
 </header>
 
-<button id="navPrev" class="arrow prev" aria-label="Précédent" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg></button>
-<button id="navNext" class="arrow next" aria-label="Suivant" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 4 8 8-8 8"/></svg></button>
+<nav id="rail" class="rail railbar" aria-label="Stations de l'univers" hidden></nav>
 
-<section id="hallCard" class="dock hall-card" hidden>
-  <div id="hallDots" class="dots" role="tablist" aria-label="Les rayons"></div>
-  <p id="hcKicker" class="kicker"></p>
-  <h2 id="hcTitle"></h2>
-  <p id="hcMeta" class="meta"></p>
-  <div class="hc-actions"><button id="hcEnter" class="btn btn-primary">Entrer dans le rayon</button><button id="hcAlt" class="btn btn-ghost" hidden>Explorer les rayons →</button></div>
-</section>
+<button id="navPrev" class="arrow prev" type="button" aria-label="Précédent" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg></button>
+<button id="navNext" class="arrow next" type="button" aria-label="Suivant" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 4 8 8-8 8"/></svg></button>
 
-<section id="rayonBar" class="dock rayon-bar" hidden>
-  <button id="btnBack" class="btn btn-ghost">← Grande salle</button>
-  <div id="stepper" class="stepper" role="tablist" aria-label="Les travées"></div>
-</section>
+<div id="bottom" class="bottom" hidden>
+  <aside id="cognitio" class="cognitio" aria-label="Cognitio, guide de la visite">
+    <div class="face"><img id="cgImg" alt="Cognitio, la mascotte-guide" src="assets/cognitio/cognitio-neutre.webp" width="92" height="92"></div>
+    <div class="bubble" id="cgBubble"><p class="who"><span class="ico" aria-hidden="true"></span><b>Cognitio</b></p><p id="cgText" aria-live="polite"></p><div class="mini"><button id="cgNext" type="button" hidden>Suite ›</button><button id="cgHide" type="button">Masquer</button></div></div>
+  </aside>
+  <section id="dock" class="dock" aria-label="Lieu courant" tabindex="-1"></section>
+</div>
 
-<aside id="bookPanel" class="panel" hidden></aside>
-<aside id="journey" class="drawer" hidden aria-label="Mon parcours"></aside>
+<aside id="vision" class="panel" hidden role="dialog" aria-modal="false" aria-labelledby="visionTitle"></aside>
+<aside id="sheet" class="panel" hidden role="dialog" aria-modal="false" aria-label="Fiche"></aside>
+<aside id="selection" class="panel" hidden role="dialog" aria-modal="false" aria-labelledby="selTitle"></aside>
+<aside id="pitch" class="panel left" hidden role="dialog" aria-modal="false" aria-labelledby="pitchTitle"></aside>
 
-<section id="gate" class="gate" aria-labelledby="gateTitle">
-  <div class="gate-card">
-    <div class="g-top"><span class="wordmark">Lefebvre Dalloz<small>Compétences</small></span></div>
-    <h1 id="gateTitle">Bibliothèque des compétences</h1>
-    <p id="gateLead" class="g-lead">Un rayon par domaine, une travée par thématique, un grand livre par formation. Choisissez vos rayons : les portes s'ouvrent.</p>
-
-    <div class="g-step"><h2>Votre métier</h2><div id="personas" class="chips"></div></div>
-    <div class="g-step"><h2>Un besoin précis ?</h2>
-      <input id="needQ" class="input" type="search" placeholder="Paie, bail commercial, IA, document unique, prise de parole…" autocomplete="off" aria-label="Décrivez votre besoin">
-      <ul id="needRes" class="need-res"></ul>
+<section id="intro" class="intro" aria-labelledby="introTitle">
+  <div class="card">
+    <div class="brand"><span id="introMark" class="ico" aria-hidden="true"></span><span id="introText" class="wordmark">Lefebvre Dalloz<small>Compétences</small></span></div>
+    <h1 id="introTitle">Bibliothèque des compétences</h1>
+    <p class="lead">Une visite pour présenter la vision de Lefebvre Dalloz, partir du besoin d'un client et composer une sélection de formations, sur la base du catalogue 2027 et du référentiel ROME 4.0.</p>
+    <div class="modes">
+      <button id="goExplore" class="mode main" type="button"><b>Explorer librement</b><span>Se promener dans la Grande salle puis dans les six univers.</span></button>
+      <button id="goPitch" class="mode" type="button"><b>Pitch guidé · 3 à 5 min</b><span>Six étapes, de l'ADN à la prochaine étape.</span></button>
     </div>
-    <div class="g-step"><h2>Vos rayons <span class="g-tools"><button id="selAll" class="link">tout ouvrir</button><button id="selNone" class="link">tout fermer</button></span></h2><div id="doms" class="doms"></div></div>
-
-    <div class="g-foot">
-      <button id="enter" class="btn btn-primary">Entrer</button>
-      <button id="gateClose" class="btn btn-ghost" hidden>Fermer</button>
-      <span id="gateSum" class="g-sum"></span>
-    </div>
+    <p class="note">Fonctionne hors ligne. Rien ne quitte cet ordinateur.</p>
   </div>
 </section>
 
+<section id="trans" class="trans" aria-hidden="true">
+  <div class="stage">
+    <video id="transVideo" muted playsinline preload="auto" hidden></video>
+    <svg id="transSvg" viewBox="0 0 560 350" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="scr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4B0000"/><stop offset=".55" stop-color="#D71635"/><stop offset="1" stop-color="#FA914B"/></linearGradient>
+        <linearGradient id="pgs" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#EBDCCD"/><stop offset=".5" stop-color="#FAFAF5"/><stop offset="1" stop-color="#E1C8B4"/></linearGradient>
+      </defs>
+      <g class="t-book">
+        <rect x="160" y="150" width="240" height="160" rx="12" fill="#4B0000"/>
+        <rect x="168" y="158" width="224" height="144" rx="8" fill="url(#pgs)"/>
+        <line x1="280" y1="158" x2="280" y2="302" stroke="#CDB4A5" stroke-width="3"/>
+        <g stroke="#CDB4A5" stroke-width="3" opacity=".8"><line x1="190" y1="190" x2="262" y2="190"/><line x1="190" y1="210" x2="262" y2="210"/><line x1="190" y1="230" x2="250" y2="230"/><line x1="298" y1="190" x2="370" y2="190"/><line x1="298" y1="210" x2="370" y2="210"/></g>
+        <g class="t-cover" style="transform-origin:280px 230px;transform-box:view-box"><rect x="168" y="158" width="112" height="144" rx="8" fill="#3B0000"/><rect x="180" y="170" width="88" height="120" rx="5" fill="none" stroke="#B58A55" stroke-width="3"/></g>
+      </g>
+      <g class="t-lap">
+        <rect x="190" y="120" width="180" height="116" rx="10" fill="#1A1210"/>
+        <rect x="198" y="128" width="164" height="100" rx="5" fill="url(#scr)"/>
+        <path d="M240 140h26a4 4 0 0 1 4 4v5h5a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4h-35a4 4 0 0 1-4-4v-37a4 4 0 0 1 4-4z" fill="#FAFAF5" opacity=".9"/>
+        <path d="M170 240h220l16 22H154z" fill="#CDB4A5"/><rect x="154" y="262" width="252" height="8" rx="4" fill="#E1C8B4"/>
+      </g>
+      <g class="t-sheet">
+        <path d="M250 120h46l22 22v78a6 6 0 0 1-6 6h-62a6 6 0 0 1-6-6v-94a6 6 0 0 1 6-6z" fill="#FAFAF5" stroke="#CDB4A5" stroke-width="2"/>
+        <path d="M296 120v16a6 6 0 0 0 6 6h16z" fill="#780024"/>
+        <g stroke="#CDB4A5" stroke-width="3"><line x1="260" y1="162" x2="304" y2="162"/><line x1="260" y1="178" x2="304" y2="178"/><line x1="260" y1="194" x2="290" y2="194"/></g>
+      </g>
+    </svg>
+    <div class="cg"><img id="transCg" alt="" src="assets/cognitio/cognitio-neutre.webp"></div>
+    <p class="say" id="transSay"></p>
+  </div>
+  <button id="transSkip" class="btn btn-ghost btn-sm skipb" type="button">Passer</button>
+  <div class="prog" id="transProg"></div>
+</section>
+
+<section id="static" class="static" hidden aria-labelledby="staticTitle"></section>
+
+<div id="veil" class="veil" aria-hidden="true"></div>
 <div id="hint" class="hint" aria-live="polite"></div>
 <div id="toast" class="toast" role="status" hidden></div>
-<div id="veil" class="veil"></div>
+<div id="print" class="print" aria-hidden="true"></div>
+<noscript><p style="padding:2rem;font-family:sans-serif">Cette application nécessite JavaScript.</p></noscript>
 
 <script src="vendor/three.min.js"></script>
-<script src="data.js"></script>
-<script src="textures.js"></script>
-<script src="book.js"></script>
-<script src="scene.js"></script>
-<script src="app.js"></script>
+<script src="content/content.bundle.js"></script>
+<script src="data/catalogue.js"></script>
+<script src="data/rome4-compact.js"></script>
+<script src="data/matching-config.js"></script>
+<script src="src/core.js"></script>
+<script src="src/catalogue.js"></script>
+<script src="src/rome.js"></script>
+<script src="src/textures.js"></script>
+<script src="src/book.js"></script>
+<script src="src/scene-hall.js"></script>
+<script src="src/scene-world.js"></script>
+<script src="src/cognitio.js"></script>
+<script src="src/transition.js"></script>
+<script src="src/vision.js"></script>
+<script src="src/sheet.js"></script>
+<script src="src/selection.js"></script>
+<script src="src/pitch.js"></script>
+<script src="src/app.js"></script>
 </body>
 </html>

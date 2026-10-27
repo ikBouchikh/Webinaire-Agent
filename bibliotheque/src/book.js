@@ -32,7 +32,7 @@
     const pages = new THREE.Mesh(new THREE.BoxGeometry(w - .045, h - .03, t - .026), [edgeMat, edgeMat, edgeMat, edgeMat, faceMat, plainMat]);
     pages.position.set(.006, 0, 0);
     // bandes dorées sur le dos
-    const bandMat = new THREE.MeshStandardMaterial({ color: B.orL, metalness: .85, roughness: .35 });
+    const bandMat = new THREE.MeshStandardMaterial({ color: B.bronzeL, metalness: .85, roughness: .35 });
     [-.36, -.28, .28, .36].forEach((f) => { const b = new THREE.Mesh(new THREE.BoxGeometry(.038, .012, t + .004), bandMat); b.position.set(-w / 2 + .017, f * h, 0); inner.add(b); });
 
     const coverPivot = new THREE.Group(); coverPivot.position.set(-w / 2, 0, t / 2 - .006);
@@ -48,7 +48,7 @@
       pv.add(s); inner.add(pv); sheets.push({ pv, m });
     }
     // marque-page
-    const rib = new THREE.Mesh(new THREE.PlaneGeometry(.035, h * .34), new THREE.MeshStandardMaterial({ color: B.framboise, roughness: .7, side: THREE.DoubleSide }));
+    const rib = new THREE.Mesh(new THREE.PlaneGeometry(.035, h * .34), new THREE.MeshStandardMaterial({ color: B.red, roughness: .7, side: THREE.DoubleSide }));
     rib.position.set(.04, -h / 2 - h * .12, -t / 2 + .02);
 
     inner.add(back, spine, pages, coverPivot, rib);

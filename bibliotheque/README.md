@@ -1,43 +1,68 @@
-# Bibliothèque des compétences · Lefebvre Dalloz Compétences
+# Bibliothèque des compétences — Lefebvre Dalloz Compétences
 
-Exploration 3D du catalogue de formation : une grande bibliothèque française ancienne (rotonde à galerie, marbre, acajou, reliures cuir et or), claire et nette. **100 % locale** : double-cliquez sur `index.html` (Chrome, Edge ou Firefox récents). Three.js est embarqué dans `vendor/`, aucun réseau n'est nécessaire.
+Outil d'aide à la vente pour les commerciaux LDC : raconter la vision, partir du besoin d'un client, explorer l'offre 2027 dans une expérience 3D immersive, composer une **sélection client** exploitable.
 
-## Le premier Code civil au centre de la Grande salle
-Au cœur de la rotonde, un pupitre sur son estrade porte le **premier Code civil (1804)**, ouvert sur sa page de titre (« Code civil des Français, édition originale et seule officielle, à Paris, de l'imprimerie de la République, an XII ») : c'est la vue d'accueil de la bibliothèque, et on le retrouve de côté quand on passe de porte en porte. Un clic ouvre une fiche (promulgation du 21 mars 1804, 2 281 articles, rédaction par quatre juristes, rebaptisé « Code Napoléon » en 1807, exemplaire récemment entré dans les collections du groupe) avec un bouton vers les formations en droit. Les textes de présentation sont dans `app.js` (fonction `showCode`) et les pages dans `textures.js` (`codeTitle`, `codePage`, `codeCover`) : à valider avec l'éditorial et à compléter avec les photos de l'exemplaire.
+**Lancement** : double-cliquer sur `index.html` (Chrome, Edge, Firefox récents). Aucun serveur, aucun CDN, aucun appel réseau. Sans WebGL, une version statique simplifiée prend le relais.
 
 ## Parcours
-| Catalogue | Dans la bibliothèque |
-|---|---|
-| **Domaine** (6) | une **porte** de la Grande salle ; elle s'ouvre, on entre dans le rayon |
-| **Thématique** (5 par domaine) | une **travée** (vitrine, plaque dorée) |
-| **Produit de formation** (4 par travée) | un **grand livre** : on l'ouvre, il s'ouvre dans la lumière et sa fiche s'affiche |
-| **France compétences** | onglet du même nom dans la fiche : certification visée, bloc de compétences, % couvert, livres à ajouter pour compléter le bloc |
 
-## Navigation (volontairement simple)
-Pas de marche libre : la caméra suit des rails.
-- **Glisser** (souris ou doigt), **flèches ‹ ›** à l'écran, **← →** au clavier ou **molette** : passer du Code civil aux six portes, puis d'une porte à l'autre, d'une travée à l'autre.
-- **Clic** sur une porte ou un livre : on le centre d'abord, un second clic l'ouvre. Aucun zoom brutal.
-- **Échap** ou le bouton « ← Grande salle » : on revient en arrière.
-- **Mes rayons** (en haut) : rouvrir le filtre à tout moment. **Mon parcours** : formations retenues, durée totale, couverture des blocs France compétences, copie du parcours.
+1. **Grande salle** (monde 1, bibliothèque française ancienne) : au centre, à égalité, *le premier Code civil* (Droit, Édition) et *Le Grand Livre du Chiffre* (la table des décisions). Six portes, une par univers.
+2. **Code civil** → expérience en trois temps *Notre origine · Notre vision · Notre offre* — « De l'expertise éditoriale à l'action professionnelle » — avec quatre actions : Découvrir notre approche · Explorer nos domaines · Construire une réponse client · Découvrir l'offre Droit.
+3. **Une porte** → transition narrative (livre → ordinateur → feuille → Cognitio) puis **monde 2** : salle contemporaine, installation d'accueil de l'univers, une station par domaine (en-tête + vitrine de quatre produits), liste complète, fiche produit.
+4. **Fiche produit** à quatre onglets : *Pour quel besoin ? · Notre réponse · Compétences ROME 4 · Argumentaire commercial*. Action principale : *Ajouter à la sélection client*.
+5. **Ma sélection client** : besoin, produits retenus, durée, formats, compétences ROME 4, argument principal, produits complémentaires ; copier, imprimer, réinitialiser ; conservée dans le navigateur.
+6. **Pitch guidé** (3 à 5 min) : ADN → besoin client → domaine → compétences → sélection → prochaine étape.
 
-## Filtrer dès l'entrée
-1. **Votre métier** : 10 profils (liste à valider, voir plus bas) qui ouvrent les bons rayons.
-2. **Un besoin précis** : saisie libre (« paie », « bail », « IA »…) ; les rayons utiles s'ouvrent, les livres repérés portent une étoile.
-3. **Vos rayons** : ouvrir ou fermer chaque domaine ; les portes se referment ou s'entrouvrent en direct.
+**Cognitio** (la mascotte) guide la visite avec des répliques scénarisées. Ce n'est pas un modèle de langage ; le fournisseur est remplaçable (`LDC.cognitio.provider`) pour brancher une API plus tard.
 
-## Brancher le vrai catalogue
-Tout part de **`data.js`** : domaines → thématiques → produits, avec la cible France compétences de chaque thématique. Rayons, travées, livres et « match » se reconstruisent seuls. Le contenu actuel (6 domaines, 30 thématiques, 120 produits) est **illustratif**, et les rattachements RNCP / RS sont **indicatifs** (pas de numéros de fiche).
+## Règles de contenu
 
-```js
-T('Paie', ['Établir un bulletin de paie', …],                                   // compétences de la thématique
-  FC('RNCP', 'Gestionnaire de paie', 5, 'Réaliser la paie et les déclarations sociales',
-     [['Établir les bulletins de paie', [0, 1]], …]),                           // bloc : compétence ↔ indices ci-dessus
-  [['Paie : les fondamentaux', 'FO', '3 jours', 'Fondamental', [0, 3]], …])     // produits : titre, format, durée, niveau, compétences
+- **Rien n'est inventé.** Produits, durées, niveaux, formats, certifications : base produits 2027. Compétences : ROME 4.0 (identifiants, libellés, types officiels, jamais déduits d'un titre). France compétences (RS / RNCP) reste séparé de ROME 4.
+- **Donnée manquante → emplacement « À VALIDER »**, centralisé dans `content/` (voir `docs/A_VALIDER.md`).
+- Tarifs et noms de collaborateurs ne sont jamais chargés dans le navigateur.
+
+## Arborescence
+
 ```
-Les **métiers** de départ sont dans `L.PERSONAS` (même fichier) : ils reprennent les grands segments du catalogue public (directions financières et fiscales, directions juridiques, banque et assurance, immobilier, RH et social, QSE, secteur public, management). À remplacer par vos cibles réelles.
+index.html            squelette, panneaux, transition, repli sans WebGL
+style.css             charte (jetons, IBM Plex, composants, mobile, impression, mouvement réduit)
+src/                  modules (scripts classiques, compatibles file://)
+  core.js             espace de noms, état local, panneaux, utilitaires
+  catalogue.js        index produits, six mondes, stations, vitrines, lots, certifications
+  rome.js             ROME 4.0 : accès, recherche, rattachements validés, correspondance explicable
+  textures.js         matières et visuels dessinés en canvas (aucune image)
+  book.js             livre 3D qui s'ouvre (Code civil, Grand Livre)
+  scene-hall.js       monde 1 : Grande salle, portes, Code civil, Grand Livre du Chiffre
+  scene-world.js      monde 2 : kit de salle contemporaine + six installations
+  cognitio.js         guide scénarisé
+  transition.js       séquence porte → univers (vidéo locale / procédurale / courte / réduite)
+  vision.js           expérience du Code civil en trois temps
+  sheet.js            liste d'une station + fiche produit à quatre onglets
+  selection.js        « Ma sélection client »
+  pitch.js            Pitch guidé en six étapes
+  app.js              orchestrateur : caméra, rails, entrée, clavier, boucle de rendu
+content/*.json        textes et configuration éditables (domaines, vision, Cognitio, pitch, transition, marque, ROME, commercial)
+content/content.bundle.js   agrégat généré (file:// ne sait pas lire du JSON)
+data/                 catalogue.js, rome4-compact.js/.json (générés), matching-config.js (pondérations)
+assets/               fonts (IBM Plex, OFL), cognitio (7 variantes), brand/ et transition/ (emplacements)
+tools/build-data.py   génère data/ et content.bundle.js, contrôle l'intégrité
+tests/                tests Playwright (voir docs/TESTS.md)
+docs/                 AUDIT.md, A_VALIDER.md, ARCHITECTURE.md, TESTS.md
+vendor/three.min.js   Three.js r149 (inclus)
+```
 
-## Charte
-Variables en tête de `style.css` (sable, bordeaux, framboise, pêche) et de `textures.js` (`C`), couleurs des domaines dans `data.js`. Les valeurs sont relevées sur les visuels de charte transmis ; pour les figer, remplacez-les par les codes exacts. Couvertures, plaques et marbres sont dessinés en canvas : aucun fichier image.
+## Mettre à jour les données
 
-## Fichiers
-`index.html` · `style.css` · `data.js` (catalogue) · `textures.js` (matières, couvertures) · `book.js` (le livre) · `scene.js` (Grande salle, rayons) · `app.js` (navigation, filtre, fiche, parcours) · `vendor/three.min.js` (Three.js r149, MIT).
+```
+python3 tools/build-data.py --produits Base_produits_2027_*.xlsx --rome ROME4_*_Vue_Consolidee.xlsx
+```
+
+(les fichiers peuvent aussi être déposés dans `sources/`, non versionné). Le script échoue si un identifiant ROME, un libellé ou un code produit cité dans `content/` n'existe pas ou diffère du référentiel. Il détecte aussi le logo, le symbole et la vidéo de transition s'ils sont déposés dans `assets/`.
+
+## Navigation
+
+Souris / tactile : glisser pour passer d'une porte ou d'une station à l'autre, cliquer pour ouvrir. Clavier : `←` `→` pour les rails, `Tab` pour atteindre les éléments de la scène (portes, produits), `Entrée` pour ouvrir, `Échap` pour fermer / revenir. Mouvement réduit : les animations deviennent des fondus brefs.
+
+## Mode débogage
+
+`index.html?debug=1` expose `LDC.debug` (tests) ; `&fast=5` accélère les animations ; `&go=explore` ou `&go=pitch` saute l'écran d'accueil ; `?nogl` force la version statique ; `?reduce` simule le mouvement réduit.

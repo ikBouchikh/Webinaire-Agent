@@ -2,7 +2,7 @@
   "_meta": {
     "statut": "A_VALIDER",
     "note": "Textes de guidage de Cognitio (micro-copie scénarisée). Aucune donnée commerciale n'est affirmée ici : les chiffres et libellés sont injectés depuis le catalogue ({n}, {domaine}…). Cognitio guide ; elle n'est jamais présentée comme experte omnisciente. Pas d'appel à un modèle de langage : un futur fournisseur API peut remplacer le fournisseur scénarisé (voir src/cognitio.js, Cognitio.provider).",
-    "variables": ["univers", "promesse", "domaine", "n", "produit", "monde"]
+    "variables": ["univers", "universL", "promesse", "domaine", "n", "produit", "monde"]
   },
   "lignes": {
     "hall.accueil": ["Bonjour, je suis Cognitio. Je vous guide dans cette salle : ici, l'édition, le droit et le chiffre se rencontrent.", "Ouvrez le Code civil pour découvrir notre vision, ou choisissez une porte pour entrer dans un univers."],
@@ -12,8 +12,8 @@
     "vision.origine": ["Tout part du patrimoine éditorial et de l'expertise humaine."],
     "vision.vision": ["Notre vision tient en une phrase : transformer des savoirs fiables en capacités professionnelles activables."],
     "vision.offre": ["Voici l'offre 2027, telle qu'elle figure au catalogue : {n} produits répartis en six univers."],
-    "transition.monde": ["Je vous accompagne : entrons dans {univers}."],
-    "monde.arrivee": ["Bienvenue dans {univers}. {promesse}", "Faites défiler les stations, ou ouvrez une fiche pour voir ce que le catalogue en dit."],
+    "transition.monde": ["Je vous accompagne : entrons dans {universL}."],
+    "monde.arrivee": ["Bienvenue dans {universL}. {promesse}", "Faites défiler les stations, ou ouvrez une fiche pour voir ce que le catalogue en dit."],
     "monde.station": ["{domaine} : {n} produits au catalogue. Les vitrines affichent d'abord ceux marqués BEST."],
     "fiche.ouverte": ["Voici ce que le catalogue indique pour ce produit. Les éléments marqués « À VALIDER » attendent une validation de l'offre."],
     "fiche.rome.vide": ["Le rattachement de ce produit aux compétences ROME 4 n'est pas encore validé. Je ne déduis jamais une compétence d'un titre."],
