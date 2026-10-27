@@ -148,9 +148,10 @@ body.has-panel .dock{display:none}
 .note{font-size:.78rem;color:var(--muted)}
 .empty-av{background:var(--ocre-soft);border:1px dashed var(--ocre-deep);border-radius:12px;padding:.7rem .85rem;font-size:.88rem;color:var(--ocre-ink)}
 .empty-av b{display:block;margin-bottom:.15rem}
-.tabs{display:flex;gap:.2rem;border-bottom:1.5px solid var(--line);margin:.6rem 0 .9rem;overflow-x:auto;scrollbar-width:none}
-.tabs button{flex:none;background:none;border:0;border-bottom:3px solid transparent;padding:.5rem .55rem;margin-bottom:-1.5px;font-weight:600;font-size:.86rem;color:var(--muted)}
-.tabs button[aria-selected="true"]{color:var(--red-ink);border-color:var(--accent)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;margin:.6rem 0 .9rem}
+.tabs button{background:var(--clay-3);border:1.5px solid transparent;border-radius:10px;padding:.5rem .6rem;font-weight:600;font-size:.84rem;color:var(--red-ink);text-align:left;min-height:40px}
+.tabs button:hover{background:var(--clay-4)}
+.tabs button[aria-selected="true"]{background:var(--red-ink);color:#fff}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin:.4rem 0 1rem}.grid3>div{background:var(--clay-3);border-radius:10px;padding:.45rem .65rem}
 .grid3 dt{font:500 .62rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.grid3 dd{margin:0;font-weight:600;font-size:.9rem;color:var(--red-ink)}
 .list{margin:0;padding-left:1.1rem}.list li{margin:.25rem 0}

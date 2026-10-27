@@ -36,3 +36,34 @@ Voir `docs/A_VALIDER.md` (13 lignes) : champs commerciaux, mapping ROME, moments
 ## 5. Dette technique
 
 Voir `docs/ARCHITECTURE.md` (§ Dette technique). Principale : `app.js` (≈ 430 lignes) à scinder si l'application grossit ; pas de comparaison automatique d'images.
+
+## 6. Suivi des écarts de l'audit (docs/AUDIT.md)
+
+| Catégorie | Écarts | État |
+|---|---|---|
+| 1. Finalité commerciale | 1.1 à 1.6 | Corrigés : mode Pitch, sélection client, fiche à 4 onglets, vision en 3 temps. **Contenus commerciaux : emplacements « À VALIDER »** (non fournis). |
+| 2. Piliers | 2.1 à 2.3 | Corrigés : Chiffre à égalité avec le Code civil ; six portes = six univers issus des 37 domaines FORMEO (regroupement à valider). L'Édition n'a pas de pièce propre : portée par le Code civil (« Droit · Édition »). |
+| 3. Transition | 3.1 à 3.3 | Corrigés : séquence narrative, version courte, Passer, mouvement réduit. **Vidéo** : emplacement prêt, fichiers non fournis. |
+| 4. Cognitio | 4.1, 4.2 | Corrigés : composant scripté, sept variantes, fournisseur remplaçable. |
+| 5. Charte | 5.1 à 5.6 | Corrigés : IBM Plex, palette PDF, forme récurrente, halos et flammes supprimés, dégradés réservés aux écrans. **Logo / symbole officiels non fournis.** |
+| 6. ROME 4 | 6.1 à 6.4 | Corrigés : référentiel intégré, rattachements validés uniquement, correspondance expliquée, France compétences séparé. **Aucun rattachement fourni.** |
+| 7. UX | 7.1 à 7.7 | Corrigés : accès clavier, panneaux accessibles, mouvement réduit, repli sans WebGL, contrastes, mobile. Panneau unique à droite. |
+| 8. Technique | 8.1 à 8.5 | Corrigés : modules, pipeline de données avec validation, contenus hors code, tests ; `LDC.debug` uniquement avec `?debug`. |
+
+## 7. Critères d'acceptation du brief
+
+| # | Critère | État |
+|---|---|---|
+| 1 | Droit, Édition et Chiffre compris rapidement | Atteint (pièces centrales + carte « Droit, édition, chiffre »). À confronter à un regard neuf. |
+| 2 | Le Code civil présente vision et offre | Atteint (3 étapes, 4 CTA), textes À VALIDER. |
+| 3 | Transition mémorable | Atteint en version procédurale ; la vidéo reste à fournir. |
+| 4 | Cognitio guide en continu | Atteint. |
+| 5 | Changement d'ambiance réel après la porte | Atteint (microciment, bois clair, mur-écran, installation propre). |
+| 6 | Conforme à la charte | Atteint sauf logo / symbole officiels. |
+| 7 | Mondes tactiles, chaleureux, high-tech | Atteint ; habillage plus riche possible. |
+| 8 | Un commercial peut pitcher | Atteint sur le cadre ; l'argumentaire attend les contenus validés. |
+| 9 | Correspondance ROME exacte et traçable | Moteur atteint et testé ; données de rattachement manquantes. |
+| 10 | France compétences séparé de ROME | Atteint. |
+| 11 | Entièrement hors ligne | Atteint (aucune requête réseau dans tous les tests). |
+| 12 | Rien d'inventé | Atteint (tout manque est un encart À VALIDER). |
+| 13 | Clair, fluide, professionnel | Clair et professionnel : atteint. **Fluidité : à confirmer sur GPU réel.** |

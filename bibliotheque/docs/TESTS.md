@@ -23,3 +23,19 @@ NODE_PATH=<node_modules de playwright> bash tests/run-all.sh
 - La **fluidité réelle** (60 images/s) ne peut pas être mesurée ici ; elle est à confirmer sur un poste commercial type.
 - Les captures d'écran sont écrites dans le dossier `OUT` : elles servent à la relecture visuelle, il n'y a pas de comparaison d'images automatique.
 - Le **mapping ROME de test** n'existe que dans la copie temporaire : aucun rattachement n'est livré tant que l'offre n'a pas validé les siens.
+
+## Résultats de la dernière exécution (2026-10-27, Chromium + rendu WebGL logiciel, file://)
+
+| Suite | Résultat |
+|---|---|
+| Données : contrôle d'intégrité (`rome_fixture.py`) | 6 / 6 |
+| Moteur ROME 4 (`rome-match.js`, copie avec mapping de test) | 16 / 16 + console propre |
+| Parcours principal (`e2e-core.js`) | 32 / 32 |
+| Pitch guidé (`e2e-pitch.js`) | 21 / 21 |
+| Mouvement réduit, Passer, version courte, Échap (`e2e-modes.js`, parties 1 et 2) | 5 / 5 et 12 / 12 |
+| Version statique sans WebGL (`e2e-modes.js`, partie 3) | 20 / 20 |
+| Mobile 390 × 844 tactile (`e2e-mobile.js`) | 9 / 9 |
+
+Dans chaque suite : console sans erreur et **aucune requête réseau**.
+
+Ce qui n'est **pas** couvert : fluidité sur GPU réel, lecteurs d'écran (les rôles et noms accessibles sont posés, pas écoutés), Safari et Firefox (seul Chromium est piloté), vidéo de transition réelle (fichiers non fournis : le chemin « vidéo » n'est pas exécuté), impression papier (seule la feuille imprimable est vérifiée).
