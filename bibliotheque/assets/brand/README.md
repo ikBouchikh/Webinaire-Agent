@@ -1,8 +1,9 @@
-# Identité de marque (emplacements)
+# Identité de marque
 
-Fichiers attendus (non fournis à ce jour — À VALIDER) :
+Fichiers officiels fournis le 28/10/2026 (PNG sur fond transparent) :
 
-- `logo-ldc.svg` : logo officiel Lefebvre Dalloz Compétences (version corporate).
-- `symbole-jl.svg` : symbole JL officiel (forme récurrente de la charte).
+- `logo-ldc-competences.png` : logo Lefebvre Dalloz Compétences, noir avec le filet orange (1600 × 568). À utiliser sur les fonds clairs.
+- `symbole-jl-blanc.png` : symbole JL blanc seul (628 × 628). À utiliser sur les fonds bleus ou sombres (passage, Studio).
 
-Dès qu'ils sont déposés ici, relancer `python3 tools/build-data.py` : l'en-tête les utilise à la place du repère générique.
+Pas de version vectorielle à ce jour : si elle existe, la déposer ici (`logo-ldc-competences.svg`, `symbole-jl.svg`) pour remplacer les PNG.
+Ces fichiers ne sont pas encore branchés dans l'interface (l'en-tête affiche toujours l'ancien repère) : ils le seront au lot A de la proposition V5 (`docs/PROPOSITION_V5.md`).
