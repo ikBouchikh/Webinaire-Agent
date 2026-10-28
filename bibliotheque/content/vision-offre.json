@@ -46,18 +46,18 @@
     },
     {
       "id": "domaines",
-      "libelle": "Explorer nos domaines",
+      "libelle": "Explorer les portes",
       "cible": "salle"
-    },
-    {
-      "id": "client",
-      "libelle": "Construire une réponse client",
-      "cible": "pitch"
     },
     {
       "id": "droit",
       "libelle": "Découvrir l'offre Droit",
       "cible": "monde:droit"
+    },
+    {
+      "id": "chiffre",
+      "libelle": "Découvrir l'offre Chiffre",
+      "cible": "monde:chiffre"
     }
   ],
   "codeCivil": {
@@ -83,6 +83,6 @@
     "sousTitre": "La table des décisions",
     "legende": "La mesure, la performance, l'analyse et l'arbitrage.",
     "statut": "A_VALIDER",
-    "note": "Installation symbolique contemporaine : aucun objet historique, aucun chiffre réel. Intitulé provisoire."
+    "note": "Installation symbolique contemporaine, utilisée dans l'univers Chiffre (plus dans la Grande salle) : aucun objet historique, aucun chiffre réel. Intitulé provisoire."
   }
 }

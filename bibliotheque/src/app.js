@@ -1,6 +1,6 @@
-/* Orchestrateur : entrée, Grande salle (poses de caméra sur rails), pièces centrales, passage vers un univers
-   (transition narrative), rails de stations, points d'accès clavier, modes Exploration / Pitch guidé, repli sans WebGL.
-   Les contenus viennent des modules (catalogue, rome, vision, sheet, selection, pitch) : ce fichier ne contient ni texte
+/* Orchestrateur : Grande salle (poses de caméra sur rails), Code civil, passage vers un univers (transition narrative),
+   échelle des six portes, points d'accès clavier, repli sans WebGL.
+   Les contenus viennent des modules (catalogue, rome, vision, sheet, selection) : ce fichier ne contient ni texte
    commercial ni donnée produit. */
 
 (function () {
@@ -8,17 +8,10 @@
   const L = window.LDC, S = L.S, T = L.tex, cat = L.cat, PI = Math.PI;
   const $ = L.$, $$ = L.$$, esc = L.esc, clamp = L.clamp, lerp = L.lerp, ease = L.ease, mod = L.mod;
   THREE.ColorManagement.legacyMode = false;
-  const STEP = PI / 3, MONDES = cat.mondes;
+  const STEP = PI / 3, MONDES = cat.mondes, N = MONDES.length;
 
   /* ---------- modules d'interface ---------- */
-  L.cognitio.init(); L.transition.init(); L.vision.init(); L.sheet.init(); L.selection.init(); L.pitch.init();
-  const BR = L.content('brand');
-  const setBrand = (mark, text) => {
-    if (BR.logo && BR.logo.disponible) { text.innerHTML = `<img src="${esc(BR.logo.svg)}" alt="${esc(BR.nom)}" style="height:2.2rem;display:block">`; mark.hidden = true; }
-    else if (BR.symbole && BR.symbole.disponible) mark.innerHTML = `<img src="${esc(BR.symbole.svg)}" alt="" style="width:100%">`;
-    else mark.innerHTML = L.ICON_SVG;
-  };
-  setBrand($('#brandMark'), $('#brandText')); setBrand($('#introMark'), $('#introText'));
+  L.cognitio.init(); L.transition.init(); L.vision.init(); L.sheet.init(); L.selection.init();
 
   /* ---------- petits outils ---------- */
   let hintT = 0; const hinted = {};
@@ -27,6 +20,7 @@
   const wait = (ms) => new Promise((r) => setTimeout(r, L.reduced() ? Math.min(ms, 30) : ms));
   const tw = [];
   const tween = (ms, fn) => new Promise((res) => { if (L.reduced()) ms = Math.min(ms, 60); tw.push({ t: 0, d: ms / 1000, fn, res }); });
+  const stationWord = (m) => (m.stationNiveau === 'theme' ? 'thème' : 'domaine');
 
   /* ====================================================================================== */
   /*  Repli sans WebGL : version statique simplifiée                                         */
@@ -38,29 +32,22 @@
     try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' }); } catch (e) { renderer = null; }
   }
   const staticMode = () => {
-    canvas.hidden = true; $('#top').hidden = false; $('#intro').classList.remove('show'); $('#bottom').hidden = false; $('#dock').hidden = true;
-    $('#modeExplore').hidden = true;
+    canvas.hidden = true; $('#top').hidden = false; $('#bottom').hidden = false; $('#dock').hidden = true; veil(false);
     const root = $('#static'); root.hidden = false;
-    root.innerHTML = `<h1 id="staticTitle">Bibliothèque des compétences</h1>
+    root.innerHTML = `<h1 id="staticTitle">L'offre de formation 2027</h1>
       <p class="lead">Version simplifiée sans 3D : votre navigateur n'affiche pas WebGL. Toutes les fonctions de présentation restent disponibles.</p>
-      <div class="chips"><button class="btn btn-primary btn-sm" type="button" data-s="vision">Découvrir notre vision</button><button class="btn btn-ghost btn-sm" type="button" data-s="pitch">Pitch guidé</button></div>
-      <div class="grid">${MONDES.map((m) => `<article class="mc" style="--c:${m.accentCfg.main}"><h2>${esc(m.nom)}</h2><p class="u">${esc(m.univers)}</p><p>${esc(m.promesse)}</p><p class="note">${m.n.toLocaleString('fr-FR')} produits · ${m.stations.length} ${L.plural(m.stations.length, 'station')}</p><div class="sts">${m.stations.map((s, i) => `<button class="chip" type="button" data-m="${m.k}" data-st="${i}">${esc(s.code)} · ${esc(s.nom)}</button>`).join('')}</div></article>`).join('')}</div>`;
+      <div class="chips"><button class="btn btn-primary btn-sm" type="button" data-s="vision">Découvrir notre vision</button></div>
+      <div class="grid">${MONDES.map((m) => `<article class="mc" style="--c:${m.accentCfg.main}"><h2><span class="rm">${L.roman(m.ordre)}</span> · ${esc(m.nom)}</h2><p class="u">${esc(m.univers)}</p><p>${esc(m.promesse)}</p><p class="note">${m.n.toLocaleString('fr-FR')} produits · ${m.stations.length} ${L.plural(m.stations.length, stationWord(m))}</p><div class="sts">${m.stations.map((s, i) => `<button class="chip" type="button" data-m="${m.k}" data-st="${i}">${esc(s.code)} · ${esc(s.nom)}</button>`).join('')}</div></article>`).join('')}</div>`;
     root.addEventListener('click', (e) => {
       const b = e.target.closest('button'); if (!b) return;
-      if (b.dataset.s === 'vision') L.vision.open(0); else if (b.dataset.s === 'pitch') { L.pitch.open(1); setModeUI('pitch'); }
+      if (b.dataset.s === 'vision') L.vision.open(0);
       else if (b.dataset.m) { const st = MONDES[+b.dataset.m].stations[+b.dataset.st]; L.cognitio.setImage(L.cognitio.imageFor(MONDES[+b.dataset.m], st)); L.sheet.openStation(st); }
     });
-    L.vision.onCta = (c) => { if (c.cible === 'pitch') { L.vision.close(); L.pitch.open(1); setModeUI('pitch'); } else if (c.cible === 'etape:vision') L.vision.go(1); else { L.vision.close(); const m = c.cible.startsWith('monde:') ? cat.mondeById[c.cible.slice(6)] : null; if (m) L.sheet.openStation(m.stations[0]); } };
-    L.pitch.hooks.quit = () => { L.pitch.close(); setModeUI('explore'); };
-    L.pitch.hooks.code = () => L.vision.open(0);
-    L.pitch.hooks.enter = (id) => L.sheet.openStation(cat.mondeById[id].stations[0]);
-    L.pitch.hooks.station = (id, i) => L.sheet.openStation(cat.mondeById[id].stations[i]);
+    L.vision.onCta = (c) => { if (c.cible === 'etape:vision') L.vision.go(1); else { L.vision.close(); const m = c.cible.startsWith('monde:') ? cat.mondeById[c.cible.slice(6)] : null; if (m) L.sheet.openStation(m.stations[0]); } };
     $('#crumbs').innerHTML = '<span class="crumb cur">Version simplifiée</span>';
-    L.cognitio.say('hall.accueil');
-    $('#modePitch').addEventListener('click', () => { if (L.pitch.isOpen()) { L.pitch.close(); setModeUI('explore'); } else { L.pitch.open(1); setModeUI('pitch'); } });
+    document.body.classList.add('in-hall'); $('#cognitio').hidden = true;
+    document.documentElement.dataset.ready = '1';
   };
-  const setModeUI = (m) => { $('#modeExplore').setAttribute('aria-pressed', m === 'explore'); $('#modePitch').setAttribute('aria-pressed', m === 'pitch'); };
-  L.pitch.onMode = (on) => setModeUI(on ? 'pitch' : 'explore');
   if (!renderer) { staticMode(); L.debug = L.params.debug ? { static: true } : undefined; return; }
 
   /* ====================================================================================== */
@@ -71,16 +58,16 @@
   renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.NoToneMapping;
   renderer.shadowMap.enabled = false;
   T.aniso = Math.min(16, renderer.capabilities.getMaxAnisotropy());
-  const scene = new THREE.Scene(); scene.background = new THREE.Color('#3B1A16'); scene.environment = S.makeEnv(renderer);
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#0A1B28'); scene.environment = S.makeEnv(renderer);
   const camera = new THREE.PerspectiveCamera(48, 1, .1, 120); camera.rotation.order = 'YXZ'; scene.add(camera);
-  const dimPlane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: '#2A0A08', transparent: true, opacity: 0, depthWrite: false })); dimPlane.position.z = -4.5; dimPlane.visible = false; camera.add(dimPlane);
+  const dimPlane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: '#06141E', transparent: true, opacity: 0, depthWrite: false })); dimPlane.position.z = -4.5; dimPlane.visible = false; camera.add(dimPlane);
 
   let hall = null, world = null, cur = null;
   let view = 'boot', busy = false, time = 0, camOverride = null, hallMode = 'home', piece = null, curK = 0;
   let lastPose = { x: 0, y: 2.4, z: 7, yaw: 0, pitch: 0 }, retPose = null, retMode = 'home';
   const H = { a: 0, tgt: 0 }, X = { x: 0, tgt: 0 }, par = { x: 0, y: 0, tx: 0, ty: 0 };
   const portrait = () => camera.aspect < .9;
-  const hallIdx = () => mod(Math.round((S.DOOR0 - H.tgt) / STEP), 6);
+  const hallIdx = () => mod(Math.round((S.DOOR0 - H.tgt) / STEP), N);
   const angFor = (k) => { const b = S.doorPhi(k); return b + Math.round((H.tgt - b) / (PI * 2)) * PI * 2; };
   const angDiff = (a, b) => ((b - a + PI * 3) % (PI * 2)) - PI;
   const railIdx = () => { let b = 0; world.P.forEach((x, i) => { if (Math.abs(x - X.tgt) < Math.abs(world.P[b] - X.tgt)) b = i; }); return b; };
@@ -88,14 +75,14 @@
   /* ---------- poses de caméra ---------- */
   const HOME = () => (portrait() ? { x: 0, y: 2.6, z: 9.6, yaw: 0, pitch: -.02 } : { x: 0, y: 2.3, z: 7.0, yaw: 0, pitch: -.04 });
   const orbitPose = (t) => { const a = t * .08 + 2.6; return { x: 6.6 * Math.sin(a), y: 2.4, z: 6.6 * Math.cos(a), yaw: a, pitch: -.03 }; };
-  /* Porte vue du même côté de la salle, de biais : les pièces centrales restent derrière la caméra. */
+  /* Porte vue du même côté de la salle, de biais : le Code civil reste derrière la caméra. */
   const doorPose = (a) => { const ang = a + .5, x = 6.6 * Math.sin(ang), z = 6.6 * Math.cos(ang), y = 2.4, dx = S.HR * Math.sin(a) - x, dz = S.HR * Math.cos(a) - z; return { x, y, z, yaw: Math.atan2(-dx, -dz), pitch: Math.atan2(3.0 - y, Math.hypot(dx, dz)) }; };
   const lerpPose = (a, b, e) => ({ x: lerp(a.x, b.x, e), y: lerp(a.y, b.y, e), z: lerp(a.z, b.z, e), yaw: a.yaw + angDiff(a.yaw, b.yaw) * e, pitch: lerp(a.pitch, b.pitch, e) });
-  /* Trajet en arc de cercle autour des pièces centrales (jamais à travers). */
+  /* Trajet en arc de cercle autour du Code civil (jamais à travers). */
   const orbitLerp = (a, b, e) => { const ra = Math.hypot(a.x, a.z), rb = Math.hypot(b.x, b.z), ta = Math.atan2(a.x, a.z), tb = ta + angDiff(ta, Math.atan2(b.x, b.z)), r = lerp(ra, rb, e), t = lerp(ta, tb, e); return { x: r * Math.sin(t), y: lerp(a.y, b.y, e), z: r * Math.cos(t), yaw: a.yaw + angDiff(a.yaw, b.yaw) * e, pitch: lerp(a.pitch, b.pitch, e) }; };
-  const piecePose = (B, big) => {
+  const piecePose = (B) => {
     const cp = lastPose; let dx = cp.x - B.x, dz = cp.z - B.z; const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
-    const narrow = innerWidth < 900, d = (portrait() ? 5.6 : 3.6) + (big ? 1.2 : 0), P = { x: B.x + dx * d, y: B.y - .1, z: B.z + dz * d }, sh = narrow ? 0 : 1.1;
+    const narrow = innerWidth < 900, d = portrait() ? 5.6 : 3.6, P = { x: B.x + dx * d, y: B.y - .1, z: B.z + dz * d }, sh = narrow ? 0 : 1.1;
     const A = { x: B.x + dz * sh, y: B.y + (narrow ? -1.0 : 0), z: B.z - dx * sh }, ddx = A.x - P.x, ddz = A.z - P.z;
     return { x: P.x, y: P.y, z: P.z, yaw: Math.atan2(-ddx, -ddz), pitch: Math.atan2(A.y - P.y, Math.hypot(ddx, ddz)) };
   };
@@ -104,24 +91,29 @@
   const placeCamera = () => {
     let p;
     if (camOverride) p = camOverride;
-    else if (cur.kind === 'hall') p = view === 'intro' ? (L.reduced() ? HOME() : orbitPose(time)) : hallMode === 'home' ? HOME() : doorPose(H.a);
+    else if (cur.kind === 'hall') p = hallMode === 'home' ? HOME() : doorPose(H.a);
     else { const b = L.clamp01(X.x / S.WORLD_SP), a = ease(b); p = { x: X.x, y: lerp(2.9, 1.5, a), z: S.WORLD_Z0 + camDist() + lerp(portrait() ? 3.2 : 2.6, 0, a), yaw: 0, pitch: lerp(-.28, .04, a) }; }
     lastPose = p; const k = L.reduced() ? 0 : 1;
     camera.position.set(p.x, p.y, p.z); camera.rotation.set(p.pitch - par.y * .02 * k, p.yaw - par.x * .03 * k, 0);
   };
 
   /* ====================================================================================== */
-  /*  Lieux : fil d'Ariane, carte du lieu (dock), points d'accès                              */
+  /*  Lieux : fil d'Ariane, carte du lieu avec l'échelle des portes, points d'accès           */
   /* ====================================================================================== */
 
   const crumbs = () => {
     const el = $('#crumbs'), parts = [];
     if (view === 'world' || (view === 'trans' && world && cur === world)) { const m = world.monde, i = railIdx(); parts.push({ t: 'Grande salle', fn: leaveWorld }); if (i === 0) parts.push({ t: m.nom, cur: true }); else parts.push({ t: m.nom, fn: () => goRail(0) }, { t: world.stations[i - 1].st.nom, cur: true }); }
-    else if (piece) parts.push({ t: 'Grande salle', fn: () => returnFromPiece() }, { t: piece === 'code' ? 'Le premier Code civil' : 'Le Grand Livre du Chiffre', cur: true });
+    else if (piece) parts.push({ t: 'Grande salle', fn: () => returnFromPiece() }, { t: 'Le premier Code civil', cur: true });
     else if (hallMode === 'doors') parts.push({ t: 'Grande salle', fn: () => hallTo('home') }, { t: MONDES[hallIdx()].nom, cur: true });
     else parts.push({ t: 'Grande salle', cur: true });
     el.innerHTML = ''; parts.forEach((p, i) => { if (i) { const s = document.createElement('span'); s.className = 'sep'; s.setAttribute('aria-hidden', 'true'); s.textContent = '›'; el.appendChild(s); } const b = document.createElement(p.fn ? 'button' : 'span'); if (p.fn) b.type = 'button'; b.className = 'crumb' + (p.cur ? ' cur' : '') + (p.fn ? ' lk' : ''); if (p.cur) b.setAttribute('aria-current', 'page'); b.textContent = p.t; if (p.fn) b.addEventListener('click', p.fn); el.appendChild(b); });
   };
+
+  /* L'échelle : le lieu d'origine (Code civil ou Grande salle) puis les six portes, dans l'ordre I à VI. */
+  const ladder = (curDoor, homeLabel, homeAct) => `<div class="ladder" role="group" aria-label="Les six portes">
+    <button class="lad home" type="button" data-d="${homeAct}" aria-label="${esc(homeLabel)}" ${curDoor < 0 ? 'aria-current="true"' : ''}><i>◆</i><span>${esc(homeLabel)}</span></button>
+    ${MONDES.map((m, i) => `<button class="lad" type="button" data-d="door" data-k="${i}" style="--c:${m.accentCfg.main}" aria-label="Porte ${L.roman(m.ordre)} : ${esc(m.nom)}" ${i === curDoor ? 'aria-current="true"' : ''}><i>${L.roman(m.ordre)}</i><span>${esc(m.court || m.nom)}</span></button>`).join('')}</div>`;
 
   const dock = $('#dock'), railEl = $('#rail');
   const dockKey = () => [view, hallMode, piece, view === 'hall' ? hallIdx() : '', world ? railIdx() : '', L.selection.count()].join('|');
@@ -130,35 +122,33 @@
     lastDock = dockKey(); const acts = (h) => `<div class="acts">${h}</div>`; railEl.hidden = true;
     const btn = (a, label, cls = 'btn-ghost') => `<button class="btn ${cls}" type="button" data-d="${a}">${label}</button>`;
     let h = '';
-    if (piece === 'chiffre') {
-      const c = L.content('vision-offre').chiffre || {};
-      h = `<p class="kicker">Installation · ${esc(c.sousTitre || '')}</p><h2>${esc(c.designation || 'Le Grand Livre du Chiffre')}</h2><p class="meta">${esc(c.legende || '')} ${L.tagAV('intitulé provisoire')}</p>${acts(btn('chiffre', 'Découvrir l\'offre Chiffre', 'btn-primary') + btn('back', '← Retour à la salle'))}`;
-    } else if (piece) {
+    if (piece) {
       h = '';
     } else if (view === 'hall' && hallMode === 'home') {
-      h = `<p class="kicker">Grande salle</p><h2>Droit, édition, chiffre</h2><p class="meta">Au centre : le premier Code civil et le Grand Livre du Chiffre. Six portes ouvrent six univers.</p>${acts(btn('vision', 'Découvrir notre vision', 'btn-primary') + btn('doors', 'Explorer les univers →'))}`;
+      const cc = L.content('vision-offre').codeCivil || {};
+      h = `${ladder(-1, 'Code civil', 'home')}<p class="kicker">À la une</p><h2>Le premier Code civil</h2><p class="meta">${esc(cc.acquisition || '')}.</p>${acts(btn('vision', 'Découvrir notre vision', 'btn-primary') + btn('doors', 'Explorer les portes →'))}`;
     } else if (view === 'hall' && hallMode === 'doors') {
       const k = hallIdx(), m = MONDES[k];
-      h = `<div class="dots" role="group" aria-label="Les six univers">${MONDES.map((x, i) => `<button type="button" data-d="door" data-k="${i}" style="--c:${x.accentCfg.main}" aria-label="${esc(x.nom)}" ${i === k ? 'aria-current="true"' : ''}></button>`).join('')}</div>
-        <p class="kicker">Univers ${String(m.ordre).padStart(2, '0')} · ${esc(m.univers)}</p><h2>${esc(m.nom)}</h2><p class="meta">${esc(m.promesse)} ${m.n.toLocaleString('fr-FR')} produits · ${m.stations.length} ${L.plural(m.stations.length, 'station')}.</p>${acts(btn('enter', 'Entrer dans l\'univers', 'btn-primary') + btn('home', '← Les deux pièces centrales'))}`;
+      h = `${ladder(k, 'Code civil', 'home')}<p class="kicker">Porte <span class="rm">${L.roman(m.ordre)}</span></p><h2>${esc(m.nom)}</h2><p class="meta">${esc(m.promesse)} ${m.n.toLocaleString('fr-FR')} produits · ${m.stations.length} ${L.plural(m.stations.length, stationWord(m))}.</p>${acts(btn('enter', 'Entrer', 'btn-primary') + btn('home', '← Code civil'))}`;
     } else if (view === 'world' && world) {
       const m = world.monde, i = railIdx(), st = i ? world.stations[i - 1].st : null;
       railEl.innerHTML = `<button class="st" type="button" data-d="rail" data-i="0" ${i === 0 ? 'aria-current="true"' : ''}><i>↩</i>Accueil</button>${world.stations.map((s, j) => `<button class="st" type="button" data-d="rail" data-i="${j + 1}" ${i === j + 1 ? 'aria-current="true"' : ''}><i>${esc(s.st.code)}</i>${esc(s.st.nom)}</button>`).join('')}`; railEl.hidden = false;
-      h = i === 0
-        ? `<p class="kicker">Univers ${String(m.ordre).padStart(2, '0')} · ${esc(m.univers)}</p><h2>${esc(m.nom)}</h2><p class="meta">${esc(m.promesse)}</p>${acts(btn('rail+', 'Explorer les stations →', 'btn-primary') + btn('leave', '← Grande salle'))}`
-        : `<p class="kicker">${esc(st.code)} · ${esc(m.nom)}</p><h2>${esc(st.nom)}</h2><p class="meta">${st.n} ${L.plural(st.n, 'produit')} au catalogue${st.nBest ? ` · ${st.nBest} marqué${st.nBest > 1 ? 's' : ''} BEST` : ''}. Vitrine : ${st.vitrine.length} ${L.plural(st.vitrine.length, 'produit')}.</p>${acts(btn('list', `Voir les ${st.n} produits`, 'btn-primary') + btn('leave', '← Grande salle'))}`;
+      h = ladder(m.k, 'Grande salle', 'leave') + (i === 0
+        ? `<p class="kicker">Porte <span class="rm">${L.roman(m.ordre)}</span> · ${esc(m.univers)}</p><h2>${esc(m.nom)}</h2><p class="meta">${esc(m.promesse)}</p>${acts(btn('rail+', 'Explorer les ' + L.plural(2, stationWord(m)) + ' →', 'btn-primary') + btn('leave', '← Grande salle'))}`
+        : `<p class="kicker">${esc(st.code)} · ${esc(m.nom)}</p><h2>${esc(st.nom)}</h2><p class="meta">${st.n} ${L.plural(st.n, 'produit')} au catalogue${st.nBest ? ` · ${st.nBest} marqué${st.nBest > 1 ? 's' : ''} BEST` : ''}. Vitrine : ${st.vitrine.length} ${L.plural(st.vitrine.length, 'produit')}.</p>${acts(btn('list', `Voir les ${st.n} produits`, 'btn-primary') + btn('leave', '← Grande salle'))}`);
     }
     const af = document.activeElement && dock.contains(document.activeElement) ? document.activeElement : null, fk = af ? `[data-d="${af.dataset.d}"]${af.dataset.i != null ? `[data-i="${af.dataset.i}"]` : ''}${af.dataset.k != null ? `[data-k="${af.dataset.k}"]` : ''}` : null;
-    dock.innerHTML = h; dock.hidden = !h || view === 'trans' || view === 'intro';
+    dock.innerHTML = h; dock.hidden = !h || view === 'trans' || view === 'boot';
     if (fk) { const nf = $(fk, dock); if (nf) nf.focus({ preventScroll: true }); }
     const on = $('[aria-current]', railEl); if (on && !railEl.hidden) railEl.scrollTo({ left: on.offsetLeft - railEl.clientWidth / 2 + on.offsetWidth / 2, behavior: L.reduced() ? 'auto' : 'smooth' });
+    const lad = $('.ladder [aria-current]', dock); if (lad) { const lw = $('.ladder', dock); lw.scrollLeft = lad.offsetLeft - lw.clientWidth / 2 + lad.offsetWidth / 2; }
   };
   const dockClick = (e) => {
     const b = e.target.closest('[data-d]'); if (!b) return; const a = b.dataset.d;
-    if (a === 'vision') openPiece('code'); else if (a === 'doors') hallTo('doors', hallIdx(), false);
-    else if (a === 'door') goHall(+b.dataset.k); else if (a === 'enter') enterWorld(hallIdx()); else if (a === 'home') hallTo('home');
-    else if (a === 'chiffre') returnFromPiece(() => hallTo('doors', 1, false, () => enterWorld(1)));
-    else if (a === 'back') returnFromPiece(); else if (a === 'rail') goRail(+b.dataset.i); else if (a === 'rail+') goRail(1);
+    if (a === 'vision') openPiece(); else if (a === 'doors') hallTo('doors', hallIdx(), false);
+    else if (a === 'door') { const k = +b.dataset.k; if (view === 'world') switchWorld(k); else goHall(k); }
+    else if (a === 'enter') enterWorld(hallIdx()); else if (a === 'home') hallTo('home');
+    else if (a === 'rail') goRail(+b.dataset.i); else if (a === 'rail+') goRail(1);
     else if (a === 'leave') leaveWorld(); else if (a === 'list') L.sheet.openStation(world.stations[railIdx() - 1].st);
   };
   dock.addEventListener('click', dockClick); railEl.addEventListener('click', dockClick);
@@ -167,17 +157,17 @@
   const hsBox = $('#hotspots'); let HS = [];
   const hsClear = () => { hsBox.innerHTML = ''; HS = []; };
   const hsAdd = (o) => {
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'hs ' + (o.cls || ''); b.setAttribute('aria-label', o.label); b.innerHTML = `<span class="cap">${esc(o.cap || o.label)}</span>`;
+    const b = document.createElement('button'); b.type = 'button'; b.hidden = true; b.className = 'hs ' + (o.cls || '');   // masqué jusqu'à la première mise en place (hsUpdate)
+     b.setAttribute('aria-label', o.label); b.innerHTML = `<span class="cap">${esc(o.cap || o.label)}</span>`;
     b.addEventListener('click', () => { if (!busy || o.always) o.act(); }); b.addEventListener('mouseenter', () => { hoverCard = o.card || null; }); b.addEventListener('mouseleave', () => { hoverCard = null; });
     hsBox.appendChild(b); HS.push({ el: b, o }); return b;
   };
   let hoverCard = null;
   const hsBuild = () => {
-    hsClear(); if (view === 'intro' || view === 'trans' || view === 'boot') return;
+    hsClear(); if (view === 'trans' || view === 'boot') return;
     if (view === 'hall' && !piece) {
-      hsAdd({ cls: 'hall lbl cap-top', label: 'Le premier Code civil : découvrir notre vision', cap: 'Le premier Code civil · Droit, Édition', pts: () => boxPts(new THREE.Vector3(S.CODE_X, 0, 0), 1.35, 0, 3.3), act: () => openPiece('code'), show: () => hallMode === 'home' });
-      hsAdd({ cls: 'hall lbl cap-top', label: 'Le Grand Livre du Chiffre : la table des décisions', cap: 'Le Grand Livre du Chiffre', pts: () => boxPts(new THREE.Vector3(S.CHIFFRE_X, 0, 0), 1.35, 0, 3.5), act: () => openPiece('chiffre'), show: () => hallMode === 'home' });
-      MONDES.forEach((m, k) => hsAdd({ cls: 'hall', label: `Univers ${m.ordre} : ${m.nom}, ${m.univers}`, cap: m.nom, pts: () => doorPts(k), act: () => (hallMode === 'doors' && hallIdx() === k ? enterWorld(k) : goHall(k)), show: () => hallMode === 'doors' }));
+      hsAdd({ cls: 'hall lbl cap-top', label: 'Le premier Code civil : découvrir notre vision', cap: 'Le premier Code civil · Droit, Édition', pts: () => boxPts(new THREE.Vector3(S.CODE_X, 0, 0), 1.35, 0, 3.3), act: () => openPiece(), show: () => hallMode === 'home' });
+      MONDES.forEach((m, k) => hsAdd({ cls: 'hall', label: `Porte ${L.roman(m.ordre)} : ${m.nom}`, cap: m.nom, pts: () => doorPts(k), act: () => (hallMode === 'doors' && hallIdx() === k ? enterWorld(k) : goHall(k)), show: () => hallMode === 'doors' }));
     } else if (view === 'world' && world) {
       const i = railIdx(); if (!i) return; const r = world.stations[i - 1];
       hsAdd({ cls: 'hall', label: `Voir les ${r.st.n} produits : ${r.st.nom}`, cap: `${r.st.code} · ${r.st.nom}`, pts: () => objPts(r.group, 1.8, 3.45, 1.125, .08), act: () => L.sheet.openStation(r.st) });
@@ -210,27 +200,24 @@
     if (!force && (busy || view !== 'hall')) return;
     const from = { ...lastPose }; let to; if (mode === 'home') to = HOME(); else { H.tgt = angFor(k); to = doorPose(H.tgt); }
     busy = true; hallMode = mode; refreshUI();
-    if (mode === 'doors') { L.cognitio.say(hinted.doors ? 'hall.porte' : 'hall.portes', { univers: MONDES[k].univers, promesse: MONDES[k].promesse }); hinted.doors = 1; }
     return tween(1400, (t) => { camOverride = orbitLerp(from, to, ease(t)); }).then(() => { camOverride = null; if (mode === 'doors') H.a = H.tgt; busy = false; refreshUI(); cb && cb(); });
   };
-  const goHall = (k) => { if (busy || view !== 'hall') return; if (hallMode === 'home') hallTo('doors', mod(k, 6)); else { H.tgt = angFor(mod(k, 6)); L.cognitio.say('hall.porte', { univers: MONDES[mod(k, 6)].univers, promesse: MONDES[mod(k, 6)].promesse }); } };
-  const stepHall = (dir) => { if (busy || view !== 'hall' || piece) return; if (hallMode === 'home') return hallTo('doors', dir > 0 ? 0 : 5); const k = hallIdx() + dir; if (k < 0 || k > 5) hallTo('home'); else goHall(k); };
+  const goHall = (k) => { if (busy || view !== 'hall') return; if (hallMode === 'home') hallTo('doors', mod(k, N)); else H.tgt = angFor(mod(k, N)); };
+  const stepHall = (dir) => { if (busy || view !== 'hall' || piece) return; if (hallMode === 'home') return hallTo('doors', dir > 0 ? 0 : N - 1); const k = hallIdx() + dir; if (k < 0 || k > N - 1) hallTo('home'); else goHall(k); };
 
   const refreshUI = () => {
-    const hallOn = view === 'hall' || view === 'code', worldOn = view === 'world';
-    $('#top').hidden = view === 'intro' || view === 'boot'; $('#bottom').hidden = view === 'intro' || view === 'boot' || view === 'trans';
+    const worldOn = view === 'world';
+    $('#top').hidden = view === 'boot'; $('#bottom').hidden = view === 'boot' || view === 'trans';
+    document.body.classList.toggle('in-hall', view === 'hall');   // l'ancien monde n'a pas de mascotte : Cognitio n'apparaît qu'après la porte
     $('#navPrev').hidden = $('#navNext').hidden = !((view === 'hall' && !piece) || worldOn);
     crumbs(); renderDock(); hsBuild();
   };
 
-  /* ---------- pièces centrales : Code civil (vision) et Grand Livre du Chiffre ---------- */
-  const openPiece = (which) => {
-    if (busy || view !== 'hall') return; piece = which; retPose = { ...lastPose }; retMode = hallMode; busy = true; hint('');
-    const B = which === 'code' ? hall.codeCenter : hall.chiffreCenter, from = { ...lastPose }, to = piecePose(B, which === 'chiffre'); dimPlane.visible = true; refreshUI();
-    tween(1200, (t) => { camOverride = lerpPose(from, to, ease(t)); dimPlane.material.opacity = .32 * ease(t); }).then(() => {
-      busy = false; refreshUI();
-      if (which === 'code') L.vision.open(0); else L.cognitio.say('hall.chiffre');
-    });
+  /* ---------- pièce centrale : le premier Code civil (vision) ---------- */
+  const openPiece = () => {
+    if (busy || view !== 'hall') return; piece = 'code'; retPose = { ...lastPose }; retMode = hallMode; busy = true; hint('');
+    const from = { ...lastPose }, to = piecePose(hall.codeCenter); dimPlane.visible = true; refreshUI();
+    tween(1200, (t) => { camOverride = lerpPose(from, to, ease(t)); dimPlane.material.opacity = .32 * ease(t); }).then(() => { busy = false; refreshUI(); L.vision.open(0); });
   };
   const returnFromPiece = (cb) => {
     if (!piece || busy) return; busy = true; const from = { ...lastPose }, to = retPose || HOME(); if (L.vision.isOpen()) { L.vision.onClose = null; L.vision.close(); }
@@ -241,13 +228,12 @@
   L.vision.onCta = (c) => {
     const t = c.cible;
     if (t === 'etape:vision') return L.vision.go(1);
-    if (t === 'pitch') return returnFromPiece(() => startPitch());
     if (t === 'salle') return returnFromPiece(() => hallTo('doors', 0));
     if (t.startsWith('monde:')) { const k = cat.mondeById[t.slice(6)].k; return returnFromPiece(() => hallTo('doors', k, false, () => enterWorld(k))); }
   };
 
   /* ====================================================================================== */
-  /*  Passage vers un univers, rails de stations, retour                                      */
+  /*  Passage vers un univers, rails de stations, retour, changement de porte                 */
   /* ====================================================================================== */
 
   const buildWorld = (monde) => {
@@ -259,7 +245,7 @@
     if (busy || view !== 'hall' || piece) return;
     if (hallMode !== 'doors' || hallIdx() !== k) await hallTo('doors', k);   // on rejoint d'abord la porte par l'arc de cercle
     if (busy || view !== 'hall') return;
-    const mo = MONDES[k]; busy = true; view = 'trans'; curK = k; hsClear(); L.panels.stack.slice().forEach((p) => { if (p.id !== 'pitch') L.panels.close(p, true); }); $('#bottom').hidden = true; hint('');
+    const mo = MONDES[k]; busy = true; view = 'trans'; curK = k; hsClear(); L.panels.stack.slice().forEach((p) => L.panels.close(p, true)); $('#bottom').hidden = true; hint('');
     const door = hall.doors[k]; door.target = 1; const from = { ...lastPose }, x1 = (S.HR - 1.3) * Math.sin(door.phi), z1 = (S.HR - 1.3) * Math.cos(door.phi), yawEnd = door.phi + PI;
     await tween(1100, (t) => { const e = ease(t); camOverride = { x: lerp(from.x, x1, e), y: lerp(from.y, 1.75, e), z: lerp(from.z, z1, e), yaw: from.yaw + angDiff(from.yaw, yawEnd) * e, pitch: lerp(from.pitch, .03, e) }; });
     await L.transition.run(mo, null, () => buildWorld(mo));
@@ -285,32 +271,13 @@
     hall.group.visible = true; cur = hall; camera.fov = baseFov(); camera.updateProjectionMatrix(); H.tgt = H.a = angFor(curK); const d = hall.doors[curK]; d.state = d.target = .16; d.apply();
     hall.doors.forEach((x, i) => { if (i !== curK) { x.state = x.target = 0; x.apply(); } });
     view = 'hall'; hallMode = 'doors'; L.cognitio.setImage('assets/cognitio/cognitio-neutre.webp'); refreshUI(); veil(false); await wait(450); busy = false;
-    L.cognitio.say('hall.porte', { univers: MONDES[curK].univers, promesse: MONDES[curK].promesse });
   };
 
-  /* ====================================================================================== */
-  /*  Entrée, modes Exploration / Pitch guidé                                                 */
-  /* ====================================================================================== */
-
-  const startExplore = () => {
-    $('#intro').classList.remove('show'); view = 'hall'; hallMode = 'home'; L.state.seenIntro = true; L.persist();
-    refreshUI(); L.cognitio.say('hall.accueil'); hint('Cliquez le Code civil ou le Grand Livre du Chiffre · ‹ › pour parcourir les six portes', 'hall');
-    const f = $('#dock .btn-primary'); if (f) f.focus({ preventScroll: true });
+  /* Changer de porte depuis un univers : on repasse par le seuil de la Grande salle, puis on franchit la porte choisie. */
+  const switchWorld = async (k) => {
+    if (busy || view !== 'world') return; if (k === curK) return goRail(0);
+    await leaveWorld(); await enterWorld(k);
   };
-  const startPitch = () => { if (view === 'intro') startExplore(); setModeUI('pitch'); L.pitch.open(1); };
-  $('#goExplore').addEventListener('click', startExplore);
-  $('#goPitch').addEventListener('click', startPitch);
-  $('#modeExplore').addEventListener('click', () => { L.pitch.close(); setModeUI('explore'); });
-  $('#modePitch').addEventListener('click', () => { if (!L.pitch.isOpen()) startPitch(); });
-
-  const toHallThen = (fn) => {
-    if (view === 'world') { leaveWorld().then(() => fn()); return; }
-    if (piece) return returnFromPiece(fn); fn();
-  };
-  L.pitch.hooks.quit = () => { L.pitch.close(); setModeUI('explore'); };
-  L.pitch.hooks.code = () => toHallThen(() => { if (hallMode === 'home') openPiece('code'); else hallTo('home', 0, false, () => openPiece('code')); });
-  L.pitch.hooks.enter = (id) => { const k = cat.mondeById[id].k; if (view === 'world' && world.monde.id === id) return goRail(0); toHallThen(() => { if (hallMode === 'home') hallTo('doors', k, false, () => enterWorld(k)); else { H.tgt = angFor(k); enterWorld(k); } }); };
-  L.pitch.hooks.station = (id, i) => { const k = cat.mondeById[id].k; if (view === 'world' && world.monde.id === id) return goRail(i + 1); toHallThen(() => { const go = () => enterWorld(k, i + 1); if (hallMode === 'home') hallTo('doors', k, false, go); else { H.tgt = angFor(k); go(); } }); };
 
   /* ====================================================================================== */
   /*  Pointeur, clavier                                                                      */
@@ -349,13 +316,13 @@
     if (!railOk() || !cur) { canvas.classList.remove('hot'); hoverCard = null; return; }
     const p = pick(x, y); hoverCard = null;
     if (p && p.kind === 'product' && world) { const r = world.stations[railIdx() - 1]; if (r) hoverCard = r.cards.find((c) => c.p === p.p) || null; }
-    canvas.classList.toggle('hot', !!p && ['door', 'code', 'chiffre', 'product', 'station'].includes(p.kind));
+    canvas.classList.toggle('hot', !!p && ['door', 'code', 'product', 'station'].includes(p.kind));
   };
   const onClick = (x, y) => {
-    if (piece) { if (!busy && piece) { /* clic dans le décor : on reste sur la pièce */ } return; }
+    if (piece) return;
     if (!railOk()) return; const p = pick(x, y); if (!p) return;
     if (p.kind === 'door') { if (hallMode === 'doors' && p.k === hallIdx()) enterWorld(p.k); else goHall(p.k); }
-    else if (p.kind === 'code') openPiece('code'); else if (p.kind === 'chiffre') openPiece('chiffre');
+    else if (p.kind === 'code') openPiece();
     else if (p.kind === 'station') { const i = world.stations.findIndex((s) => s.st === p.st) + 1; if (i === railIdx()) L.sheet.openStation(p.st); else goRail(i); }
     else if (p.kind === 'product') { const i = world.stations.findIndex((s) => s.st === p.st) + 1; if (i === railIdx()) L.sheet.openProduct(p.p, { back: false }); else goRail(i); }
   };
@@ -373,13 +340,12 @@
   const escape = (e) => {
     if (L.transition.active) return L.transition.skip();
     const top = L.panels.top();
-    if (top && top.id !== 'pitch') { if (top.id === 'vision') L.vision.close(); else if (top.id === 'sheet') L.sheet.close(); else if (top.id === 'selection') L.selection.close(); return; }
-    if (view === 'intro') return;
+    if (top) { if (top.id === 'vision') L.vision.close(); else if (top.id === 'sheet') L.sheet.close(); else if (top.id === 'selection') L.selection.close(); return; }
+    if (view === 'boot') return;
     if (piece) return returnFromPiece();
     if (view === 'world') return leaveWorld();
     if (view === 'hall' && hallMode === 'doors') hallTo('home');
   };
-  $('#intro').addEventListener('keydown', (e) => { if (e.key === 'Escape') e.stopPropagation(); });
 
   /* ====================================================================================== */
   /*  Boucle                                                                                 */
@@ -393,31 +359,36 @@
     requestAnimationFrame(frame);
     const dt = Math.min(.05, (now - last) / 1000) * (L.params.fast || 1); last = now; time += dt; const red = L.reduced();
     par.x += (par.tx - par.x) * Math.min(1, dt * 3); par.y += (par.ty - par.y) * Math.min(1, dt * 3);
-    if (cur.kind === 'hall') { if (hallMode === 'doors' && view !== 'intro') H.a += (H.tgt - H.a) * (1 - Math.exp(-dt * 6.5)); }
+    if (cur.kind === 'hall') { if (hallMode === 'doors') H.a += (H.tgt - H.a) * (1 - Math.exp(-dt * 6.5)); }
     else { X.x += (X.tgt - X.x) * (1 - Math.exp(-dt * 6.5)); cur.focus(X.x); cur.ensure(X.x); }
     for (let i = tw.length - 1; i >= 0; i--) { const q = tw[i]; q.t += dt; const k = L.clamp01(q.t / q.d); q.fn(k); if (k >= 1) { tw.splice(i, 1); q.res(); } }
     placeCamera(); if (cur.kind === 'hall') cur.camPos.copy(camera.position); cur.update(dt, time, red);
     if (cur.kind === 'world') cur.stations.forEach((r) => r.cards.forEach((c) => { const hv = hoverCard === c ? 1 : 0; c.hv += (hv - c.hv) * Math.min(1, dt * 10); c.group.position.y = c.home.y + c.hv * .05; c.group.scale.setScalar(1 + c.hv * .04); }));
-    if (view !== 'intro' && view !== 'boot' && dockKey() !== lastDock && !busy) refreshUI();
+    if (view !== 'boot' && dockKey() !== lastDock && !busy) refreshUI();
     renderer.render(scene, camera);
-    if (view !== 'intro') hsUpdate();
+    hsUpdate();
   };
 
   /* ====================================================================================== */
-  /*  Démarrage                                                                              */
+  /*  Démarrage : directement dans la Grande salle, sans écran d'introduction                */
   /* ====================================================================================== */
 
   const fonts = () => { if (!document.fonts || !document.fonts.load) return Promise.resolve(); return Promise.race([Promise.all(['500 24px "IBM Plex Serif"', 'italic 400 24px "IBM Plex Serif"', '400 24px "IBM Plex Sans"', '500 24px "IBM Plex Mono"'].map((f) => document.fonts.load(f))), new Promise((r) => setTimeout(r, 2500))]); };
   const boot = () => {
-    hall = S.buildHall(MONDES); scene.add(hall.group); cur = hall; H.a = H.tgt = S.doorPhi(0); resize(); view = 'intro';
-    $('#intro').classList.add('show'); $('#goExplore').focus({ preventScroll: true });
+    hall = S.buildHall(MONDES); scene.add(hall.group); cur = hall; H.a = H.tgt = S.doorPhi(0); resize();
+    view = 'hall'; hallMode = 'home'; busy = true; refreshUI();
     L.onChange(() => { if (world) world.syncSelection(L.selection.has); });
     requestAnimationFrame((t) => { last = t; frame(t); });
-    const go = L.params.debug && new URLSearchParams(location.search).get('go');
-    if (go === 'explore') startExplore(); else if (go === 'pitch') startPitch();
+    veil(false);
+    /* arrivée : un lent mouvement de caméra depuis le fond de la salle jusqu'au Code civil */
+    const from = orbitPose(0), to = HOME();
+    tween(L.reduced() ? 0 : 3000, (t) => { camOverride = orbitLerp(from, to, ease(t)); }).then(() => {
+      camOverride = null; busy = false; refreshUI(); hint('Cliquez le Code civil · ‹ › pour parcourir les six portes', 'hall');
+      const f = $('#dock .btn-primary'); if (f && !document.activeElement.closest('#dock')) { /* le focus reste sur la page ; Tab atteint le bouton principal */ }
+    });
     document.documentElement.dataset.ready = '1';
   };
   fonts().then(boot);
 
-  if (L.params.debug) L.debug = { L, S, scene, camera, renderer, view: () => view, busy: () => busy, hall: () => hall, world: () => world, X, H, hallTo, openPiece, returnFromPiece, enterWorld, leaveWorld, goRail, goHall, startExplore, startPitch, hallMode: () => hallMode, piece: () => piece, lastPose: () => lastPose, railIdx: () => railIdx() };
+  if (L.params.debug) L.debug = { L, S, scene, camera, renderer, view: () => view, busy: () => busy, hall: () => hall, world: () => world, X, H, hallTo, openPiece, returnFromPiece, enterWorld, leaveWorld, switchWorld, goRail, goHall, hallMode: () => hallMode, piece: () => piece, lastPose: () => lastPose, railIdx: () => railIdx() };
 })();

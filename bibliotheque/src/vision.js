@@ -39,7 +39,7 @@
   const render = () => {
     const d = DATA(), n = d.etapes.length, i = V.step, last = i === n - 1;
     el().innerHTML = `
-      <div class="ph"><span class="ico" aria-hidden="true">${L.ICON_SVG}</span><p class="kicker">Le premier Code civil</p><button class="x" type="button" data-a="close" aria-label="Fermer et revenir à la salle">✕</button></div>
+      <div class="ph"><span class="ico" aria-hidden="true">${L.MARK}</span><p class="kicker">Le premier Code civil</p><button class="x" type="button" data-a="close" aria-label="Fermer et revenir à la salle">✕</button></div>
       <div class="pb">
         <h2 id="visionTitle" data-autofocus>${esc(d.titre)}</h2>
         <nav class="vsteps" aria-label="Étapes">${d.etapes.map((e, k) => `<button type="button" data-step="${k}" ${k === i ? 'aria-current="step"' : ''}><i>${k + 1}</i>${esc(e.kicker)}</button>`).join('')}</nav>

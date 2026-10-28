@@ -55,14 +55,13 @@
   const saved = L.store.load();
   const S = L.state = {
     seenTransition: !!saved.seenTransition,
-    seenIntro: !!saved.seenIntro,
     client: Object.assign(blank(), saved.client || {}),
     listeners: new Set(),
   };
   S.client.besoin = Object.assign(blank().besoin, S.client.besoin || {});
   L.onChange = (fn) => { S.listeners.add(fn); return () => S.listeners.delete(fn); };
   L.persist = () => {
-    L.store.save({ seenTransition: S.seenTransition, seenIntro: S.seenIntro, client: S.client });
+    L.store.save({ seenTransition: S.seenTransition, client: S.client });
     S.listeners.forEach((fn) => { try { fn(); } catch (e) { /* un abonné défaillant ne bloque pas les autres */ } });
   };
   L.resetClient = () => { S.client = blank(); L.persist(); };
@@ -82,15 +81,12 @@
 
   /* ---------- panneaux : ouverture, fermeture, Échap, focus ---------- */
   const stack = [];
-  const sync = () => {
-    document.body.classList.toggle('has-panel', stack.some((el) => !el.classList.contains('left')));
-    document.body.classList.toggle('has-pitch', stack.some((el) => el.classList.contains('left')));
-  };
+  const sync = () => { document.body.classList.toggle('has-panel', stack.length > 0); };
   L.panels = {
     stack,
     open(el, opts = {}) {
-      /* un seul panneau à droite à la fois (le pitch, à gauche, reste ouvert) */
-      if (!el.classList.contains('left')) stack.slice().forEach((o) => { if (o !== el && !o.classList.contains('left')) L.panels.close(o, true); });
+      /* un seul panneau à droite à la fois */
+      stack.slice().forEach((o) => { if (o !== el) L.panels.close(o, true); });
       if (!stack.includes(el)) stack.push(el);
       sync();
       el._opener = document.activeElement; el._onClose = opts.onClose;
@@ -109,8 +105,9 @@
     isOpen(el) { return stack.includes(el); },
   };
 
-  /* ---------- identité : symbole approché (À VALIDER) ----------
-     Le symbole officiel « JL » n'a pas été fourni. Cette forme (rectangle à angles arrondis, encoche
-     en haut à droite) reprend la silhouette récurrente de la charte et n'est PAS le logo officiel. */
-  L.ICON_SVG = '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M12 6h30a6 6 0 0 1 6 6v8h8a6 6 0 0 1 6 6v26a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6V12a6 6 0 0 1 6-6z" fill="currentColor"/></svg>';
+  /* ---------- identité : symbole JL officiel (blanc, fourni par le client), posé sur une pastille bleue par la feuille de style ---------- */
+  L.MARK = '<img class="jl" src="assets/brand/symbole-jl-blanc.png" alt="" width="20" height="21">';
+
+  /* Chiffres romains : numérotation des portes (I à VI). */
+  L.roman = (n) => ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'][n] || String(n);
 })();

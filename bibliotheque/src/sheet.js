@@ -11,7 +11,7 @@
   const el = () => $('#sheet');
   const TABS = [['besoin', 'Pour quel besoin ?'], ['reponse', 'Notre réponse'], ['rome', 'Compétences ROME 4'], ['argu', 'Argumentaire commercial']];
 
-  /* ---------- besoin exprimé (pitch, étape 2) ---------- */
+  /* ---------- besoin exprimé (renseigné par Cognitio, lot D ; vide tant que rien n'est saisi) ---------- */
   const need = () => { const b = L.state.client.besoin; return { competences: b.competences, metier: b.metier, momentId: b.momentId, niveau: b.niveau, formats: b.formats, dureeMax: b.dureeMax, mondes: [] }; };
   const needActive = () => { const b = L.state.client.besoin; return !!(b.competences.length || b.metier || b.momentId || b.niveau || b.formats.length || b.dureeMax); };
   Sh.needActive = needActive; Sh.need = need;
@@ -53,7 +53,7 @@
     el().style.setProperty('--accent', mo.accentCfg.text);
     el().setAttribute('aria-label', `Produits : ${st.nom}`);
     el().innerHTML = `
-      <div class="ph"><span class="ico" aria-hidden="true">${L.ICON_SVG}</span><p class="kicker">${esc(mo.nom)} · ${esc(st.code)}</p><button class="x" type="button" data-a="close" aria-label="Fermer le panneau">✕</button></div>
+      <div class="ph"><span class="ico" aria-hidden="true">${L.MARK}</span><p class="kicker">${esc(mo.nom)} · ${esc(st.code)}</p><button class="x" type="button" data-a="close" aria-label="Fermer le panneau">✕</button></div>
       <div class="pb">
         <h2 data-autofocus>${esc(st.nom)}</h2>
         <p class="lead">${st.n} ${L.plural(st.n, 'produit')} au catalogue 2027${st.nBest ? ` · ${st.nBest} marqué${st.nBest > 1 ? 's' : ''} BEST` : ''}.</p>
@@ -124,7 +124,7 @@
     el().style.setProperty('--accent', mo ? mo.accentCfg.text : '#D71635');
     el().setAttribute('aria-label', `Fiche produit : ${p.t}`);
     el().innerHTML = `
-      <div class="ph"><span class="ico" aria-hidden="true">${L.ICON_SVG}</span><p class="kicker">${esc(mo ? mo.nom : '')}${st ? ' · ' + esc(st.code) : ''}</p><button class="x" type="button" data-a="close" aria-label="Fermer la fiche">✕</button></div>
+      <div class="ph"><span class="ico" aria-hidden="true">${L.MARK}</span><p class="kicker">${esc(mo ? mo.nom : '')}${st ? ' · ' + esc(st.code) : ''}</p><button class="x" type="button" data-a="close" aria-label="Fermer la fiche">✕</button></div>
       <div class="pb">
         <p style="margin:.1rem 0 .3rem">${tags(p)}<span class="tag">${esc(p.f || p.tp || '')}</span> <span class="tag">${esc(cat.duree(p))}</span>${p.n ? ` <span class="tag">${esc(p.n)}</span>` : ''}</p>
         <h2 data-autofocus>${esc(p.t)}</h2>

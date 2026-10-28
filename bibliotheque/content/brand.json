@@ -1,9 +1,13 @@
 {
   "_meta": {
-    "statut": "A_VALIDER",
-    "note": "Le logo et le symbole officiels (JL) n'ont pas été fournis en fichier vectoriel. Déposez-les aux emplacements ci-dessous puis relancez `python3 tools/build-data.py` : l'interface les utilise automatiquement. Tant qu'ils sont absents, un repère générique à la forme récurrente de la charte (non officiel) est affiché, avec le nom du produit en texte."
+    "statut": "FOURNI",
+    "note": "Logo officiel (noir, filet orange) et symbole JL (blanc) fournis par le client le 28/10/2026, PNG sur fond transparent. Remplacer par les fichiers vectoriels s'ils existent."
   },
-  "logo": { "svg": "assets/brand/logo-ldc.svg" },
-  "symbole": { "svg": "assets/brand/symbole-jl.svg" },
+  "logo": {
+    "fichier": "assets/brand/logo-ldc-competences.png"
+  },
+  "symbole": {
+    "fichier": "assets/brand/symbole-jl-blanc.png"
+  },
   "nom": "Lefebvre Dalloz Compétences"
 }

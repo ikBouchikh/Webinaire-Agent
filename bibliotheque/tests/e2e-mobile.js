@@ -6,9 +6,9 @@ const fs = require('fs'); const out = process.argv[2] || '/tmp/e2e-mobile'; fs.m
   await open(page, '?debug=1&fast=6');
   const noOverflow = () => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1 && document.body.scrollWidth <= innerWidth + 1);
   ok('mobile : accueil sans défilement horizontal', await noOverflow());
-  await page.screenshot({ path: out + '/01-intro.png' });
-  await page.tap('#goExplore'); await idle(page);
-  ok('mobile : Grande salle, carte du lieu et Cognitio dans l\'écran', await page.evaluate(() => { const r = document.getElementById('dock').getBoundingClientRect(), c = document.getElementById('cognitio').getBoundingClientRect(); return r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth && c.right <= innerWidth && c.left >= 0; }));
+  await idle(page);
+  ok('mobile : Grande salle, carte du lieu dans l\'écran, Cognitio absente (ancien monde)', await page.evaluate(() => { const r = document.getElementById('dock').getBoundingClientRect(); return r.bottom <= innerHeight + 1 && r.left >= 0 && r.right <= innerWidth + 1 && getComputedStyle(document.getElementById('cognitio')).display === 'none'; }));
+  ok('mobile : échelle des portes tenant dans l\'écran, cibles ≥ 40 px', await page.evaluate(() => { const ls = [...document.querySelectorAll('#dock .lad')], d = document.getElementById('dock').getBoundingClientRect(); return ls.length === 7 && ls.every((b) => b.getBoundingClientRect().height >= 40) && document.querySelector('#dock .ladder').scrollWidth <= document.querySelector('#dock .ladder').clientWidth + 2 && d.right <= innerWidth + 1; }));
   await page.screenshot({ path: out + '/02-hall.png' });
   await page.tap('#dock [data-d="vision"]'); await page.waitForSelector('#vision.show'); await idle(page); await page.waitForTimeout(1200);
   ok('mobile : panneau Code civil dans l\'écran', await page.evaluate(() => { const r = document.getElementById('vision').getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.bottom <= innerHeight + 1; }));

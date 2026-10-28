@@ -43,7 +43,7 @@
   C.init = () => {
     $('#cgNext').addEventListener('click', C.next);
     $('#cgHide').addEventListener('click', C.toggle);
-    $('#cgBubble .ico').innerHTML = L.ICON_SVG;
+    $('#cgBubble .ico').innerHTML = L.MARK;
     $('#cognitio .face').addEventListener('click', () => { if ($('#cognitio').classList.contains('off')) C.toggle(); });
     $('#cgBubble').addEventListener('click', (e) => { if (!e.target.closest('button')) $('#cognitio').classList.toggle('open'); });   // mobile : le texte replié se déplie au toucher
   };

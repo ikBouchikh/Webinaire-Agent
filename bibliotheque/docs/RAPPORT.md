@@ -1,4 +1,6 @@
-# Compte rendu — passe de correction stricte
+# Compte rendu — passe de correction stricte (version V4, historique)
+
+> Ce rapport décrit la V4. Depuis, la V5 a retiré l'écran d'introduction, le Pitch guidé et le Grand Livre du Chiffre de la Grande salle, aligné les six portes sur le site, passé la charte au bleu et intégré le logo officiel (lot A). Voir `docs/PROPOSITION_V5.md`, `docs/ARCHITECTURE.md` et `docs/TESTS.md`.
 
 Entrée : le brief « outil d'aide à la vente LDC » + la consigne « audite ton propre rendu, corrige, n'invente rien, utilise À VALIDER ».
 Sorties : A écarts · B priorités · C plan fichier par fichier → `docs/AUDIT.md` ; D patchs → commits de la branche ; E tests → `docs/TESTS.md` et ci-dessous.

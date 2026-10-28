@@ -4,7 +4,7 @@ const fs = require('fs'); const out = process.argv[2] || '/tmp/e2e-modes'; fs.mk
 (async () => {
   /* 1. prefers-reduced-motion */
   { const { browser, page, log } = await launch({ viewport: { width: 1100, height: 650 }, reducedMotion: 'reduce' });
-    await open(page, '?debug=1&go=explore'); await idle(page);
+    await open(page, '?debug=1'); await idle(page);
     ok('prefers-reduced-motion : détecté', await page.evaluate(() => LDC.reduced() === true));
     await page.evaluate(() => LDC.debug.hallTo('doors', 2)); await idle(page);
     await watchTrans(page); await page.evaluate(() => LDC.debug.enterWorld(2)); await worldReady(page);
@@ -15,7 +15,7 @@ const fs = require('fs'); const out = process.argv[2] || '/tmp/e2e-modes'; fs.mk
 
   /* 2. Passer + version courte */
   { const { browser, page, log } = await launch({ viewport: { width: 1100, height: 650 } });
-    await open(page, '?debug=1&fast=6&go=explore'); await idle(page);
+    await open(page, '?debug=1&fast=6'); await idle(page);
     await page.evaluate(() => LDC.debug.hallTo('doors', 0)); await idle(page);
     /* « Passer » est cliqué par le navigateur dès que la séquence démarre (pas de course avec les à-coups du rendu logiciel) */
     await watchTrans(page);
@@ -43,8 +43,9 @@ const fs = require('fs'); const out = process.argv[2] || '/tmp/e2e-modes'; fs.mk
     ok('sans WebGL : liste de produits d\'une station', await page.evaluate(() => document.querySelectorAll('#sheet .prow').length === 102));
     await page.click('#sheet .pgrp > summary'); await page.click('#sheet .pgrp[open] .prow .t'); await page.waitForSelector('#sheet [role=tablist]'); await page.click('#sheet .pf .btn-primary'); await page.waitForTimeout(200);
     ok('sans WebGL : ajout à la sélection client', await page.evaluate(() => LDC.selection.count() === 1));
-    await page.click('#modePitch'); await page.waitForSelector('#pitch.show');
-    ok('sans WebGL : Pitch guidé disponible', await page.evaluate(() => /étape 1 sur 6/i.test(document.querySelector('#pitch .kicker').innerText)));
-    ok('sans WebGL : Cognitio présente', await page.evaluate(() => document.getElementById('cgText').innerText.length > 10));
+    await page.click('#sheet .x, #sheet [data-a="close"]'); await page.waitForTimeout(500);
+    await page.click('#static [data-s="vision"]'); await page.waitForSelector('#vision.show');
+    ok('sans WebGL : « Découvrir notre vision » ouvre le Code civil en trois étapes', await page.evaluate(() => document.querySelectorAll('#vision .vsteps button').length === 3));
+    ok('sans WebGL : ni Pitch guidé ni bascule de mode', await page.evaluate(() => !document.getElementById('modePitch') && !document.getElementById('pitch') && !/pitch/i.test(document.getElementById('static').innerText)));
     process.exitCode = done(log) || process.exitCode; await browser.close(); }
 })();

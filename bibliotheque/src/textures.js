@@ -1,5 +1,5 @@
 /* Matières et visuels dessinés en canvas (aucun fichier image) aux couleurs de la charte :
-   rouge, clay (beiges), bleu et ocre en touches. Titres en IBM Plex Serif, catégories en IBM Plex Mono,
+   bleu dominant, clay (beiges), rouge et ocre en touches. Titres en IBM Plex Serif, catégories en IBM Plex Mono,
    interface en IBM Plex Sans (polices locales, assets/fonts). */
 
 (function () {
@@ -10,7 +10,9 @@
     clay1: '#FAFAF5', clay2: '#F2EEE1', clay3: '#EBDCCD', clay4: '#E1C8B4', clay5: '#CDB4A5',
     blue: '#1E87BE', blueDeep: '#081F2C', ocre: '#FA914B', ocreDeep: '#CD5008', ink: '#1A1210',
     /* matières de la Grande salle (ancien monde) : bois sombre et bronze, dérivés du rouge profond et de l'ocre */
-    wood: '#3A1812', woodL: '#5A2A20', bronze: '#B58A55', bronzeL: '#DDB985', bronzeD: '#6E4E2A', ash: '#D9BE9C',
+    wood: '#33211A', woodL: '#4E382B', bronze: '#B58A55', bronzeL: '#DDB985', bronzeD: '#6E4E2A', ash: '#D9BE9C',
+    /* bleus de la Grande salle : marine profond (laque, reliures, coupole) et bleu charte en touches */
+    navy: '#0E2F45', navyD: '#081F2C', navyL: '#1B4766',
   };
   const SERIF = L.SERIF = '"IBM Plex Serif", Georgia, "Times New Roman", serif';
   const SANS = L.SANS = '"IBM Plex Sans", "Helvetica Neue", Arial, sans-serif';
@@ -50,9 +52,9 @@
     const [c, g] = mk(1024, 1024), r = rng(7);
     for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
       const dark = (i + j) % 2, x = i * 256, y = j * 256;
-      g.fillStyle = dark ? '#4B0000' : C.clay4; g.fillRect(x, y, 256, 256);
-      for (let k = 0; k < 7; k++) { g.strokeStyle = dark ? `rgba(255,214,200,${.05 + r() * .08})` : `rgba(110,70,50,${.05 + r() * .08})`; g.lineWidth = .8 + r() * 2; g.beginPath(); g.moveTo(x + r() * 256, y); g.bezierCurveTo(x + r() * 256, y + 90, x + r() * 256, y + 170, x + r() * 256, y + 256); g.stroke(); }
-      g.strokeStyle = dark ? 'rgba(20,0,0,.5)' : 'rgba(110,80,50,.4)'; g.lineWidth = 3; g.strokeRect(x + 1.5, y + 1.5, 253, 253);
+      g.fillStyle = dark ? C.navy : C.clay4; g.fillRect(x, y, 256, 256);
+      for (let k = 0; k < 7; k++) { g.strokeStyle = dark ? `rgba(190,220,240,${.05 + r() * .08})` : `rgba(110,80,60,${.05 + r() * .08})`; g.lineWidth = .8 + r() * 2; g.beginPath(); g.moveTo(x + r() * 256, y); g.bezierCurveTo(x + r() * 256, y + 90, x + r() * 256, y + 170, x + r() * 256, y + 256); g.stroke(); }
+      g.strokeStyle = dark ? 'rgba(2,12,20,.55)' : 'rgba(110,80,50,.4)'; g.lineWidth = 3; g.strokeRect(x + 1.5, y + 1.5, 253, 253);
     }
     noise(g, 1024, 1024, 9000, r, .05);
     return tex(c, { repeat: true });
@@ -74,23 +76,28 @@
     return tex(c, { repeat: true });
   });
 
-  /* Rayonnages peints : dos de livres rouges et clay, touches de bleu et d'ocre (proportions de la charte). */
+  /* Rayonnages peints : dos de livres marine et bleus (dominante), bordeaux, clay et ocre en touches (proportions de la charte).
+     Quelques dos portent un numéro de tome en chiffres romains (rappel du Chiffre dans le décor). */
+  const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
   T.bookwall = (seed = 1) => memo('bw:' + seed, () => {
     const [c, g] = mk(2048, 2048), r = rng(seed * 97 + 5);
-    const pal = ['#4B0000', '#3B0000', '#6B0A12', '#D71635', '#4B0000', '#3B0000', '#8A1A1A', '#E1C8B4', '#CDB4A5', '#EBDCCD', '#4B0000', '#1E87BE', '#081F2C', '#CD5008', '#6B0A12', '#3B0000'];
+    const pal = ['#0E2F45', '#081F2C', '#123F5C', '#1B4766', '#0E2F45', '#081F2C', '#1E87BE', '#6B0A12', '#4B0000', '#E1C8B4', '#CDB4A5', '#EBDCCD', '#0E2F45', '#123F5C', '#CD5008', '#081F2C', '#D71635', '#1B4766'];
     const rows = 8, sh = 2048 / rows;
     for (let s = 0; s < rows; s++) {
-      const y0 = s * sh; const bg = g.createLinearGradient(0, y0, 0, y0 + sh); bg.addColorStop(0, '#190606'); bg.addColorStop(1, '#2C0F0C'); g.fillStyle = bg; g.fillRect(0, y0, 2048, sh);
+      const y0 = s * sh; const bg = g.createLinearGradient(0, y0, 0, y0 + sh); bg.addColorStop(0, '#071520'); bg.addColorStop(1, '#10202B'); g.fillStyle = bg; g.fillRect(0, y0, 2048, sh);
       let x = 0;
       while (x < 2048) {
         const w = 20 + r() * 34, h = 150 + r() * 70, col = pal[(r() * pal.length) | 0]; if (r() < .05) { x += 30 + r() * 50; continue; }
         const top = y0 + sh - 22 - h, gr = g.createLinearGradient(x, 0, x + w, 0); gr.addColorStop(0, 'rgba(255,255,255,.18)'); gr.addColorStop(.3, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(0,0,0,.45)');
         g.fillStyle = col; g.fillRect(x, top, w, h); g.fillStyle = gr; g.fillRect(x, top, w, h);
         g.fillStyle = r() > .4 ? C.bronzeD : C.bronzeL; g.fillRect(x, top + 12 + r() * 8, w, 3); g.fillRect(x, top + h - 26 - r() * 8, w, 3);
-        if (r() > .5) { g.fillStyle = 'rgba(225,200,180,.55)'; g.fillRect(x + w * .22, top + h * .32, w * .56, h * .2); }
+        if (r() > .5) {
+          g.fillStyle = 'rgba(225,200,180,.6)'; g.fillRect(x + w * .14, top + h * .3, w * .72, h * .22);
+          if (w > 30 && r() > .45) { g.fillStyle = '#1A2630'; g.font = `500 ${Math.round(Math.min(w * .5, 17))}px ${SERIF}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ROMAN[(r() * ROMAN.length) | 0], x + w / 2, top + h * .41); }
+        }
         x += w + 1;
       }
-      const wd = g.createLinearGradient(0, y0 + sh - 22, 0, y0 + sh); wd.addColorStop(0, C.woodL); wd.addColorStop(.25, '#6E3426'); wd.addColorStop(1, '#2A0E0A'); g.fillStyle = wd; g.fillRect(0, y0 + sh - 22, 2048, 22);
+      const wd = g.createLinearGradient(0, y0 + sh - 22, 0, y0 + sh); wd.addColorStop(0, C.woodL); wd.addColorStop(.25, '#5A4030'); wd.addColorStop(1, '#1F140F'); g.fillStyle = wd; g.fillRect(0, y0 + sh - 22, 2048, 22);
       g.fillStyle = 'rgba(0,0,0,.4)'; g.fillRect(0, y0 + sh - 44, 2048, 22);
     }
     return tex(c, { repeat: true });
@@ -100,14 +107,14 @@
     const [c, g] = mk(2048, 512);
     const bg = g.createLinearGradient(0, 0, 0, 512); bg.addColorStop(0, C.clay1); bg.addColorStop(1, C.clay4); g.fillStyle = bg; g.fillRect(0, 0, 2048, 512);
     for (let i = 0; i < 24; i++) { const x = i * 2048 / 24; g.fillStyle = i % 2 ? 'rgba(110,60,40,.07)' : 'rgba(255,255,255,.12)'; g.fillRect(x, 0, 2048 / 24, 512); }
-    for (let i = 0; i < 12; i++) { const x = i * 2048 / 12; g.fillStyle = C.redDeep; g.fillRect(x - 10, 0, 20, 512); g.fillStyle = bronze(g, 0, 0, 0, 512); g.fillRect(x - 3, 0, 6, 512); }
-    for (let k = 1; k < 5; k++) { g.fillStyle = C.redDeep; g.fillRect(0, k * 96, 2048, 12); g.fillStyle = C.bronze; g.fillRect(0, k * 96 + 4, 2048, 4); }
+    for (let i = 0; i < 12; i++) { const x = i * 2048 / 12; g.fillStyle = C.navy; g.fillRect(x - 10, 0, 20, 512); g.fillStyle = bronze(g, 0, 0, 0, 512); g.fillRect(x - 3, 0, 6, 512); }
+    for (let k = 1; k < 5; k++) { g.fillStyle = C.navy; g.fillRect(0, k * 96, 2048, 12); g.fillStyle = C.bronze; g.fillRect(0, k * 96 + 4, 2048, 4); }
     return tex(c);
   });
 
   T.balustrade = () => memo('bal', () => {
     const [c, g] = mk(512, 256); g.clearRect(0, 0, 512, 256);
-    for (let x = 16; x < 512; x += 64) { const q = g.createLinearGradient(x - 14, 0, x + 14, 0); q.addColorStop(0, '#2A0E0A'); q.addColorStop(.4, '#8A4A3C'); q.addColorStop(1, '#2A0E0A'); g.fillStyle = q; g.beginPath(); g.moveTo(x - 7, 12); g.quadraticCurveTo(x - 17, 128, x - 7, 244); g.lineTo(x + 7, 244); g.quadraticCurveTo(x + 17, 128, x + 7, 12); g.fill(); g.beginPath(); g.arc(x, 128, 14, 0, 7); g.fill(); }
+    for (let x = 16; x < 512; x += 64) { const q = g.createLinearGradient(x - 14, 0, x + 14, 0); q.addColorStop(0, '#1F140F'); q.addColorStop(.4, '#7A5A44'); q.addColorStop(1, '#1F140F'); g.fillStyle = q; g.beginPath(); g.moveTo(x - 7, 12); g.quadraticCurveTo(x - 17, 128, x - 7, 244); g.lineTo(x + 7, 244); g.quadraticCurveTo(x + 17, 128, x + 7, 12); g.fill(); g.beginPath(); g.arc(x, 128, 14, 0, 7); g.fill(); }
     return tex(c, { repeat: true });
   });
 
@@ -115,7 +122,7 @@
     const [c, g] = mk(512, 1024);
     const sky = g.createLinearGradient(0, 0, 0, 1024); sky.addColorStop(0, C.clay1); sky.addColorStop(1, C.clay3); g.fillStyle = sky; g.fillRect(0, 0, 512, 1024);
     const gl = g.createRadialGradient(256, 300, 10, 256, 300, 420); gl.addColorStop(0, 'rgba(255,255,255,.9)'); gl.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gl; g.fillRect(0, 0, 512, 1024);
-    g.strokeStyle = '#6A4A3A'; g.lineWidth = 12; g.beginPath(); g.moveTo(256, 0); g.lineTo(256, 1024); g.stroke();
+    g.strokeStyle = '#5B4636'; g.lineWidth = 12; g.beginPath(); g.moveTo(256, 0); g.lineTo(256, 1024); g.stroke();
     for (const y of [300, 560, 800]) { g.beginPath(); g.moveTo(0, y); g.lineTo(512, y); g.stroke(); }
     return tex(c);
   });
@@ -123,9 +130,9 @@
   /* ---------- portes : une teinte d'accent par univers, un numéro en IBM Plex Mono ---------- */
   T.doorLeaf = () => memo('leaf', () => {
     const [c, g] = mk(512, 1024), r = rng(41);
-    g.fillStyle = C.wood; g.fillRect(0, 0, 512, 1024);
-    for (let i = 0; i < 40; i++) { const x = r() * 512; g.strokeStyle = r() > .5 ? 'rgba(0,0,0,.14)' : 'rgba(255,210,200,.07)'; g.lineWidth = 1 + r() * 2; g.beginPath(); g.moveTo(x, 0); g.bezierCurveTo(x + 12, 300, x - 12, 700, x, 1024); g.stroke(); }
-    const panel = (x, y, w, h) => { g.fillStyle = 'rgba(0,0,0,.28)'; g.fillRect(x - 6, y - 6, w + 12, h + 12); g.fillStyle = C.woodL; g.fillRect(x, y, w, h); const q = g.createLinearGradient(x, y, x + w, y + h); q.addColorStop(0, 'rgba(255,255,255,.16)'); q.addColorStop(1, 'rgba(0,0,0,.28)'); g.fillStyle = q; g.fillRect(x, y, w, h); g.strokeStyle = 'rgba(221,185,133,.6)'; g.lineWidth = 3; g.strokeRect(x + 14, y + 14, w - 28, h - 28); };
+    g.fillStyle = C.navyD; g.fillRect(0, 0, 512, 1024);
+    for (let i = 0; i < 40; i++) { const x = r() * 512; g.strokeStyle = r() > .5 ? 'rgba(0,0,0,.18)' : 'rgba(170,210,235,.06)'; g.lineWidth = 1 + r() * 2; g.beginPath(); g.moveTo(x, 0); g.bezierCurveTo(x + 12, 300, x - 12, 700, x, 1024); g.stroke(); }
+    const panel = (x, y, w, h) => { g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(x - 6, y - 6, w + 12, h + 12); g.fillStyle = C.navyL; g.fillRect(x, y, w, h); const q = g.createLinearGradient(x, y, x + w, y + h); q.addColorStop(0, 'rgba(255,255,255,.14)'); q.addColorStop(1, 'rgba(0,0,0,.32)'); g.fillStyle = q; g.fillRect(x, y, w, h); g.strokeStyle = 'rgba(221,185,133,.65)'; g.lineWidth = 3; g.strokeRect(x + 14, y + 14, w - 28, h - 28); };
     panel(46, 50, 420, 400); panel(46, 500, 420, 470);
     g.fillStyle = C.bronzeL; for (const [x, y] of [[26, 26], [486, 26], [26, 998], [486, 998], [26, 480], [486, 480]]) { g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill(); }
     noise(g, 512, 1024, 3000, r, .05);
@@ -136,10 +143,10 @@
     const A = m.accentCfg, [c, g] = mk(512, 256); g.clearRect(0, 0, 512, 256);
     g.save(); g.beginPath(); g.moveTo(0, 256); g.arc(256, 256, 256, Math.PI, 0); g.closePath(); g.clip();
     const q = g.createRadialGradient(256, 256, 10, 256, 256, 260); q.addColorStop(0, C.clay1); q.addColorStop(.5, A.main); q.addColorStop(1, A.deep); g.fillStyle = q; g.fillRect(0, 0, 512, 256);
-    g.strokeStyle = 'rgba(30,8,6,.75)'; g.lineWidth = 6; for (let i = 0; i <= 12; i++) { const a = Math.PI + i * Math.PI / 12; g.beginPath(); g.moveTo(256, 256); g.lineTo(256 + Math.cos(a) * 260, 256 + Math.sin(a) * 260); g.stroke(); }
+    g.strokeStyle = 'rgba(6,20,30,.78)'; g.lineWidth = 6; for (let i = 0; i <= 12; i++) { const a = Math.PI + i * Math.PI / 12; g.beginPath(); g.moveTo(256, 256); g.lineTo(256 + Math.cos(a) * 260, 256 + Math.sin(a) * 260); g.stroke(); }
     for (const rad of [90, 170]) { g.beginPath(); g.arc(256, 256, rad, Math.PI, 0); g.stroke(); }
     g.fillStyle = C.clay1; g.beginPath(); g.arc(256, 256, 64, Math.PI, 0); g.fill(); g.stroke();
-    g.fillStyle = A.deep; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.font = `500 52px ${MONO}`; g.fillText(String(m.ordre).padStart(2, '0'), 256, 240);
+    g.fillStyle = A.deep; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.font = `500 ${m.ordre > 3 ? 56 : 64}px ${SERIF}`; g.fillText(L.roman(m.ordre), 256, 238, 118);
     g.restore(); return tex(c);
   });
 
@@ -157,23 +164,52 @@
     const q = g.createLinearGradient(0, 0, 0, h); q.addColorStop(0, C.clay2); q.addColorStop(1, C.clay4); g.fillStyle = q; rr(g, 6, 6, w - 12, h - 12, h * .1); g.fill();
     g.strokeStyle = bronze(g, 0, 0, w, h); g.lineWidth = h * .03; rr(g, h * .08, h * .08, w - h * .16, h - h * .16, h * .06); g.stroke();
     g.textAlign = 'center'; g.textBaseline = 'middle';
-    if (kicker) { g.fillStyle = C.redDeep; g.font = `500 ${h * .15}px ${MONO}`; spaced(g, h * .02); g.fillText(kicker, w / 2, h * .28); spaced(g, 0); }
-    g.fillStyle = tcol || C.redDeep; let fs = h * (kicker ? .3 : .4); g.font = `500 ${fs}px ${SERIF}`; while (g.measureText(title).width > w * .86 && fs > 18) { fs -= 2; g.font = `500 ${fs}px ${SERIF}`; }
+    if (kicker) { g.fillStyle = C.navy; g.font = `500 ${h * .15}px ${MONO}`; spaced(g, h * .02); g.fillText(kicker, w / 2, h * .28); spaced(g, 0); }
+    g.fillStyle = tcol || C.navy; let fs = h * (kicker ? .3 : .4); g.font = `500 ${fs}px ${SERIF}`; while (g.measureText(title).width > w * .86 && fs > 18) { fs -= 2; g.font = `500 ${fs}px ${SERIF}`; }
     g.fillText(title, w / 2, h * (kicker ? .64 : .52));
     return tex(c, { own: true });
   };
-  T.plaque = (m) => memo('plq:' + m.id, () => plate(1024, 200, `UNIVERS ${String(m.ordre).padStart(2, '0')}`, m.nom, C.redDeep));
+  T.plaque = (m) => memo('plq:' + m.id, () => plate(1024, 200, `${L.roman(m.ordre)} · ${m.n.toLocaleString('fr-FR')} PRODUITS`, m.nom, C.navyD));
 
-  /* Rosace : motif géométrique issu de la forme récurrente (aucun texte, aucun faux logo). */
+  /* Rosace : motif géométrique issu de la forme récurrente (aucun texte, aucun faux logo).
+     Couronne extérieure graduée en bronze, comme un cadran (rappel du Chiffre). */
   T.rosace = () => memo('rosace', () => {
     const [c, g] = mk(1024, 1024), cx = 512, cy = 512; g.clearRect(0, 0, 1024, 1024);
     const ring = (r0, r1, col) => { g.fillStyle = col; g.beginPath(); g.arc(cx, cy, r1, 0, 7); g.arc(cx, cy, r0, 0, 7, true); g.fill(); };
-    g.fillStyle = C.redDeep; g.beginPath(); g.arc(cx, cy, 508, 0, 7); g.fill(); ring(484, 508, C.bronze); ring(470, 478, C.bronzeL);
-    ring(330, 440, '#3B0000'); ring(322, 330, C.bronzeL);
-    for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; g.save(); g.translate(cx + Math.cos(a) * 385, cy + Math.sin(a) * 385); g.rotate(a + Math.PI / 2); g.fillStyle = i % 2 ? C.red : C.clay4; brand(g, -34, -46, 68, 92, 14); g.fill(); g.restore(); }
-    g.fillStyle = C.red; g.strokeStyle = C.bronzeL; g.lineWidth = 4; g.beginPath(); for (let i = 0; i < 24; i++) { const a = i * Math.PI / 12 - Math.PI / 2, rad = i % 2 ? 150 : 300; g.lineTo(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad); } g.closePath(); g.fill(); g.stroke();
-    g.fillStyle = C.redDeep; g.beginPath(); g.arc(cx, cy, 120, 0, 7); g.fill(); g.lineWidth = 5; g.stroke();
+    g.fillStyle = C.navyD; g.beginPath(); g.arc(cx, cy, 508, 0, 7); g.fill(); ring(484, 508, C.bronze); ring(470, 478, C.bronzeL);
+    g.strokeStyle = C.bronzeL; for (let i = 0; i < 120; i++) { const a = i * Math.PI / 60, big = i % 10 === 0, mid = i % 5 === 0, r0 = big ? 440 : mid ? 450 : 458; g.lineWidth = big ? 4 : mid ? 3 : 2; g.beginPath(); g.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0); g.lineTo(cx + Math.cos(a) * 468, cy + Math.sin(a) * 468); g.stroke(); }
+    ring(330, 436, C.navy); ring(322, 330, C.bronzeL);
+    for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; g.save(); g.translate(cx + Math.cos(a) * 385, cy + Math.sin(a) * 385); g.rotate(a + Math.PI / 2); g.fillStyle = i % 2 ? C.blue : C.clay4; brand(g, -34, -46, 68, 92, 14); g.fill(); g.restore(); }
+    g.fillStyle = C.blue; g.strokeStyle = C.bronzeL; g.lineWidth = 4; g.beginPath(); for (let i = 0; i < 24; i++) { const a = i * Math.PI / 12 - Math.PI / 2, rad = i % 2 ? 150 : 300; g.lineTo(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad); } g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = C.navyD; g.beginPath(); g.arc(cx, cy, 120, 0, 7); g.fill(); g.lineWidth = 5; g.stroke();
     g.fillStyle = C.clay2; brand(g, cx - 54, cy - 54, 108, 108, 20); g.fill();
+    return tex(c);
+  });
+
+  /* Cadran de bronze : couronne graduée (graduations et chiffres romains) posée sur le socle du Code civil. */
+  T.dial = () => memo('dial', () => {
+    const [c, g] = mk(1024, 1024), cx = 512, cy = 512; g.clearRect(0, 0, 1024, 1024);
+    g.fillStyle = C.navyD; g.beginPath(); g.arc(cx, cy, 508, 0, 7); g.arc(cx, cy, 380, 0, 7, true); g.fill();
+    g.strokeStyle = bronze(g, 0, 0, 1024, 1024); g.lineWidth = 8; g.beginPath(); g.arc(cx, cy, 500, 0, 7); g.stroke(); g.beginPath(); g.arc(cx, cy, 388, 0, 7); g.stroke();
+    g.strokeStyle = C.bronzeL; for (let i = 0; i < 144; i++) { const a = i * Math.PI / 72, big = i % 12 === 0, mid = i % 6 === 0; g.lineWidth = big ? 5 : mid ? 3.5 : 2; g.beginPath(); g.moveTo(cx + Math.cos(a) * (big ? 396 : 410), cy + Math.sin(a) * (big ? 396 : 410)); g.lineTo(cx + Math.cos(a) * (big ? 440 : mid ? 432 : 424), cy + Math.sin(a) * (big ? 440 : mid ? 432 : 424)); g.stroke(); }
+    g.fillStyle = C.bronzeL; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `500 44px ${SERIF}`;
+    for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6 - Math.PI / 2; g.save(); g.translate(cx + Math.cos(a) * 470, cy + Math.sin(a) * 470); g.rotate(a + Math.PI / 2); g.fillText(ROMAN[(i + 11) % 12], 0, 0); g.restore(); }
+    return tex(c);
+  });
+
+  /* Frise de registre : papier réglé d'un grand livre de comptes, filets dorés sur fond marine (aucun nombre lisible). */
+  T.ledgerFrieze = () => memo('frieze', () => {
+    const [c, g] = mk(2048, 128);
+    g.fillStyle = C.navyD; g.fillRect(0, 0, 2048, 128);
+    g.strokeStyle = 'rgba(221,185,133,.55)'; g.lineWidth = 2; for (let y = 22; y < 128; y += 14) { g.beginPath(); g.moveTo(0, y); g.lineTo(2048, y); g.stroke(); }
+    g.strokeStyle = C.bronzeL; g.lineWidth = 5; for (let x = 64; x < 2048; x += 256) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 128); g.stroke(); g.lineWidth = 2; g.beginPath(); g.moveTo(x + 14, 0); g.lineTo(x + 14, 128); g.stroke(); g.lineWidth = 5; }
+    g.strokeStyle = C.bronze; g.lineWidth = 8; g.beginPath(); g.moveTo(0, 5); g.lineTo(2048, 5); g.moveTo(0, 123); g.lineTo(2048, 123); g.stroke();
+    return tex(c, { repeat: true });
+  });
+
+  /* Chiffre doré : particule de la poussière de lumière. */
+  T.digit = (ch) => memo('digit:' + ch, () => {
+    const [c, g] = mk(64, 64); g.clearRect(0, 0, 64, 64); g.fillStyle = C.bronzeL; g.font = `500 52px ${SERIF}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ch, 32, 36);
     return tex(c);
   });
 
@@ -197,7 +233,8 @@
   });
   T.codePage = () => memo('codePage', () => {
     const W = 1024, H = 1440, [c, g] = aged(W, H, 21), r = rng(5);
-    for (let blk = 0; blk < 2; blk++) { const y0 = blk ? 860 : 190; for (let i = 0; i < (blk ? 10 : 16); i++) { const y = y0 + i * 40, w = (i % 6 === 5) ? 340 : 700; g.fillStyle = `rgba(43,26,20,${.42 + r() * .12})`; g.fillRect(150, y, w, 6); } }
+    let art = 1; g.textAlign = 'right'; g.textBaseline = 'middle'; g.font = `500 28px ${SERIF}`;
+    for (let blk = 0; blk < 2; blk++) { const y0 = blk ? 860 : 190; for (let i = 0; i < (blk ? 10 : 16); i++) { const y = y0 + i * 40, w = (i % 6 === 5) ? 340 : 700; g.fillStyle = `rgba(43,26,20,${.42 + r() * .12})`; g.fillRect(150, y, w, 6); if (i % 6 === 0) { g.fillStyle = 'rgba(110,70,30,.8)'; g.fillText(String(art++), 128, y + 3); } } }
     return tex(c);
   });
   T.codeCover = () => memo('codeCover', () => {
@@ -277,9 +314,9 @@
     g.fillStyle = C.clay1; brand(g, 6, 6, W - 12, H - 12, 44); g.fill();
     g.fillStyle = A.main; g.save(); brand(g, 6, 6, W - 12, H - 12, 44); g.clip(); g.fillRect(0, 0, W, 22); g.restore();
     g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillStyle = A.text; g.font = `500 50px ${MONO}`; spaced(g, 4); g.fillText(st.code, 64, 112); spaced(g, 0);
-    g.fillStyle = C.redInk; let fs = 74; g.font = `500 ${fs}px ${SERIF}`; let lines = wrap(g, st.nom, W - 190); while (lines.length > 2 && fs > 44) { fs -= 4; g.font = `500 ${fs}px ${SERIF}`; lines = wrap(g, st.nom, W - 190); }
+    g.fillStyle = C.navyD; let fs = 74; g.font = `500 ${fs}px ${SERIF}`; let lines = wrap(g, st.nom, W - 190); while (lines.length > 2 && fs > 44) { fs -= 4; g.font = `500 ${fs}px ${SERIF}`; lines = wrap(g, st.nom, W - 190); }
     lines.forEach((l, i) => g.fillText(l, 64, 200 + i * fs * 1.12));
-    g.fillStyle = '#5E4A42'; g.font = `400 40px ${SANS}`; g.fillText(`${st.n} ${L.plural(st.n, 'produit')} au catalogue`, 64, H - 52);
+    g.fillStyle = '#46586A'; g.font = `400 40px ${SANS}`; g.fillText(`${st.n} ${L.plural(st.n, 'produit')} au catalogue`, 64, H - 52);
     return tex(c, { own: true });
   };
 
@@ -290,15 +327,15 @@
     g.save(); brand(g, 4, 4, W - 8, H - 8, 34); g.clip(); g.fillStyle = A.main; g.fillRect(0, 0, W, 18); g.restore();
     g.textAlign = 'left'; g.textBaseline = 'alphabetic';
     g.fillStyle = A.text; g.font = `500 27px ${MONO}`; spaced(g, 2); g.fillText(String(p.f || p.tp || '').toUpperCase().slice(0, 22), 40, 92); spaced(g, 0);
-    g.fillStyle = C.redInk; let fs = 56; g.font = `500 ${fs}px ${SERIF}`; let lines = wrap(g, p.t, W - 84); while (lines.length > 6 && fs > 30) { fs -= 3; g.font = `500 ${fs}px ${SERIF}`; lines = wrap(g, p.t, W - 84); }
+    g.fillStyle = C.navyD; let fs = 56; g.font = `500 ${fs}px ${SERIF}`; let lines = wrap(g, p.t, W - 84); while (lines.length > 6 && fs > 30) { fs -= 3; g.font = `500 ${fs}px ${SERIF}`; lines = wrap(g, p.t, W - 84); }
     lines.slice(0, 7).forEach((l, i) => g.fillText(l, 40, 170 + i * fs * 1.18));
-    g.fillStyle = '#5E4A42'; g.font = `400 30px ${SANS}`; g.fillText(`${p.dl || p.dh || ''}${p.n ? ' · ' + p.n : ''}`, 40, H - 66);
+    g.fillStyle = '#46586A'; g.font = `400 30px ${SANS}`; g.fillText(`${p.dl || p.dh || ''}${p.n ? ' · ' + p.n : ''}`, 40, H - 66);
     if (p.best === 1) { g.fillStyle = A.text; rr(g, W - 40 - 112, H - 104, 112, 42, 21); g.fill(); g.fillStyle = '#fff'; g.font = `500 23px ${MONO}`; g.textAlign = 'center'; g.fillText('BEST', W - 40 - 56, H - 75); }
     return tex(c, { own: true });
   };
 
   T.check = () => memo('check', () => {
-    const [c, g] = mk(128, 128); g.fillStyle = C.red; g.beginPath(); g.arc(64, 64, 60, 0, 7); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 14; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); g.moveTo(36, 66); g.lineTo(56, 86); g.lineTo(92, 44); g.stroke();
+    const [c, g] = mk(128, 128); g.fillStyle = '#1773A0'; g.beginPath(); g.arc(64, 64, 60, 0, 7); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 14; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); g.moveTo(36, 66); g.lineTo(56, 86); g.lineTo(92, 44); g.stroke();
     return tex(c);
   });
   T.glow = () => memo('glow', () => { const [c, g] = mk(128, 128), q = g.createRadialGradient(64, 64, 0, 64, 64, 64); q.addColorStop(0, 'rgba(255,255,255,1)'); q.addColorStop(.3, 'rgba(255,255,255,.45)'); q.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = q; g.fillRect(0, 0, 128, 128); return tex(c); });

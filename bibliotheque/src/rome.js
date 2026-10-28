@@ -120,7 +120,7 @@
     return out;
   };
 
-  /* Synthèse des compétences ROME 4 d'un ensemble de produits (étape 4 du pitch et synthèse client). */
+  /* Synthèse des compétences ROME 4 d'un ensemble de produits (synthèse client). */
   R.synthese = (produits) => {
     const map = new Map();
     produits.forEach((p) => R.competencesDe(p.c).forEach((c) => {

@@ -3,7 +3,7 @@ const { launch, open } = require('./lib');
 let fails = 0; const ok = (label, cond, extra = '') => { console.log((cond ? 'OK   ' : 'ÉCHEC'), label, extra); if (!cond) fails++; };
 (async () => {
   const { browser, page, log } = await launch({ viewport: { width: 1200, height: 700 } });
-  await open(page, '?debug=1&fast=6&go=explore');
+  await open(page, '?debug=1&fast=6');
   const r = await page.evaluate(() => {
     const R = LDC.rome, cat = LDC.cat, out = {};
     out.comp = R.competence(400878);
@@ -17,7 +17,7 @@ let fails = 0; const ok = (label, cond, extra = '') => { console.log((cond ? 'OK
     out.onlyMapped = res.every((x) => x.rattache);
     const needM = { momentId: 'M-TEST' };
     out.moment = R.match(needM, cat.produits).slice(0, 3).map((x) => ({ c: x.produit.c, niveau: x.niveau, why: x.raisons.map((y) => y.critere) }));
-    out.cadre = R.match({ niveau: 'Fondamentaux', formats: ['Inter standard'], dureeMax: 1, mondes: ['public'] }, cat.produits).slice(0, 3).map((x) => ({ c: x.produit.c, niveau: x.niveau, why: x.raisons.map((y) => y.critere) }));
+    out.cadre = R.match({ niveau: 'Fondamentaux', formats: ['Inter standard'], dureeMax: 1, mondes: ['droit'] }, cat.produits).slice(0, 3).map((x) => ({ c: x.produit.c, niveau: x.niveau, why: x.raisons.map((y) => y.critere) }));
     out.syn = R.synthese([cat.byCode.get('600013'), cat.byCode.get('521038')]).map((c) => ({ id: c.id, imp: c.importance, n: c.produits.length }));
     out.search = R.search('marchés publics', 3).map((c) => c.id);
     out.metiers = R.searchMetiers('comptable', 2);

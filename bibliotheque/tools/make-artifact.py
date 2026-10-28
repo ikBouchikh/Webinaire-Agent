@@ -31,7 +31,7 @@ body = body.replace('<a class="skip" href="#dock">Aller à la carte du lieu</a>\
 page = f'<title>{title}</title>\n<style>\n{css}\n</style>\n{body}\n<script>window.LDC_ENV={{artifact:true}};</script>\n' + '\n'.join(f'<script src="{s}"></script>' for s in scripts) + '\n'
 open(os.path.join(out, 'page.html'), 'w', encoding='utf-8').write(page)
 
-files = list(scripts) + sorted(os.path.relpath(p, ROOT) for p in glob.glob(os.path.join(ROOT, 'assets', 'cognitio', '*.webp')))
+files = list(scripts) + sorted(os.path.relpath(p, ROOT) for p in glob.glob(os.path.join(ROOT, 'assets', 'cognitio', '*.webp'))) + sorted(os.path.relpath(p, ROOT) for p in glob.glob(os.path.join(ROOT, 'assets', 'brand', '*.png')))
 json.dump(files, open(os.path.join(out, 'files.json'), 'w'), indent=1)
 print('page.html', os.path.getsize(os.path.join(out, 'page.html')) // 1024, 'Ko ;', len(files), 'fichiers')
 for f in files:

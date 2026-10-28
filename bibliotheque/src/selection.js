@@ -78,13 +78,11 @@
   const render = () => {
     const s = Se.synthese(), root = el(), sc = $('.pb', root) ? $('.pb', root).scrollTop : 0, keepArg = document.activeElement && document.activeElement.id === 'selArg';
     root.innerHTML = `
-      <div class="ph"><span class="ico" aria-hidden="true">${L.ICON_SVG}</span><p class="kicker">Proposition client</p><button class="x" type="button" data-a="close" aria-label="Fermer la sélection">✕</button></div>
+      <div class="ph"><span class="ico" aria-hidden="true">${L.MARK}</span><p class="kicker">Proposition client</p><button class="x" type="button" data-a="close" aria-label="Fermer la sélection">✕</button></div>
       <div class="pb">
         <h2 id="selTitle" data-autofocus>Ma sélection client</h2>
         <p class="lead">${s.items.length ? `${s.items.length} ${L.plural(s.items.length, 'produit')} · ${cat.fmtJours(s.jours)}` : 'Aucun produit pour le moment.'}</p>
-        <div class="sec"><h4>Besoin exprimé</h4>
-          ${s.besoin.length ? `<dl class="kv">${s.besoin.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>` : '<p class="note">Aucun besoin saisi. Le mode Pitch guidé permet de le renseigner en quelques repères.</p>'}
-          <button class="btn btn-soft btn-sm" type="button" data-a="need">${s.besoin.length ? 'Modifier le besoin' : 'Renseigner le besoin'}</button></div>
+        ${s.besoin.length ? `<div class="sec"><h4>Besoin exprimé</h4><dl class="kv">${s.besoin.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></div>` : ''}
         <div class="sec"><h4>Produits retenus</h4>
           ${s.items.length ? `<ul class="sel-items">${s.items.map((p) => { const m = cat.mondeOf(p); return `<li class="sel-item" style="--c:${m ? m.accentCfg.main : '#D71635'}"><span class="bar"></span><div class="tx"><button class="link" type="button" data-open="${esc(p.c)}" style="text-align:left;text-decoration:none"><b>${esc(p.t)}</b></button><small>${esc(m ? m.nom : '')} · ${esc(p.f || '')} · ${esc(cat.duree(p))}${p.n ? ' · ' + esc(p.n) : ''}</small></div><button class="rm" type="button" data-rm="${esc(p.c)}" aria-label="Retirer : ${esc(p.t)}">✕</button></li>`; }).join('')}</ul>` : '<p class="note">Ouvrez une fiche produit et choisissez « Ajouter à la sélection client ».</p>'}
         </div>
@@ -115,13 +113,12 @@
       if (b.dataset.open) { const p = cat.byCode.get(b.dataset.open); if (p) L.sheet.openProduct(p, { back: false }); return; }
       const a = b.dataset.a;
       if (a === 'close') Se.close();
-      else if (a === 'need') { Se.close(); L.pitch.open(2); }
       else if (a === 'copy') L.copy(Se.toText()).then((ok) => L.toast(ok ? 'Synthèse copiée' : 'Copie impossible : sélectionnez le texte à la main'));
       else if (a === 'print') Se.print();
       else if (a === 'reset') { if (!confirmReset) { confirmReset = setTimeout(() => { confirmReset = 0; if (Se.isOpen()) render(); }, 4000); render(); } else { clearTimeout(confirmReset); confirmReset = 0; L.resetClient(); L.toast('Sélection réinitialisée'); } }
     });
     let t = 0;
-    root.addEventListener('input', (e) => { if (e.target.id === 'selArg') { L.state.client.argument = e.target.value; clearTimeout(t); t = setTimeout(() => L.store.save({ seenTransition: L.state.seenTransition, seenIntro: L.state.seenIntro, client: L.state.client }), 300); } });
+    root.addEventListener('input', (e) => { if (e.target.id === 'selArg') { L.state.client.argument = e.target.value; clearTimeout(t); t = setTimeout(() => L.store.save({ seenTransition: L.state.seenTransition, client: L.state.client }), 300); } });
     const upd = () => { const n = Se.count(), c = $('#selCount'); c.textContent = n; c.hidden = !n; if (Se.isOpen()) render(); };
     L.onChange(upd); upd();
   };

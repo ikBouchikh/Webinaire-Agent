@@ -1,8 +1,8 @@
 {
   "_meta": {
     "statut": "A_VALIDER",
-    "note": "Regroupement des 37 « domaines FORMEO » de la base produits en six univers d'exposition. Proposition de travail : à valider par l'offre. Les intitulés d'univers sont des directions artistiques et restent configurables.",
-    "source": "Base_produits_2027 (colonnes MARCHE FORMEO / DOMAINE FORMEO) et brief client"
+    "note": "Six portes alignées sur les domaines du site formation.lefebvre-dalloz.fr (Chiffre, Droit, Technologies numériques, Gestion RH, Soft Skills, QSE), regroupant les 37 « domaines FORMEO » de la base produits. Le septième domaine du site, « Secteurs et métiers », n'est pas une porte : il devient l'entrée « un métier » de Cognitio. Proposition de travail : à valider par l'offre. Les sous-titres d'univers sont des directions artistiques et restent configurables.",
+    "source": "Base_produits_2027 (colonnes MARCHE FORMEO / DOMAINE FORMEO) et page d'accueil du site (28/10/2026)"
   },
   "mondes": [
     {
@@ -12,7 +12,7 @@
       "univers": "La chambre des sources",
       "promesse": "Textes, références, raisonnements et chaînes de preuve.",
       "accessoire": "droit",
-      "accent": "red",
+      "accent": "blue",
       "stationNiveau": "domaine",
       "domaines": [
         "DA - Droit des affaires",
@@ -21,8 +21,16 @@
         "DD - Conformité",
         "DL - Droit des particuliers",
         "DK - Contentieux - Procédure - Médiation",
-        "DO - Soft skills Droit"
-      ]
+        "DO - Soft skills Droit",
+        "DM - Marchés publics",
+        "DN - Secteur public"
+      ],
+      "domainesProvisoires": [
+        "DM - Marchés publics",
+        "DN - Secteur public"
+      ],
+      "noteProvisoire": "Marchés publics et Secteur public (41 produits) restent rattachés au Droit jusqu'à la création de l'entrée « un métier » (Secteurs et métiers) dans le Studio Cognitio.",
+      "court": "Droit"
     },
     {
       "id": "chiffre",
@@ -41,14 +49,15 @@
         "CE - Patrimoine",
         "CF - Banque - Assurance",
         "CG - Soft skills Chiffre"
-      ]
+      ],
+      "court": "Chiffre"
     },
     {
       "id": "rh",
       "ordre": 3,
-      "nom": "RH, Paie & Social",
+      "nom": "Gestion RH",
       "univers": "La constellation des talents",
-      "promesse": "Relations, trajectoires, situations humaines et compétences.",
+      "promesse": "Relations, trajectoires, paie, droit social et situations humaines.",
       "accessoire": "rh",
       "accent": "ocre",
       "stationNiveau": "domaine",
@@ -58,44 +67,36 @@
         "DG - Paie",
         "DH - IRP",
         "DJ - Action sociale"
-      ]
+      ],
+      "court": "Gestion RH"
     },
     {
-      "id": "qse",
+      "id": "tech",
       "ordre": 4,
-      "nom": "QSE",
-      "univers": "La salle des risques et des impacts",
-      "promesse": "Prévention, qualité, sécurité, environnement et scénarios.",
-      "accessoire": "qse",
+      "nom": "Technologies numériques",
+      "univers": "Le laboratoire des outils",
+      "promesse": "Intelligence artificielle, données, cybersécurité, outils et marketing digital.",
+      "accessoire": "technologies",
       "accent": "blue",
-      "stationNiveau": "theme",
-      "domaines": [
-        "DI - QHSE"
-      ]
-    },
-    {
-      "id": "public",
-      "ordre": 5,
-      "nom": "Service public",
-      "univers": "La cartographie des missions",
-      "promesse": "Territoires, acteurs, responsabilités et service rendu.",
-      "accessoire": "neutre",
-      "accessoireStatut": "A_VALIDER (aucun accessoire Cognitio fourni pour ce domaine)",
-      "accent": "red",
       "stationNiveau": "domaine",
       "domaines": [
-        "DN - Secteur public",
-        "DM - Marchés publics"
-      ]
+        "TNIA - IA",
+        "TNDA - Data",
+        "TNCY - Cyber",
+        "TNIT - Informatique-IT",
+        "TNBU - Bureautique",
+        "TNMD - Marketing digital"
+      ],
+      "court": "Numérique"
     },
     {
-      "id": "mgmt",
-      "ordre": 6,
-      "nom": "Management, Soft skills & Numérique",
+      "id": "soft",
+      "ordre": 5,
+      "nom": "Soft Skills",
       "univers": "L'arène de situations",
-      "promesse": "Décisions, conversations, simulations et transformations liées à l'IA.",
+      "promesse": "Management, communication, efficacité, développement personnel et coaching.",
       "accessoire": "management",
-      "accent": "ocre",
+      "accent": "red",
       "stationNiveau": "domaine",
       "domaines": [
         "SA - Management et leadership",
@@ -105,23 +106,24 @@
         "SE - Efficacité professionnelle",
         "SF - Learning",
         "SG - Relation client et fournisseur",
-        "TNIA - IA",
-        "TNBU - Bureautique",
-        "TNMD - Marketing digital",
-        "TNIT - Informatique-IT",
-        "TNDA - Data",
-        "TNCY - Cyber",
         "COACH_I - Coaching individuel",
         "COACH_C - Coaching collectif"
       ],
-      "accessoiresParDomaine": {
-        "TNIA - IA": "technologies",
-        "TNBU - Bureautique": "technologies",
-        "TNMD - Marketing digital": "technologies",
-        "TNIT - Informatique-IT": "technologies",
-        "TNDA - Data": "technologies",
-        "TNCY - Cyber": "technologies"
-      }
+      "court": "Soft Skills"
+    },
+    {
+      "id": "qse",
+      "ordre": 6,
+      "nom": "QSE",
+      "univers": "La salle des risques et des impacts",
+      "promesse": "Prévention, qualité, sécurité, environnement et scénarios.",
+      "accessoire": "qse",
+      "accent": "ocre",
+      "stationNiveau": "theme",
+      "domaines": [
+        "DI - QHSE"
+      ],
+      "court": "QSE"
     }
   ],
   "selection": {

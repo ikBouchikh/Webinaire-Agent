@@ -3,26 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Bibliothèque des compétences · Lefebvre Dalloz Compétences</title>
-<meta name="description" content="Outil d'aide à la vente : explorer l'offre de formation 2027 de Lefebvre Dalloz Compétences, composer une sélection client.">
+<title>Lefebvre Dalloz Compétences · L'offre de formation 2027</title>
+<meta name="description" content="Outil d'aide à la vente : présenter l'offre de formation 2027 de Lefebvre Dalloz Compétences à un client et composer une sélection.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <a class="skip" href="#dock">Aller à la carte du lieu</a>
-<canvas id="gl" role="img" aria-label="Scène 3D : la Grande salle et les six univers de l'offre. Toutes les actions sont aussi disponibles au clavier."></canvas>
+<canvas id="gl" role="img" aria-label="Scène 3D : la Grande salle, le premier Code civil et les six portes de l'offre. Toutes les actions sont aussi disponibles au clavier."></canvas>
 <div id="hotspots" class="hotspots" aria-label="Éléments de la scène"></div>
 
 <header id="top" class="top" hidden>
-  <div class="brand">
-    <span id="brandMark" class="ico" aria-hidden="true"></span>
-    <span id="brandText" class="wordmark">Lefebvre Dalloz<small>Compétences</small></span>
-  </div>
+  <div class="brand"><img id="brandLogo" class="logo" src="assets/brand/logo-ldc-competences.png" alt="Lefebvre Dalloz Compétences" width="141" height="37"></div>
   <nav id="crumbs" class="crumbs" aria-label="Où suis-je ?"></nav>
   <div class="top-actions">
-    <div class="seg" role="group" aria-label="Mode d'utilisation">
-      <button id="modeExplore" type="button" aria-pressed="true">Exploration</button>
-      <button id="modePitch" type="button" aria-pressed="false">Pitch guidé</button>
-    </div>
     <button id="btnSel" class="pill pill-main" type="button" aria-haspopup="dialog"><span class="long">Ma sélection client</span><span class="short">Sélection</span> <span id="selCount" class="count" hidden>0</span></button>
   </div>
 </header>
@@ -34,7 +27,7 @@
 
 <div id="bottom" class="bottom" hidden>
   <aside id="cognitio" class="cognitio" aria-label="Cognitio, guide de la visite">
-    <div class="face"><img id="cgImg" alt="Cognitio, la mascotte-guide" src="assets/cognitio/cognitio-neutre.webp" width="92" height="92"></div>
+    <div class="face"><img id="cgImg" alt="Cognitio, le compagnon de visite" src="assets/cognitio/cognitio-neutre.webp" width="92" height="92"></div>
     <div class="bubble" id="cgBubble"><p class="who"><span class="ico" aria-hidden="true"></span><b>Cognitio</b></p><p id="cgText" aria-live="polite"></p><div class="mini"><button id="cgNext" type="button" hidden>Suite ›</button><button id="cgHide" type="button">Masquer</button></div></div>
   </aside>
   <section id="dock" class="dock" aria-label="Lieu courant" tabindex="-1"></section>
@@ -43,20 +36,6 @@
 <aside id="vision" class="panel" hidden role="dialog" aria-modal="false" aria-labelledby="visionTitle"></aside>
 <aside id="sheet" class="panel" hidden role="dialog" aria-modal="false" aria-label="Fiche"></aside>
 <aside id="selection" class="panel" hidden role="dialog" aria-modal="false" aria-labelledby="selTitle"></aside>
-<aside id="pitch" class="panel left" hidden role="dialog" aria-modal="false" aria-labelledby="pitchTitle"></aside>
-
-<section id="intro" class="intro" aria-labelledby="introTitle">
-  <div class="card">
-    <div class="brand"><span id="introMark" class="ico" aria-hidden="true"></span><span id="introText" class="wordmark">Lefebvre Dalloz<small>Compétences</small></span></div>
-    <h1 id="introTitle">Bibliothèque des compétences</h1>
-    <p class="lead">Une visite pour présenter la vision de Lefebvre Dalloz, partir du besoin d'un client et composer une sélection de formations, sur la base du catalogue 2027 et du référentiel ROME 4.0.</p>
-    <div class="modes">
-      <button id="goExplore" class="mode main" type="button"><b>Explorer librement</b><span>Se promener dans la Grande salle puis dans les six univers.</span></button>
-      <button id="goPitch" class="mode" type="button"><b>Pitch guidé · 3 à 5 min</b><span>Six étapes, de l'ADN à la prochaine étape.</span></button>
-    </div>
-    <p class="note">Fonctionne hors ligne. Rien ne quitte cet ordinateur.</p>
-  </div>
-</section>
 
 <section id="trans" class="trans" aria-hidden="true">
   <div class="stage">
@@ -94,7 +73,7 @@
 
 <section id="static" class="static" hidden aria-labelledby="staticTitle"></section>
 
-<div id="veil" class="veil" aria-hidden="true"></div>
+<div id="veil" class="veil on" aria-hidden="true"></div>
 <div id="hint" class="hint" aria-live="polite"></div>
 <div id="toast" class="toast" role="status" hidden></div>
 <div id="print" class="print" aria-hidden="true"></div>
@@ -117,7 +96,6 @@
 <script src="src/vision.js"></script>
 <script src="src/sheet.js"></script>
 <script src="src/selection.js"></script>
-<script src="src/pitch.js"></script>
 <script src="src/app.js"></script>
 </body>
 </html>

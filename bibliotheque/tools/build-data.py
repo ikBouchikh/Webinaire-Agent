@@ -220,7 +220,7 @@ def bundle_content():
     br = out.get('brand', {})
     for k in ('logo', 'symbole'):
         if br.get(k):
-            br[k]['disponible'] = os.path.exists(os.path.join(ROOT, br[k]['svg']))
+            br[k]['disponible'] = os.path.exists(os.path.join(ROOT, br[k]['fichier']))
     tr = out.get('transition', {}).get('video')
     if tr:
         tr['disponible'] = {k: os.path.exists(os.path.join(ROOT, tr[k])) for k in ('webm', 'mp4', 'poster') if tr.get(k)}

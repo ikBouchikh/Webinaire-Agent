@@ -1,4 +1,4 @@
-/* Monde 2 : six univers contemporains, chauds et tactiles (microciment, bois clair, plâtre clay, verre).
+/* Monde 2 (provisoire, refait au lot D) : six univers contemporains, chauds et tactiles (microciment, bois clair, plâtre clay, verre).
    Même gabarit pour tous : une salle en longueur, un mur-écran en dégradé tone sur tone, un « accueil » avec
    l'installation de l'univers, puis une station par domaine (en-tête à la forme récurrente + vitrine de produits).
    Les produits vitrines et les intitulés viennent du catalogue ; rien n'est écrit à la main. */
@@ -15,7 +15,7 @@
   const tagTex = (text, A, w = 512, h = 224) => {
     const [c, g] = T.mk(w, h); g.clearRect(0, 0, w, h); g.fillStyle = C.clay1; T.brand(g, 4, 4, w - 8, h - 8, 28); g.fill();
     g.save(); T.brand(g, 4, 4, w - 8, h - 8, 28); g.clip(); g.fillStyle = A.main; g.fillRect(0, 0, 14, h); g.restore();
-    g.fillStyle = C.redInk; g.font = `500 ${h * .2}px ${L.MONO}`; g.textAlign = 'center'; g.textBaseline = 'middle'; T.spaced(g, 2); g.fillText(text.toUpperCase(), w / 2 + 6, h / 2 + 4, w - 60); T.spaced(g, 0);
+    g.fillStyle = C.navyD; g.font = `500 ${h * .2}px ${L.MONO}`; g.textAlign = 'center'; g.textBaseline = 'middle'; T.spaced(g, 2); g.fillText(text.toUpperCase(), w / 2 + 6, h / 2 + 4, w - 60); T.spaced(g, 0);
     return T.tex(c, { own: true });
   };
   const faceMat = (map) => new THREE.MeshBasicMaterial({ map, transparent: true, side: THREE.DoubleSide });
@@ -26,7 +26,7 @@
   const HERO = {
     /* Droit — la chambre des sources : textes, jurisprudence, doctrine, reliés par une chaîne de preuve. */
     droit(g, A) {
-      const pal = [C.clay1, C.clay4, C.redDeep, C.clay3, C.clay1, C.clay5];
+      const pal = [C.clay1, C.clay4, C.navy, C.clay3, C.clay1, C.clay5];
       const dais = mesh(new THREE.CylinderGeometry(2.9, 3.0, .12, 64), std({ color: C.clay3, roughness: .8 }), true); dais.position.set(0, .06, -4.0); g.add(dais);
       for (let i = 0; i < 13; i++) {
         const a = (i / 12 - .5) * 2.1, h = 1.7 + 1.3 * Math.cos(a * 1.3) , col = i === 6 ? A.main : pal[i % pal.length], s = box(.36, h, .17, std({ color: col, roughness: .68 }), true);
@@ -70,21 +70,23 @@
       [[1.1, C.red], [1.9, C.ocre], [2.7, C.blue]].forEach(([rad, col], i) => { const t = mesh(new THREE.TorusGeometry(rad, .03, 8, 96), new THREE.MeshBasicMaterial({ color: col })); t.rotation.x = PI / 2; t.position.set(0, .025, -3.4); g.add(t); });
     },
 
-    /* Service public — la cartographie des missions : relief hexagonal d'un territoire, missions repérées et reliées. */
-    public(g, A) {
-      const r = T.rng(31), top = .5, base = mesh(new THREE.CylinderGeometry(3.3, 3.4, top, 72), std({ map: T.ashWood(), roughness: .6 }), true); base.position.set(0, top / 2, -4.2); g.add(base);
-      const pal = [C.clay1, C.clay3, C.clay4, C.clay5, C.clay2], s = .4, hl = [], tiles = [];
-      for (let q = -3; q <= 3; q++) for (let rr = -3; rr <= 3; rr++) {
-        if (Math.abs(q + rr) > 3) continue;
-        const h = .06 + r() * .34, x = s * Math.sqrt(3) * (q + rr / 2), z = s * 1.5 * rr, hx = mesh(new THREE.CylinderGeometry(s * .95, s * .95, h, 6), std({ color: pal[(r() * pal.length) | 0], roughness: .7 }), true);
-        hx.rotation.y = PI / 6; hx.position.set(x, top + h / 2, -4.2 + z); g.add(hx); tiles.push({ x, z, h });
-      }
-      [3, 11, 19, 27, 33].forEach((i, k) => { const t = tiles[i % tiles.length], col = [C.red, C.ocre, C.blue, C.red, C.ocre][k]; const pin = mesh(new THREE.CylinderGeometry(.018, .018, .7, 8), new THREE.MeshBasicMaterial({ color: col })); pin.position.set(t.x, top + t.h + .35, -4.2 + t.z); g.add(pin); const hd = mesh(new THREE.SphereGeometry(.09, 14, 12), new THREE.MeshBasicMaterial({ color: col })); hd.position.set(t.x, top + t.h + .72, -4.2 + t.z); g.add(hd); hl.push(new THREE.Vector3(t.x, top + t.h + .72, -4.2 + t.z)); });
-      for (let i = 0; i < hl.length - 1; i++) { const a = hl[i], b = hl[i + 1], mid = a.clone().lerp(b, .5).add(new THREE.Vector3(0, .55, 0)); g.add(tube([a, mid, b], A.main, .012, 24)); }
+    /* Technologies numériques — le laboratoire des outils : un réseau en couches (données, modèles, usages) sur un socle. */
+    tech(g, A) {
+      const r = T.rng(31), dais = mesh(new THREE.CylinderGeometry(3.1, 3.2, .12, 64), std({ color: C.clay3, roughness: .8 }), true); dais.position.set(0, .06, -4.2); g.add(dais);
+      const layers = [4, 6, 6, 3], layerCol = [C.blue, A.main, C.clay1, C.navy], P = [];
+      layers.forEach((n, li) => {
+        const row = []; for (let i = 0; i < n; i++) {
+          const p = new THREE.Vector3((li - 1.5) * 1.5, 1.45 + (i - (n - 1) / 2) * .46 + 1.15, -4.2 + (r() - .5) * .5); row.push(p);
+          const nd = mesh(new THREE.SphereGeometry(.1 + r() * .05, 18, 14), std({ color: layerCol[li], roughness: .45, metalness: .1 }), true); nd.position.copy(p); g.add(nd);
+        } P.push(row);
+      });
+      const seg = []; for (let li = 0; li < P.length - 1; li++) P[li].forEach((a) => P[li + 1].forEach((b) => { if (r() > .38) seg.push(a, b); }));
+      g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(seg), new THREE.LineBasicMaterial({ color: '#46586A', transparent: true, opacity: .5 })));
+      ['Data', 'IA', 'Cyber'].forEach((t, i) => { const tg = flat(1.0, .44, .09, tagTex(t, A, 384, 168)); tg.position.set((i - 1) * 1.7, 3.95 + (i % 2) * .22, -3.9); g.add(tg); });
     },
 
-    /* Management, Soft skills & Numérique — l'arène de situations : gradins, cartes de situation autour d'un pupitre. */
-    mgmt(g, A) {
+    /* Soft Skills — l'arène de situations : gradins, cartes de situation autour d'un pupitre. */
+    soft(g, A) {
       const r = T.rng(41), woods = [std({ map: T.ashWood(), roughness: .6 }), std({ color: C.clay3, roughness: .8 }), std({ color: C.clay4, roughness: .8 })];
       [[2.9, .16], [2.3, .32], [1.7, .48]].forEach(([rad, h], i) => { const c = mesh(new THREE.CylinderGeometry(rad, rad + .04, h, 72), woods[i], true); c.position.set(0, h / 2, -4.2); g.add(c); });
       const ped = mesh(new THREE.CylinderGeometry(.5, .56, .9, 32), woods[0], true); ped.position.set(0, .48 + .45, -4.2); g.add(ped);
