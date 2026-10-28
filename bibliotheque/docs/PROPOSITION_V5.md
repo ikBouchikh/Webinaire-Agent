@@ -1,5 +1,7 @@
 # Proposition V5 — à valider avant de construire
 
+> **Révision 1 (28/10/2026)** : la version à jour est le document en ligne https://claude.ai/artifact/6a4uoGytGKAvAwJqF3EAzM . Elle ajoute le copilote commercial (besoin, pistes avec « pourquoi », comparateur, « Ma solution client », « Mon pitch »), un état honnête des données disponibles, et remplace les quatre pages du livre par ADN / expertise / métier / aujourd'hui. Ce fichier est conservé tel que remis en révision 0.
+
 Rien n'est codé à ce stade. Ce document décrit ce que je propose de construire ; on le valide (ou on le corrige) ensemble, puis je compile.
 
 ## 0. Ce que j'ai compris
